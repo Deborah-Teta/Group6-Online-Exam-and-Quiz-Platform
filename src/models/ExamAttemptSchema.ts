@@ -41,3 +41,49 @@ const answerSchema = new Schema<IAnswer>(
 );
 
 
+const examAttemptSchema = new Schema<IExamAttempt>(
+    {
+        examId: {
+            type: Schema.Types.ObjectId,
+            ref: "Exam",
+            required: true,
+        },
+        studentId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        answers: {
+            type: [answerSchema],
+            default: [],
+        },
+        startedAt: {
+            type: Date,
+            required: true,
+            default: Date.now,
+        },
+        submittedAt: Date,
+        status: {
+            type: String,
+            enum: ["in_progress", "submitted", "auto_submitted"],
+            default: "in_progress",
+        },
+        score: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        totalPoints: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        percentage: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 100,
+        },
+    },
+    { timestamps: true }
+);
