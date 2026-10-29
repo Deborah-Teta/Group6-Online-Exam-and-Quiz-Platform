@@ -12,4 +12,6 @@ const classMemberSchema = new Schema<IClassMember>({
     joinedAt:{type:Date,default:Date.now},
 })
 
+
+
 export const classMemberModel = mongoose.model<IClassMember>("ClassMember", classMemberSchema);
