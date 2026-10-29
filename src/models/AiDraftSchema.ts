@@ -17,3 +17,62 @@ export interface IAIDraft extends Document {
 }
 
 
+const aiDraftSchema = new Schema<IAIDraft>(
+    {
+        generationId: {
+            type: Schema.Types.ObjectId,
+            ref: "AIGeneration",
+            required: true,
+        },
+        teacherId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        type: {
+            type: String,
+            enum: ["multiple_choice", "true_false"],
+            required: true,
+        },
+        questionText: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        options: {
+            type: [
+                {
+                    text: { type: String, required: true, trim: true },
+                    isCorrect: { type: Boolean, required: true },
+                },
+            ],
+            required: true,
+            validate: {
+                validator: (options: { text: string; isCorrect: boolean }[]) =>
+                    options.length >= 2 &&
+                    options.filter((o) => o.isCorrect).length === 1 &&
+                    new Set(options.map((o) => o.text.trim().toLowerCase())).size ===
+                    options.length,
+                message: "Draft options must be unique with one correct answer.",
+            },
+        },
+        explanation: String,
+        difficulty: {
+            type: String,
+            enum: ["easy", "medium", "hard"],
+            default: "medium",
+        },
+        points: {
+            type: Number,
+            min: 1,
+            default: 1,
+        },
+        reviewStatus: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: "pending",
+        },
+        reviewedAt: Date,
+    },
+    { timestamps: true }
+);
