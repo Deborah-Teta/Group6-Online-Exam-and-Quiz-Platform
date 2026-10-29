@@ -15,3 +15,5 @@ export interface IAIDraft extends Document {
     reviewStatus: "pending" | "approved" | "rejected";
     reviewedAt?: Date;
 }
+
+
