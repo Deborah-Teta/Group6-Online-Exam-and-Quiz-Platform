@@ -25,6 +25,10 @@ const userSchema = new Schema<IUser>({
             return this.role === "teacher" ? "pending" : "approved";
         },
     },
+    isBlocked: {
+        type: Boolean,
+        default: false,
+    },
 },{timestamps:true})
 
 export const userModel = mongoose.model<IUser>("User", userSchema);
