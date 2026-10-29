@@ -18,3 +18,4 @@ export interface IExamAttempt extends Document {
     totalPoints: number;
     percentage: number;
 }
+
