@@ -90,6 +90,9 @@ const examAttemptSchema = new Schema<IExamAttempt>(
     { timestamps: true }
 );
 
-
+examAttemptSchema.index(
+    { examId: 1, studentId: 1 },
+    { unique: true }
+);
 
 export const examAttemptModel = mongoose.model<IExamAttempt>("ExamAttempt",examAttemptSchema);
