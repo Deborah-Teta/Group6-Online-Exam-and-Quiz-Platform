@@ -7,3 +7,14 @@ export interface IAnswer {
     awardedPoints?: number;
 }
 
+export interface IExamAttempt extends Document {
+    examId: mongoose.Types.ObjectId;
+    studentId: mongoose.Types.ObjectId;
+    answers: IAnswer[];
+    startedAt: Date;
+    submittedAt?: Date;
+    status: "in_progress" | "submitted" | "auto_submitted";
+    score: number;
+    totalPoints: number;
+    percentage: number;
+}
