@@ -62,3 +62,4 @@ const examSchema = new Schema<IExam>(
     },
     { timestamps: true }
 );
+
