@@ -12,6 +12,9 @@ const classMemberSchema = new Schema<IClassMember>({
     joinedAt:{type:Date,default:Date.now},
 })
 
-
+classMemberSchema.index(
+    { classId: 1, studentId: 1 },
+    { unique: true }
+);
 
 export const classMemberModel = mongoose.model<IClassMember>("ClassMember", classMemberSchema);
