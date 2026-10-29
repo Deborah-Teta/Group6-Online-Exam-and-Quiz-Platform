@@ -7,6 +7,7 @@ export interface IUser extends Document{
     resetCode?: string;
     resetCodeExpires?: Date;
     approvalStatus: "pending" | "approved" | "rejected";
+    isBlocked: boolean;
 }
 
 const userSchema = new Schema<IUser>({
