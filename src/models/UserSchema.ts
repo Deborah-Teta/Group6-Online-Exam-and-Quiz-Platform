@@ -18,6 +18,13 @@ const userSchema = new Schema<IUser>({
     role:{type:String,required:true,enum:["admin" ,"student" ,"teacher"],default:"student"},
     resetCode:{type:String},
     resetCodeExpires:{type:Date},
+    approvalStatus: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+        default: function () {
+            return this.role === "teacher" ? "pending" : "approved";
+        },
+    },
 },{timestamps:true})
 
 export const userModel = mongoose.model<IUser>("User", userSchema);
