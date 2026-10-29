@@ -19,3 +19,23 @@ export interface IExamAttempt extends Document {
     percentage: number;
 }
 
+const answerSchema = new Schema<IAnswer>(
+    {
+        questionId: {
+            type: Schema.Types.ObjectId,
+            ref: "Question",
+            required: true,
+        },
+        selectedOptionIndex: {
+            type: Number,
+            default: null,
+            min: 0,
+        },
+        isCorrect: Boolean,
+        awardedPoints: {
+            type: Number,
+            min: 0,
+        },
+    },
+    { _id: false }
+);
