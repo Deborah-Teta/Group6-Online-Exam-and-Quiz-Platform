@@ -29,7 +29,10 @@ const userSchema = new Schema<IUser>({
         type: Boolean,
         default: false,
     },
-    
+    blockedReason: {
+        type: String,
+        trim: true,
+    },
 },{timestamps:true})
 
 export const userModel = mongoose.model<IUser>("User", userSchema);
