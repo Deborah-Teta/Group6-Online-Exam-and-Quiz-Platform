@@ -47,11 +47,13 @@ const examAttemptSchema = new Schema<IExamAttempt>(
             type: Schema.Types.ObjectId,
             ref: "Exam",
             required: true,
+            index:true,
         },
         studentId: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+            index:true,
         },
         answers: {
             type: [answerSchema],
@@ -87,3 +89,4 @@ const examAttemptSchema = new Schema<IExamAttempt>(
     },
     { timestamps: true }
 );
+
