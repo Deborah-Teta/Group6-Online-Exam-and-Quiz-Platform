@@ -63,3 +63,4 @@ const examSchema = new Schema<IExam>(
     { timestamps: true }
 );
 
+export const examModel =  mongoose.model<IExam>("Exam", examSchema);
