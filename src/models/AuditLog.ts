@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-xport interface IAuditLog extends Document {
+export interface IAuditLog extends Document {
     adminId: mongoose.Types.ObjectId;
     targetUserId: mongoose.Types.ObjectId;
     action:
