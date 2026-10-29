@@ -31,6 +31,7 @@ const questionSchema = new Schema<IQuestion>(
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+            index:true
         },
         topic: { type: String, required: true, trim: true },
         type: {
