@@ -5,3 +5,7 @@ export interface IClassMember extends Document{
     studentId: mongoose.Types.ObjectId;
     joinedAt: Date;
 }
+
+const classMemberSchema = new Schema<IClassMember>({
+    classId:{type:mongoose.Types.ObjectId,ref:"Class",required:true},
+})
