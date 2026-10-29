@@ -95,4 +95,5 @@ examAttemptSchema.index(
     { unique: true }
 );
 
+
 export const examAttemptModel = mongoose.model<IExamAttempt>("ExamAttempt",examAttemptSchema);
