@@ -5,3 +5,14 @@ export interface IOption {
     isCorrect: boolean;
 }
 
+export interface IQuestion extends Document {
+    teacherId: mongoose.Types.ObjectId;
+    topic: string;
+    type: "multiple_choice" | "true_false";
+    questionText: string;
+    options: IOption[];
+    explanation?: string;
+    points: number;
+    difficulty: "easy" | "medium" | "hard";
+    source: "manual" | "ai";
+}
