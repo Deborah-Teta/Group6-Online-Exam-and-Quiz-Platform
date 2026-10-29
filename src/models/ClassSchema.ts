@@ -14,4 +14,4 @@ const classSchema = new Schema<IClass>({
     classCode:{type:String,required:true,trim:true,uppercase:true,unique:true},
     teacherId:{type:mongoose.Types.ObjectId,ref:"User",required:true},
     isActive:{type:Boolean,default:true},
-})
+},{timestamps:true})
