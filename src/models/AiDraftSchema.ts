@@ -78,3 +78,5 @@ const aiDraftSchema = new Schema<IAIDraft>(
     },
     { timestamps: true }
 );
+
+export const aiDraftModel = mongoose.model<IAIDraft>("AIDraft", aiDraftSchema);
