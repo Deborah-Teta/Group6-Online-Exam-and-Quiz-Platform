@@ -6,6 +6,7 @@ export interface IUser extends Document{
     role:"admin" | "student" | "teacher",
     resetCode?: string;
     resetCodeExpires?: Date;
+    approvalStatus: "pending" | "approved" | "rejected";
 }
 
 const userSchema = new Schema<IUser>({
