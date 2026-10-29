@@ -19,6 +19,7 @@ const aiGenerationSchema = new Schema<IAIGeneration>(
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+            index:true
         },
         sourceNotes: {
             type: String,
@@ -59,3 +60,5 @@ const aiGenerationSchema = new Schema<IAIGeneration>(
     },
     { timestamps: true }
 );
+
+export const aiGenerationModel = mongoose.model<IAIGeneration>("AiGeneration", aiGenerationSchema);
