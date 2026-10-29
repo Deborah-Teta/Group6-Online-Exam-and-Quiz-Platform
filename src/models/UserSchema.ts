@@ -8,6 +8,7 @@ export interface IUser extends Document{
     resetCodeExpires?: Date;
 }
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
     fullName:{type:String,required:true},
+    email:{type:String,required:true,unique:true},
 },{timestamps:true})
