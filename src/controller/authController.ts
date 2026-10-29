@@ -38,7 +38,23 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
             return res.status(400).json({error: "Email and Password are all required"})
         }
 
+        const user = await userModel.findOne({email})
+        if(!user){
+            return res.status(400).json({error: 'no user with this email or password'});
+        }
 
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if(!isPasswordCorrect){
+            return res.status(400).json({error: 'no user with this email or password'});
+        }
+
+
+        const token = jwt.sign(
+            {userId:user._id,role:user.role,name:user.name},
+            process.env.JWT_SECRET as string,
+            {expiresIn:"1d"})
+
+        return  res.status(200).json({message:"Login successful",token:token});
     }catch(e){
         console.log(e)
         return res.status(500).send({message:"Something went wrong",e})
