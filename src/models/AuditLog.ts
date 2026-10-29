@@ -17,6 +17,7 @@ const auditLogSchema = new Schema<IAuditLog>(
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
+            index:true,
         },
         action: {
             type: String,
@@ -32,3 +33,5 @@ const auditLogSchema = new Schema<IAuditLog>(
     },
     { timestamps: true }
 );
+
+export const auditLogModel = mongoose.model<IAuditLog>("AuditLog", auditLogSchema);
