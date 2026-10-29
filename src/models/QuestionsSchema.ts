@@ -16,3 +16,11 @@ export interface IQuestion extends Document {
     difficulty: "easy" | "medium" | "hard";
     source: "manual" | "ai";
 }
+
+const optionSchema = new Schema<IOption>(
+    {
+        text: { type: String, required: true, trim: true },
+        isCorrect: { type: Boolean, required: true },
+    },
+    { _id: false }
+);
