@@ -15,10 +15,6 @@ export const registerUser = async (req: express.Request, res: express.Response) 
             return res.status(400).json({error: "no user with this email or password"})
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password,user.password)
-        if(!isPasswordCorrect){
-            return res.status(400).json({error: "Password incorrect or password"})
-        }
 
         const hashedPassword = await bcrypt.hash(password,10)
         await userModel.create({
@@ -30,6 +26,21 @@ export const registerUser = async (req: express.Request, res: express.Response) 
             user: { fullName, email }
         });
     }catch(e){
-        res.status(500).send({message:"Something went wrong"})
+        console.log(e)
+        return res.status(500).send({message:"Something went wrong",e})
+    }
+}
+
+export const loginUser = async (req: express.Request, res: express.Response) => {
+    try{
+        const {email, password} = req.body
+        if(!email || !password){
+            return res.status(400).json({error: "Email and Password are all required"})
+        }
+
+
+    }catch(e){
+        console.log(e)
+        return res.status(500).send({message:"Something went wrong",e})
     }
 }
