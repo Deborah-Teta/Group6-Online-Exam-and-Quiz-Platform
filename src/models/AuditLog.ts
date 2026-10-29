@@ -5,3 +5,30 @@ export interface IAuditLog extends Document {
     action: "approve_teacher" | "reject_teacher" | "block_user" | "unblock_user";
     reason?: string;
 }
+
+const auditLogSchema = new Schema<IAuditLog>(
+    {
+        adminId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        targetUserId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        action: {
+            type: String,
+            enum: [
+                "approve_teacher",
+                "reject_teacher",
+                "block_user",
+                "unblock_user",
+            ],
+            required: true,
+        },
+        reason: String,
+    },
+    { timestamps: true }
+);
