@@ -90,3 +90,4 @@ const examAttemptSchema = new Schema<IExamAttempt>(
     { timestamps: true }
 );
 
+export const examAttemptModel = mongoose.model<IExamAttempt>("ExamAttempt",examAttemptSchema);
