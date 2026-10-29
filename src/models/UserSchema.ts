@@ -3,7 +3,7 @@ export interface IUser extends Document{
     fullName: string,
     email: string,
     password: string,
-    role:"Admin" | "Student" | "Teacher",
+    role:"admin" | "student" | "teacher",
     resetCode?: string;
     resetCodeExpires?: Date;
 }
@@ -12,4 +12,9 @@ const userSchema = new Schema<IUser>({
     fullName:{type:String,required:true},
     email:{type:String,required:true,unique:true},
     password:{type:String,required:true},
+    role:{type:String,required:true,enum:["admin" ,"student" ,"teacher"],default:"student"},
+    resetCode:{type:String},
+    resetCodeExpires:{type:Date},
 },{timestamps:true})
+
+export const userModel = mongoose.model<IUser>("User", userSchema);
