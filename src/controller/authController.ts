@@ -1,7 +1,7 @@
 import express from "express"
 import {userModel} from "../models/UserSchema.js";
 import bcrypt from "bcrypt"
-
+import jwt from "jsonwebtoken"
 
 
 export const registerUser = async (req: express.Request, res: express.Response) => {
@@ -50,7 +50,7 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
 
 
         const token = jwt.sign(
-            {userId:user._id,role:user.role,name:user.name},
+            {userId:user._id,role:user.role,name:user.fullName},
             process.env.JWT_SECRET as string,
             {expiresIn:"1d"})
 
