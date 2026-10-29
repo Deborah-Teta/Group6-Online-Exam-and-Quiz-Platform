@@ -72,6 +72,7 @@ const aiDraftSchema = new Schema<IAIDraft>(
             type: String,
             enum: ["pending", "approved", "rejected"],
             default: "pending",
+            index:true
         },
         reviewedAt: Date,
     },
