@@ -10,4 +10,6 @@ export interface IClass extends Document{
 
 const classSchema = new Schema<IClass>({
     name:{type:String,required:true,trim:true},
+    description:{type:String,required:true,trim:true},
+    classCode:{type:String,required:true,trim:true,uppercase:true},
 })
