@@ -12,5 +12,6 @@ const classSchema = new Schema<IClass>({
     name:{type:String,required:true,trim:true},
     description:{type:String,required:true,trim:true},
     classCode:{type:String,required:true,trim:true,uppercase:true,unique:true},
-    teacherId:{type:mongoose.Types.ObjectId,required:true,unique:true},
+    teacherId:{type:mongoose.Types.ObjectId,ref:"User",required:true},
+    isActive:{type:Boolean,default:true},
 })
