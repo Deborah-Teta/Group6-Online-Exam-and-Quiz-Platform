@@ -33,7 +33,7 @@ const questionSchema = new Schema<IQuestion>(
             required: true,
             index:true
         },
-        topic: { type: String, required: true, trim: true },
+        topic: { type: String, required: true, trim: true,index:true },
         type: {
             type: String,
             enum: ["multiple_choice", "true_false"],
