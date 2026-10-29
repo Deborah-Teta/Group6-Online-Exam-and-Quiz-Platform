@@ -21,7 +21,7 @@ const aiDraftSchema = new Schema<IAIDraft>(
     {
         generationId: {
             type: Schema.Types.ObjectId,
-            ref: "AIGeneration",
+            ref: "AiGeneration",
             required: true,
         },
         teacherId: {
