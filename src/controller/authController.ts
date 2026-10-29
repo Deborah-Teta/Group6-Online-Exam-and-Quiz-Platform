@@ -11,7 +11,7 @@ export const registerUser = async (req: express.Request, res: express.Response) 
             return res.status(400).json({error: "Names,Email and Password are all required"})
         }
         const user = await userModel.findOne({email})
-        if(!user){
+        if(user){
             return res.status(400).json({error: "no user with this email or password"})
         }
 
