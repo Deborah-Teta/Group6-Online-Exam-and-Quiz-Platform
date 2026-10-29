@@ -75,3 +75,5 @@ const questionSchema = new Schema<IQuestion>(
     },
     { timestamps: true }
 );
+
+export const questionModel = mongoose.model<IQuestion>("Question", questionSchema);
