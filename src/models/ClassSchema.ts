@@ -15,3 +15,5 @@ const classSchema = new Schema<IClass>({
     teacherId:{type:mongoose.Types.ObjectId,ref:"User",required:true,index:true},
     isActive:{type:Boolean,default:true},
 },{timestamps:true})
+
+export const classModel = mongoose.model<IClass>("Class", classSchema);
