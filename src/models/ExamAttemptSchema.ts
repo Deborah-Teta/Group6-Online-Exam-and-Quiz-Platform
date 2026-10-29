@@ -6,3 +6,4 @@ export interface IAnswer {
     isCorrect?: boolean;
     awardedPoints?: number;
 }
+
