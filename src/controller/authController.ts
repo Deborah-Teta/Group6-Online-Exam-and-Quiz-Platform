@@ -21,7 +21,7 @@ export const registerUser = async (req: express.Request, res: express.Response) 
 
         const hashedPassword = await bcrypt.hash(password,10)
         await userModel.create({
-            fullName,email,password:hashedPassword
+            fullName,email,password:hashedPassword,role:userRole
         })
 
         return res.status(201).json({
