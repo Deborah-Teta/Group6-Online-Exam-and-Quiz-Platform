@@ -59,6 +59,10 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
             return res.status(403).json({error: "Your account is waiting for admin approval."});
         }
 
+        if (user.role === "teacher" && user.approvalStatus === "rejected") {
+            return res.status(403).json({error: "Your teacher registration was rejected."});
+        }
+
         const token = jwt.sign(
             {userId:user._id,role:user.role,name:user.fullName},
             process.env.JWT_SECRET as string,
