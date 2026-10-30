@@ -12,7 +12,7 @@ export const registerUser = async (req: express.Request, res: express.Response) 
         }
 
         const allowedRoles = ["student","teacher"]
-        
+        const userRole = role && allowedRoles.includes(role) ? role : "student";
         const user = await userModel.findOne({email})
         if(user){
             return res.status(400).json({error: 'Email already exists'})
