@@ -51,6 +51,10 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
             return res.status(400).json({error: 'no user with this email or password'});
         }
 
+        if(user.isBlocked){
+            return res.status(403).json({error: "Your account has been blocked. Contact the administrator."});
+        }
+
 
         const token = jwt.sign(
             {userId:user._id,role:user.role,name:user.fullName},
