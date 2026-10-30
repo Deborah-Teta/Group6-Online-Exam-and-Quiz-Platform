@@ -61,4 +61,5 @@ const aiGenerationSchema = new Schema<IAIGeneration>(
     { timestamps: true }
 );
 
+
 export const aiGenerationModel = mongoose.model<IAIGeneration>("AiGeneration", aiGenerationSchema);
