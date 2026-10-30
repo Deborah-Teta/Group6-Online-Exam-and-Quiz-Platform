@@ -49,7 +49,7 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
 
         const user = await userModel.findOne({email}).select("+password")
         if(!user){
-            return res.status(400).json({error: 'no user with this email or password'});
+            return res.status(401).json({error: 'no user with this email or password'});
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
