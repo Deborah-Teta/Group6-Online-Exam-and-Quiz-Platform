@@ -54,7 +54,7 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if(!isPasswordCorrect){
-            return res.status(400).json({error: 'no user with this email or password'});
+            return res.status(401).json({error: 'no user with this email or password'});
         }
 
         if(user.isBlocked){
