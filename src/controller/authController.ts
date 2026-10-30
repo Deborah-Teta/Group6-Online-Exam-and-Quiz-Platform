@@ -26,7 +26,7 @@ export const registerUser = async (req: express.Request, res: express.Response) 
 
         return res.status(201).json({
             message: "User created",
-            user: { fullName, email }
+            user: { fullName, email,role }
         });
     }catch(e){
         console.log(e)
@@ -41,7 +41,7 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
             return res.status(400).json({error: "Email and Password are all required"})
         }
 
-        const user = await userModel.findOne({email})
+        const user = await userModel.findOne({email}).select("password")
         if(!user){
             return res.status(400).json({error: 'no user with this email or password'});
         }
