@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken"
 
 export const registerUser = async (req: express.Request, res: express.Response) => {
     try{
-        const {fullName, email, password} = req.body
+        const {fullName, email, password,role} = req.body
         if(!fullName || !email || !password){
             return res.status(400).json({error: "Names,Email and Password are all required"})
         }
