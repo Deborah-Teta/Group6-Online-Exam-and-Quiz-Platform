@@ -11,8 +11,13 @@ export const registerUser = async (req: express.Request, res: express.Response) 
             return res.status(400).json({error: "Names,Email and Password are all required"})
         }
 
-        const allowedRoles = ["student","teacher"]
-        const userRole = role && allowedRoles.includes(role) ? role : "student";
+        if (role && !allowedRoles.includes(role)) {
+            return res.status(400).json({
+                error: "Invalid role"
+            });
+        }
+
+        const userRole = role || "student";
         const user = await userModel.findOne({email})
         if(user){
             return res.status(400).json({error: 'Email already exists'})
