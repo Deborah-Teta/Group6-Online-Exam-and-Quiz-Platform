@@ -10,9 +10,11 @@ export const registerUser = async (req: express.Request, res: express.Response) 
         if(!fullName || !email || !password){
             return res.status(400).json({error: "Names,Email and Password are all required"})
         }
+
+        
         const user = await userModel.findOne({email})
         if(user){
-            return res.status(400).json({error: "no user with this email or password"})
+            return res.status(400).json({error: 'Email already exists'})
         }
 
 
