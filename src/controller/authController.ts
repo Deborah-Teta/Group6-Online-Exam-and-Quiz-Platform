@@ -55,6 +55,9 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
             return res.status(403).json({error: "Your account has been blocked. Contact the administrator."});
         }
 
+        if (user.role === "teacher" && user.approvalStatus === "pending") {
+            return res.status(403).json({error: "Your account is waiting for admin approval."});
+        }
 
         const token = jwt.sign(
             {userId:user._id,role:user.role,name:user.fullName},
