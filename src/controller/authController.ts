@@ -11,6 +11,7 @@ export const registerUser = async (req: express.Request, res: express.Response) 
             return res.status(400).json({error: "Names,Email and Password are all required"})
         }
 
+        const allowedRoles = ["student","teacher"]
         if (role && !allowedRoles.includes(role)) {
             return res.status(400).json({
                 error: "Invalid role"
