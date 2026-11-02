@@ -43,7 +43,6 @@ export const approveTeacher = async (
             });
         }
 
-        // Find a pending teacher and approve them
         const teacher = await userModel.findOneAndUpdate(
             {
                 _id: teacherId,
