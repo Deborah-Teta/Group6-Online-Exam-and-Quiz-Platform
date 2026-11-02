@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import { userModel } from "../models/UserSchema.js";
-import { auditLogModel } from "../models/AuditLogSchema.js";
+
 
 export const getPendingTeachers = async (
     req: express.Request,
@@ -30,7 +30,6 @@ export const getPendingTeachers = async (
 };
 
 
-// Approve a teacher
 export const approveTeacher = async (
     req: express.Request,
     res: express.Response
