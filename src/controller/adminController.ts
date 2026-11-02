@@ -66,7 +66,7 @@ export const approveTeacher = async (
             });
         }
 
-        // Record the admin action
+
         const adminId = (req as any).user.userId;
 
         await auditLogModel.create({
