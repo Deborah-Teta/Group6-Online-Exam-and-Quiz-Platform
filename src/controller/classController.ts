@@ -31,7 +31,7 @@ export const createClass = async (
 
         } while (existingClass);
 
-        // Create the class
+
         const newClass = await classModel.create({
             name,
             description,
