@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import { userModel } from "../models/UserSchema.js";
 import { auditLogModel } from "../models/AuditLogSchema.js";
 
-// Get all teachers waiting for approval
 export const getPendingTeachers = async (
     req: express.Request,
     res: express.Response
