@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import { userModel } from "../models/UserSchema.js";
+import {auditLogModel} from "../models/AuditLog.js";
 
 
 export const getPendingTeachers = async (
