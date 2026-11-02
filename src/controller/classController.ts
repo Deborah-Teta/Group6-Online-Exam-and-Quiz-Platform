@@ -17,7 +17,6 @@ export const createClass = async (
 
         const teacherId = (req as any).user.userId;
 
-        // Generate a unique class code
         let classCode = "";
         let existingClass;
 
