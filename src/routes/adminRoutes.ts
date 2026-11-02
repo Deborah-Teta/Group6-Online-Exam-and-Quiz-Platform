@@ -12,7 +12,7 @@ router.get(
     getPendingTeachers
 );
 
-// Approve teacher
+
 router.patch(
     "/teachers/:teacherId/approve",
     authenticate,
