@@ -599,6 +599,7 @@ export const approveAIDraft = async (req: Request, res: Response) => {
             );
         });
 
+
         return res.status(201).json({
             message: "AI draft approved and saved as a question.",
             question: createdQuestion
