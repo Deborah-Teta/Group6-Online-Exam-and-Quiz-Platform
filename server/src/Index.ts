@@ -1,5 +1,5 @@
 import express from "express"
-import {dbConnection} from "./database/DatabaseConnection";
+import { dbConnection } from "./database/DatabaseConnection.js";
 import authRoute from "./routes/authRoute.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import classRoutes from "./routes/classRoutes.js";
