@@ -38,6 +38,11 @@ export const approveTeacher = async (
 ) => {
     try {
         const { teacherId } = req.params;
+        if (typeof teacherId !== "string") {
+            return res.status(400).json({
+                message: "Invalid teacher ID"
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(teacherId)) {
             return res.status(400).json({
