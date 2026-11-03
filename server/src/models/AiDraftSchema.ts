@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IAIDraft extends Document {
     generationId: mongoose.Types.ObjectId;
     teacherId: mongoose.Types.ObjectId;
+    topic: string;
     type: "multiple_choice" | "true_false";
     questionText: string;
     options: {
@@ -12,6 +13,7 @@ export interface IAIDraft extends Document {
     explanation?: string;
     difficulty: "easy" | "medium" | "hard";
     points: number;
+
     reviewStatus: "pending" | "approved" | "rejected";
     reviewedAt?: Date;
 }
@@ -29,6 +31,11 @@ const aiDraftSchema = new Schema<IAIDraft>(
             ref: "User",
             required: true,
             index:true
+        },
+        topic: {
+            type: String,
+            required: true,
+            trim: true,
         },
         type: {
             type: String,
