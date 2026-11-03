@@ -341,3 +341,117 @@ export const submitExam = async (
         });
     }
 };
+
+export const getAttemptResult = async (
+    req: express.Request,
+    res: express.Response
+) => {
+    try {
+        const { attemptId } = req.params;
+        const studentId = (req as any).user.userId;
+
+        if (!mongoose.Types.ObjectId.isValid(attemptId)) {
+            return res.status(400).json({
+                error: "Invalid attempt ID."
+            });
+        }
+
+        const attempt = await examAttemptModel.findOne({
+            _id: attemptId,
+            studentId
+        });
+
+        if (!attempt) {
+            return res.status(404).json({
+                error: "Exam attempt not found."
+            });
+        }
+
+        const exam = await examModel.findById(attempt.examId);
+
+        if (!exam) {
+            return res.status(404).json({
+                error: "Exam not found."
+            });
+        }
+
+        const now = new Date();
+
+        const deadline = new Date(
+            exam.startTime.getTime() +
+            exam.durationMinutes * 60 * 1000
+        );
+
+        const examClosed = exam.status === "closed" || now >= deadline;
+
+        if (
+            attempt.status === "in_progress" &&
+            examClosed
+        ) {
+            await finalizeAttempt(attempt, exam, true);
+        }
+
+        if (attempt.status === "in_progress") {
+            return res.status(403).json({
+                error: "You must submit your exam before viewing results."
+            });
+        }
+
+
+        const result: any = {
+            examTitle: exam.title,
+            score: attempt.score,
+            totalPoints: attempt.totalPoints,
+            percentage: attempt.percentage,
+            status: attempt.status,
+            submittedAt: attempt.submittedAt,
+            answersReleased: false
+        };
+
+        if (examClosed && exam.showAnswersAfterClose) {
+            const questions = await questionModel.find({
+                _id: { $in: exam.questionIds }
+            });
+
+            result.answersReleased = true;
+
+            result.answers = attempt.answers.map(answer => {
+                const question = questions.find(
+                    q => q._id.toString() === answer.questionId.toString()
+                );
+
+                if (!question) return null;
+
+                const correctOptionIndex = question.options.findIndex(
+                    option => option.isCorrect
+                );
+
+                return {
+                    questionId: question._id,
+                    questionText: question.questionText,
+                    options: question.options.map(option => option.text),
+                    selectedOptionIndex: answer.selectedOptionIndex,
+                    correctOptionIndex,
+                    correctAnswer: question.options[correctOptionIndex]?.text,
+                    isCorrect: answer.isCorrect,
+                    awardedPoints: answer.awardedPoints,
+                    explanation: question.explanation
+                };
+            });
+        } else {
+            result.message = "Correct answers will be available when the exam closes.";
+        }
+
+        return res.status(200).json({
+            message: "Exam result retrieved successfully.",
+            result
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            error: "Failed to retrieve exam result."
+        });
+    }
+};
