@@ -1,7 +1,7 @@
 import express from "express";
 import {authenticate} from "../middleware/authMiddleware.js";
 import {authorize} from "../middleware/roleMiddleware.js";
-import {createClass} from "../controller/classController.js";
+import {createClass, joinClass} from "../controller/classController.js";
 
 
 
@@ -12,6 +12,14 @@ router.post(
     authenticate,
     authorize("teacher"),
     createClass
+);
+
+
+router.post(
+    "/join",
+    authenticate,
+    authorize("student"),
+    joinClass
 );
 
 export default router;
