@@ -1,6 +1,7 @@
 import express from "express";
 import { classModel } from "../models/ClassSchema.js";
 import crypto from "crypto";
+import {classMemberModel} from "../models/ClassMember.js";
 
 
 export const createClass = async (
@@ -82,7 +83,6 @@ export const joinClass = async (
             });
         }
 
-        // Check whether student already joined
         const membership = await classMemberModel.findOne({
             classId: existingClass._id,
             studentId
