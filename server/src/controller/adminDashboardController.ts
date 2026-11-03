@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 import { userModel } from "../models/UserSchema.js";
 import { classModel } from "../models/ClassSchema.js";
 import { examModel } from "../models/ExamSchema.js";
-import { aiGenerationModel } from "../models/AIGenerationSchema.js";
-import { auditLogModel } from "../models/AuditLogSchema.js";
+import {auditLogModel} from "../models/AuditLog.js";
+import {aiGenerationModel} from "../models/AIgenerationSchema.js";
 
 
 export const getAllUsers = async (
