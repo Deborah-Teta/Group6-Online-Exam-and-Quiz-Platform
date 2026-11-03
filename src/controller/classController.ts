@@ -2,6 +2,7 @@ import express from "express";
 import { classModel } from "../models/ClassSchema.js";
 import crypto from "crypto";
 
+
 export const createClass = async (
     req: express.Request,
     res: express.Response
