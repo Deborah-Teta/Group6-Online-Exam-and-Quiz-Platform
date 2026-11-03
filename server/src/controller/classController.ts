@@ -55,7 +55,6 @@ export const createClass = async (
 };
 
 
-
 export const joinClass = async (
     req: express.Request,
     res: express.Response
