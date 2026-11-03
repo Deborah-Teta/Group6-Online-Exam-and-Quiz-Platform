@@ -136,3 +136,36 @@ export const createQuestion = async (
         });
     }
 };
+
+export const getMyQuestions = async (
+    req: express.Request,
+    res: express.Response
+) => {
+    try {
+        const teacherId = (req as any).user.userId;
+
+        const { topic } = req.query;
+
+        const filter: any = { teacherId };
+
+        if (topic) {
+            filter.topic = topic;
+        }
+
+        const questions = await questionModel
+            .find(filter)
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            count: questions.length,
+            questions
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            error: "Failed to retrieve questions"
+        });
+    }
+};
