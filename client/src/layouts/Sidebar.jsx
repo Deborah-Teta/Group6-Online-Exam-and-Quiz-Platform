@@ -12,7 +12,6 @@ import {
   X,
 } from "lucide-react";
 
-// Navigation links for each user role
 const navigationByRole = {
   teacher: [
     { label: "Overview", icon: Home, href: "/teacher/dashboard" },
