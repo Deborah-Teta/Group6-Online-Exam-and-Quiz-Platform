@@ -1,17 +1,26 @@
-﻿
+﻿import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
-import Sidebar from './layouts/Sidebar';
-import Navbar from './layouts/Navbar';
-import Footer from './layouts/Footer';
-import Dashboard from './layouts/Dashboard';
+import StudentLayout from './layouts/StudentLayout';
+import StudentDashboard from './pages/student/StudentDashboard';
+import StudentPlaceholder from './pages/student/StudentPlaceholder';
+
 function App() {
   return (
-    <div className= "min-h-screen  bg-white">
-      <Sidebar />
-      <Navbar />
-      <Dashboard />
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/" element={<Navigate to="/student/dashboard" replace />} />
+
+      <Route path="/student" element={<StudentLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<StudentDashboard />} />
+        <Route path="classes" element={<StudentPlaceholder title="My classes" />} />
+        <Route path="exams" element={<StudentPlaceholder title="My exams" />} />
+        <Route path="quizzes" element={<StudentPlaceholder title="My quizzes" />} />
+        <Route path="results" element={<StudentPlaceholder title="Results" />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
+    </Routes>
   );
 }
+
 export default App;
