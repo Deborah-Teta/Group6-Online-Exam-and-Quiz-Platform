@@ -20,7 +20,7 @@ function StudentLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#f7f7f2] text-left font-['DM_Sans',system-ui,sans-serif] [font-variation-settings:'opsz'_14]">
+    <div className="flex min-h-screen bg-[#f7f7f2] text-left font-['DM_Sans',system-ui,sans-serif] [color-scheme:light] [font-variation-settings:'opsz'_14]">
       <StudentSidebar
         student={mockStudent}
         isOpen={isSidebarOpen}
