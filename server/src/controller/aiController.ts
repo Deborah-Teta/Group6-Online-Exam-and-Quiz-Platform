@@ -592,6 +592,7 @@ export const approveAIDraft = async (req: Request, res: Response) => {
                 throw new Error("DRAFT_NOT_PENDING");
             }
 
+
             await aiGenerationModel.updateOne(
                 { _id: draft.generationId, teacherId },
                 { $inc: { acceptedCount: 1 } },
