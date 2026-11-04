@@ -24,8 +24,8 @@ const buildColumns = ({ nounTitle }, type) => [
     header: nounTitle,
     render: (item) => (
       <div className="flex flex-col gap-[4px]">
-        <p className="font-semibold">{item.title}</p>
-        <p className="text-[11px] text-muted">{item.details}</p>
+        <p className="text-sm font-bold text-slate-900">{item.title}</p>
+        <p className="text-xs text-slate-500">{item.details}</p>
       </div>
     ),
   },
@@ -83,33 +83,29 @@ function StudentAssessments({ type }) {
   };
 
   return (
-    <div className="flex flex-col gap-[24px]">
+    <>
       {/* Statistics */}
-      <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<ClipboardList size={20} strokeWidth={1.6} />}
-          color="indigo"
+          icon={<ClipboardList size={28} className="text-[#0B609D]" />}
           title={`All ${plural}`}
           value={items.length}
           subtext={`Across ${enrolledClasses.length} classes`}
         />
         <StatCard
-          icon={<ClipboardCheck size={20} strokeWidth={1.6} />}
-          color="emerald"
+          icon={<ClipboardCheck size={28} className="text-[#0B609D]" />}
           title="Open now"
           value={openItems.length}
           subtext={`${openItems[0].title} closes at ${openItems[0].closesAt}`}
         />
         <StatCard
-          icon={<CalendarClock size={20} strokeWidth={1.6} />}
-          color="blue"
+          icon={<CalendarClock size={28} className="text-[#0B609D]" />}
           title="Coming up"
           value={upcomingItems.length}
           subtext={nextNote}
         />
         <StatCard
-          icon={<CircleCheck size={20} strokeWidth={1.6} />}
-          color="purple"
+          icon={<CircleCheck size={28} className="text-[#0B609D]" />}
           title="Completed"
           value={completedItems.length}
           subtext={`Average score ${formatPercent(averageScore(completedItems))}`}
@@ -119,7 +115,7 @@ function StudentAssessments({ type }) {
       {/* List */}
       <SectionCard
         title={`Your ${plural}`}
-        flush
+       
         action={
           <ClassFilter
             classNames={classNames}
@@ -135,7 +131,7 @@ function StudentAssessments({ type }) {
           emptyMessage={`No ${plural} match this filter.`}
         />
       </SectionCard>
-    </div>
+    </>
   );
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { CloudCheck, Info, Timer, TriangleAlert } from "lucide-react";
-import Button from "../../components/common/Button";
+import Button from "../../components/common/ActionButton";
 import Modal from "../../components/common/Modal";
 import Notice from "../../components/common/Notice";
 import SectionCard from "../../components/common/SectionCard";
@@ -24,12 +24,12 @@ function AnswerOption({ name, marker, label, isSelected, onSelect }) {
   return (
     <label
       className={`
-        relative flex min-h-[48px] cursor-pointer items-center gap-[12px] rounded-sm border p-[14px]
+        relative flex min-h-[48px] cursor-pointer items-center gap-[12px] rounded-xl border p-[14px]
         transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary
         ${
           isSelected
             ? "border-primary bg-primary-light"
-            : "border-line bg-white hover:bg-surface-hover"
+            : "border-line bg-white hover:bg-slate-50"
         }
       `}
     >
@@ -72,7 +72,7 @@ function QuestionNumber({ number, isCurrent, isAnswered, onClick }) {
       aria-label={`Question ${number}, ${isAnswered ? "answered" : "not answered"}`}
       aria-current={isCurrent ? "step" : undefined}
       className={`
-        flex size-[39px] cursor-pointer items-center justify-center rounded-sm border-[1.5px]
+        flex size-[39px] cursor-pointer items-center justify-center rounded-xl border-[1.5px]
         text-[14px] font-semibold leading-[1.55] transition-colors
         ${borderColor}
         ${isAnswered ? "bg-primary-light" : "bg-white hover:bg-surface-hover"}
@@ -142,9 +142,9 @@ function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
   };
 
   return (
-    <div className="flex flex-col gap-[24px]">
+    <>
       {/* Page heading */}
-      <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between sm:gap-[24px]">
+      <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="flex min-w-0 flex-col gap-[6px]">
           <p className="text-[20px] font-bold leading-[1.3] tracking-[-0.3px] text-main">{assessment.title}</p>
           <p className="text-[13px] leading-normal text-muted">
@@ -152,7 +152,7 @@ function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
           </p>
         </div>
 
-        <div role="timer" className="flex w-fit shrink-0 items-center gap-[12px] rounded-md border border-primary-border bg-primary-light px-[16px] py-[10px] text-primary">
+        <div role="timer" className="flex w-fit shrink-0 items-center gap-[12px] rounded-2xl bg-[#EEF3FD] px-5 py-3 text-[#0B609D]">
           <Timer size={18} strokeWidth={1.6} className="shrink-0" />
           <div className="leading-[1.55]">
             <p className="text-[10px]">TIME REMAINING</p>
@@ -166,7 +166,7 @@ function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
         Answers save automatically. Your {noun} is submitted when time runs out, even if questions are unanswered.
       </Notice>
 
-      <div className="grid grid-cols-1 items-start gap-[24px] xl:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
         {/* Question */}
         <SectionCard
           title={`Question ${currentIndex + 1} of ${questions.length}`}
@@ -247,7 +247,7 @@ function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
           <div className="h-px bg-line" />
 
           {savedAt && (
-            <div className="flex items-start gap-[7px] text-[var(--color-success-text)]">
+            <div className="flex items-start gap-[7px] text-emerald-700">
               <CloudCheck size={16} strokeWidth={1.6} className="mt-[2px] shrink-0" />
               <p className="text-[12px] leading-[1.55]">
                 All changes saved · {new Date(savedAt).toLocaleTimeString("en-GB")}
@@ -269,12 +269,6 @@ function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         title={`Submit your ${noun}?`}
-        footer={
-          <>
-            <Button label="Keep working" variant="secondary" onClick={() => setIsConfirmOpen(false)} />
-            <Button label={`Submit ${noun}`} onClick={handleSubmit} />
-          </>
-        }
       >
         <div className="flex flex-col gap-[16px]">
           <p className="text-[14px] leading-[1.55] text-muted">
@@ -287,7 +281,7 @@ function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
 
           <div className="flex items-start justify-between gap-[16px] text-[14px] leading-[1.55]">
             <p className="text-muted">Answered</p>
-            <p className="font-semibold text-main">
+            <p className="font-bold text-slate-900">
               {answeredCount} of {questions.length} questions
             </p>
           </div>
@@ -295,9 +289,14 @@ function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
           <p className="text-[12px] leading-[1.55] text-muted">
             Your score and correct answers will be available today at {assessment.closesAt} GMT, after the {noun} closes.
           </p>
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            <Button label="Keep working" variant="secondary" onClick={() => setIsConfirmOpen(false)} />
+            <Button label={`Submit ${noun}`} onClick={handleSubmit} />
+          </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 }
 

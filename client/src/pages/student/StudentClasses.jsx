@@ -1,6 +1,6 @@
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { CalendarClock, ChartNoAxesCombined, ClipboardCheck, Plus, Users } from "lucide-react";
-import Button from "../../components/common/Button";
+import Button from "../../components/common/ActionButton";
 import DataTable from "../../components/common/DataTable";
 import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
@@ -16,8 +16,8 @@ const classColumns = [
     header: "Class",
     render: (enrolledClass) => (
       <div className="flex flex-col gap-[4px]">
-        <p className="font-semibold whitespace-nowrap">{enrolledClass.name}</p>
-        <p className="text-[11px] whitespace-nowrap text-muted">{enrolledClass.teacher}</p>
+        <p className="text-sm font-bold whitespace-nowrap text-slate-900">{enrolledClass.name}</p>
+        <p className="text-xs whitespace-nowrap text-slate-500">{enrolledClass.teacher}</p>
       </div>
     ),
   },
@@ -62,8 +62,8 @@ const classColumns = [
 
       return (
         <div className="flex flex-col gap-[4px]">
-          <p className="font-semibold whitespace-nowrap">{nextExam.title}</p>
-          <p className="text-[11px] whitespace-nowrap text-muted">{nextExam.schedule}</p>
+          <p className="text-sm font-bold whitespace-nowrap text-slate-900">{nextExam.title}</p>
+          <p className="text-xs whitespace-nowrap text-slate-500">{nextExam.schedule}</p>
         </div>
       );
     },
@@ -74,7 +74,7 @@ const classColumns = [
     render: (enrolledClass) => (
       <Link
         to={`/student/exams?class=${encodeURIComponent(enrolledClass.name)}`}
-        className="text-[12px] whitespace-nowrap text-primary hover:underline"
+        className="text-xs font-bold whitespace-nowrap text-[#0B609D] hover:underline"
       >
         View exams →
       </Link>
@@ -92,33 +92,29 @@ function StudentClasses() {
   const completedExams = mockExams.filter((exam) => exam.status === "closed");
 
   return (
-    <div className="flex flex-col gap-[24px]">
+    <>
       {/* Statistics */}
-      <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<Users size={20} strokeWidth={1.6} />}
-          color="indigo"
+          icon={<Users size={28} className="text-[#0B609D]" />}
           title="Enrolled classes"
           value={enrolledClasses.length}
           subtext={classNames.join(" · ")}
         />
         <StatCard
-          icon={<ClipboardCheck size={20} strokeWidth={1.6} />}
-          color="emerald"
+          icon={<ClipboardCheck size={28} className="text-[#0B609D]" />}
           title="Open now"
           value={openExams.length}
           subtext={`${openExams[0].title} closes at ${openExams[0].closesAt}`}
         />
         <StatCard
-          icon={<CalendarClock size={20} strokeWidth={1.6} />}
-          color="blue"
+          icon={<CalendarClock size={28} className="text-[#0B609D]" />}
           title="Coming up"
           value={upcomingExams.length}
           subtext={mockNextExamNote}
         />
         <StatCard
-          icon={<ChartNoAxesCombined size={20} strokeWidth={1.6} />}
-          color="purple"
+          icon={<ChartNoAxesCombined size={28} className="text-[#0B609D]" />}
           title="Average score"
           value={formatPercent(averageScore(completedExams))}
           subtext={`Across ${completedExams.length} completed exams`}
@@ -128,7 +124,7 @@ function StudentClasses() {
       {/* Classes */}
       <SectionCard
         title="Your classes"
-        flush
+       
         action={
           <Button
             label="Join a class"
@@ -143,7 +139,7 @@ function StudentClasses() {
           emptyMessage="You haven't joined a class yet."
         />
       </SectionCard>
-    </div>
+    </>
   );
 }
 

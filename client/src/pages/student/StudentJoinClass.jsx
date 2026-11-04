@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { BookOpen, Info, Search } from "lucide-react";
-import Button from "../../components/common/Button";
+import Button from "../../components/common/ActionButton";
 import Card from "../../components/common/Card";
 import Input from "../../components/common/Input";
 import Notice from "../../components/common/Notice";
@@ -14,7 +14,7 @@ function FoundClass({ foundClass, onConfirm }) {
     <Card className="flex flex-col items-start gap-[16px] p-[20px]">
       <StatusBadge label="Class found" variant="open" />
 
-      <div className="flex size-[44px] items-center justify-center rounded-md bg-primary-light">
+      <div className="flex size-[44px] items-center justify-center rounded-2xl bg-primary-light">
         <BookOpen size={20} strokeWidth={1.6} className="text-primary" />
       </div>
 
@@ -81,8 +81,8 @@ function StudentJoinClass() {
   };
 
   return (
-    <div className="flex flex-col gap-[24px]">
-      <div className="grid grid-cols-1 items-start gap-[24px] xl:grid-cols-[minmax(0,1fr)_460px]">
+    <>
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_460px]">
         <SectionCard title="Enter a class code">
           <p className="text-[14px] leading-[1.55] text-muted">
             Every class has its own code. Check with your teacher if you don't have one.
@@ -118,7 +118,7 @@ function StudentJoinClass() {
 
         {foundClass && <FoundClass foundClass={foundClass} onConfirm={handleConfirm} />}
       </div>
-    </div>
+    </>
   );
 }
 

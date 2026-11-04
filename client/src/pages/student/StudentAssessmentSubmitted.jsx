@@ -1,6 +1,6 @@
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Check, LockKeyhole } from "lucide-react";
-import Button from "../../components/common/Button";
+import Button from "../../components/common/ActionButton";
 import Card from "../../components/common/Card";
 import Notice from "../../components/common/Notice";
 import SectionCard from "../../components/common/SectionCard";
@@ -30,8 +30,8 @@ const formatSubmittedAt = (timestamp) => {
 function ReceiptFact({ label, value }) {
   return (
     <div className="flex min-w-0 flex-col gap-[6px] leading-[1.55]">
-      <p className="text-[11px] text-muted">{label}</p>
-      <p className="text-[13px] font-semibold text-main">{value}</p>
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className="text-[13px] font-bold text-slate-900">{value}</p>
     </div>
   );
 }
@@ -57,9 +57,9 @@ function StudentAssessmentSubmitted({ type }) {
   const answeredCount = questions.filter((item) => attempt.answers[item.id] !== undefined).length;
 
   return (
-    <div className="flex flex-col gap-[24px]">
+    <>
       {/* Page heading */}
-      <div className="flex items-start justify-between gap-[24px] sm:items-center">
+      <div className="flex items-start justify-between gap-6 sm:items-center">
         <div className="flex min-w-0 flex-col gap-[6px]">
           <p className="text-[20px] font-bold leading-[1.3] tracking-[-0.3px] text-main">{assessment.title}</p>
           <p className="text-[13px] leading-normal text-muted">
@@ -71,11 +71,11 @@ function StudentAssessmentSubmitted({ type }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-[24px] xl:grid-cols-[minmax(0,1fr)_350px]">
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_350px]">
         {/* Submission receipt */}
         <Card className="flex flex-col gap-[16px] p-[20px]">
-          <div className="flex size-[48px] items-center justify-center rounded-full bg-[var(--color-success-bg)]">
-            <Check size={24} strokeWidth={1.6} className="text-[var(--color-success-text)]" />
+          <div className="flex size-[48px] items-center justify-center rounded-full bg-emerald-50">
+            <Check size={24} strokeWidth={1.6} className="text-emerald-700" />
           </div>
 
           <p className="text-[20px] font-bold leading-[1.3] tracking-[-0.3px] text-main">
@@ -87,7 +87,7 @@ function StudentAssessmentSubmitted({ type }) {
 
           <div className="h-px bg-line" />
 
-          <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-3 sm:gap-[24px]">
+          <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-3 sm:gap-6">
             <ReceiptFact label="Submitted at" value={formatSubmittedAt(attempt.submittedAt)} />
             <ReceiptFact
               label="Answers saved"
@@ -109,7 +109,7 @@ function StudentAssessmentSubmitted({ type }) {
           </div>
         </Card>
 
-        <div className="flex flex-col gap-[24px]">
+        <div className="flex flex-col gap-6">
           {/* Results release */}
           <SectionCard title="Results release">
             <LockKeyhole size={26} strokeWidth={1.6} className="text-primary" />
@@ -141,7 +141,7 @@ function StudentAssessmentSubmitted({ type }) {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

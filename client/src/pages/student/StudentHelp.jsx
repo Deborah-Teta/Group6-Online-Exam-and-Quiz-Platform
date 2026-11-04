@@ -20,20 +20,18 @@ function StudentHelp() {
       : helpQuestions.filter((question) => question.topic === activeTopic);
 
   return (
-    <div className="flex flex-col gap-[24px]">
-      <div className="grid grid-cols-1 items-start gap-[24px] xl:grid-cols-[minmax(0,1fr)_350px]">
+    <>
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_350px]">
         {/* Common questions */}
-        <SectionCard title="Common questions" flush action={`${visibleQuestions.length} shown`}>
+        <SectionCard title="Common questions" action={`${visibleQuestions.length} shown`}>
           <Tabs tabs={helpTopics} activeTab={activeTopic} onChange={setActiveTopic} />
-          <div className="px-[20px] py-[6px]">
-            <Accordion key={activeTopic} items={visibleQuestions} />
-          </div>
+          <Accordion key={activeTopic} items={visibleQuestions} />
         </SectionCard>
 
-        <div className="flex flex-col gap-[24px]">
+        <div className="flex flex-col gap-6">
           {/* Guidelines */}
           <SectionCard title="Exam and quiz guidelines">
-            <div className="flex flex-col gap-[24px]">
+            <div className="flex flex-col gap-6">
               {helpGuidelines.map(({ icon, title, text }) => (
                 <InfoRow key={title} icon={icon} title={title}>
                   {text}
@@ -51,15 +49,15 @@ function StudentHelp() {
             <div className="flex flex-col gap-[12px]">
               {enrolledClasses.map(({ id, name, teacher }) => (
                 <div key={id} className="flex flex-col leading-[1.55]">
-                  <p className="text-[13px] font-semibold text-main">{teacher}</p>
-                  <p className="text-[11px] text-muted">{name}</p>
+                  <p className="text-[13px] font-bold text-slate-900">{teacher}</p>
+                  <p className="text-xs text-slate-500">{name}</p>
                 </div>
               ))}
             </div>
           </SectionCard>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { CalendarClock, CircleCheck, LockKeyhole, Send, Timer } from "lucide-react";
-import Button from "../../components/common/Button";
+import Button from "../../components/common/ActionButton";
 import InfoRow from "../../components/common/InfoRow";
 import SectionCard from "../../components/common/SectionCard";
 import StatusBadge from "../../components/common/StatusBadge";
@@ -11,8 +11,8 @@ import { loadAttempt } from "../../services/studentAttempts";
 function AssessmentFact({ label, value }) {
   return (
     <div className="flex flex-col gap-[3px] leading-[1.55]">
-      <p className="text-[11px] text-muted">{label}</p>
-      <p className="text-[14px] font-semibold text-main">{value}</p>
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className="text-[14px] font-bold text-slate-900">{value}</p>
     </div>
   );
 }
@@ -40,9 +40,9 @@ function StudentAssessmentInstructions({ type }) {
   const teacher = enrolledClasses.find((item) => item.name === assessment.className)?.teacher;
 
   return (
-    <div className="flex flex-col gap-[24px]">
+    <>
       {/* Page heading */}
-      <div className="flex items-start justify-between gap-[24px] sm:items-center">
+      <div className="flex items-start justify-between gap-6 sm:items-center">
         <div className="flex min-w-0 flex-col gap-[6px]">
           <p className="text-[20px] font-bold leading-[1.3] tracking-[-0.3px] text-main">{assessment.title}</p>
           <p className="text-[13px] leading-normal text-muted">
@@ -54,12 +54,12 @@ function StudentAssessmentInstructions({ type }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-[24px] xl:grid-cols-[minmax(0,1fr)_350px]">
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_350px]">
         {/* Rules */}
         <SectionCard title="A moment before you begin">
           <p className="text-[14px] leading-[1.55] text-muted">{assessment.summary}</p>
 
-          <div className="flex flex-col gap-[24px]">
+          <div className="flex flex-col gap-6">
             <InfoRow icon={CalendarClock} title="A scheduled window">
               {assessment.windowLabel}. You can only start while this window is open.
             </InfoRow>
@@ -116,7 +116,7 @@ function StudentAssessmentInstructions({ type }) {
           </p>
         </SectionCard>
       </div>
-    </div>
+    </>
   );
 }
 

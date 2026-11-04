@@ -30,8 +30,8 @@ const examColumns = [
     header: "Exam",
     render: (exam) => (
       <div className="flex flex-col gap-[4px]">
-        <p className="font-semibold">{exam.title}</p>
-        <p className="text-[11px] text-muted">{exam.className}</p>
+        <p className="text-sm font-bold text-slate-900">{exam.title}</p>
+        <p className="text-xs text-slate-500">{exam.className}</p>
       </div>
     ),
   },
@@ -85,33 +85,29 @@ function StudentDashboard() {
     }));
 
   return (
-    <div className="flex flex-col gap-[24px]">
+    <>
       {/* Row 1: statistics */}
-      <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<Users size={20} strokeWidth={1.6} />}
-          color="indigo"
+          icon={<Users size={28} className="text-[#0B609D]" />}
           title="My classes"
           value={enrolledClasses.length}
           subtext={classNames.join(" · ")}
         />
         <StatCard
-          icon={<ClipboardCheck size={20} strokeWidth={1.6} />}
-          color="emerald"
+          icon={<ClipboardCheck size={28} className="text-[#0B609D]" />}
           title="Open now"
           value={openExams.length}
           subtext={`${openExams[0].title} closes at ${openExams[0].closesAt}`}
         />
         <StatCard
-          icon={<CalendarClock size={20} strokeWidth={1.6} />}
-          color="blue"
+          icon={<CalendarClock size={28} className="text-[#0B609D]" />}
           title="Coming up"
           value={upcomingExams.length}
           subtext={mockNextExamNote}
         />
         <StatCard
-          icon={<ChartNoAxesCombined size={20} strokeWidth={1.6} />}
-          color="purple"
+          icon={<ChartNoAxesCombined size={28} className="text-[#0B609D]" />}
           title="Average score"
           value={formatPercent(averageScore(completedExams))}
           subtext={`Across ${completedExams.length} completed exams`}
@@ -119,7 +115,7 @@ function StudentDashboard() {
       </div>
 
       {/* Row 2: charts */}
-      <div className="grid grid-cols-1 gap-[24px] xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <SectionCard title="Score trend" action="Completed exams" className="xl:col-span-2">
           <LineChart
             data={scoreTrend}
@@ -138,10 +134,10 @@ function StudentDashboard() {
       </div>
 
       {/* Row 3: exams and results */}
-      <div className="grid grid-cols-1 gap-[24px] xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <SectionCard
           title="Your exams"
-          flush
+         
           action={
             <Link to="/student/exams" className="text-primary hover:underline">
               View all exams →
@@ -184,7 +180,7 @@ function StudentDashboard() {
           </ul>
         </SectionCard>
       </div>
-    </div>
+    </>
   );
 }
 
