@@ -1,17 +1,15 @@
-﻿const StatCard = ({ icon, title, value, subtext }) => {
+﻿import Card from "./Card";
+
+const StatCard = ({ icon, title, value, subtext }) => {
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center gap-4 transition-transform hover:-translate-y-1 duration-300">
-      <div className="text-[#1e3a8a]">
-        {icon}
+    <Card className="flex flex-col gap-[10px] p-[22px]">
+      <div className="flex items-center justify-between gap-[8px]">
+        <p className="text-[12px] leading-[1.55] text-[#6d7180]">{title}</p>
+        {icon && <div className="text-[#5149b8]">{icon}</div>}
       </div>
-      <div>
-        <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-black text-gray-900">{value}</span>
-          <span className="text-xs font-bold text-[#1e3a8a]">{subtext}</span>
-        </div>
-      </div>
-    </div>
+      <p className="text-[32px] font-semibold leading-normal text-[#202536]">{value}</p>
+      <p className="text-[11px] leading-[1.55] text-[#6d7180]">{subtext}</p>
+    </Card>
   );
 };
 
