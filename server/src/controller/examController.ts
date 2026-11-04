@@ -6,6 +6,7 @@ import { classModel } from "../models/ClassSchema.js";
 import {questionModel} from "../models/QuestionsSchema.js";
 
 
+
 export const createExam = async (
     req: express.Request,
     res: express.Response
