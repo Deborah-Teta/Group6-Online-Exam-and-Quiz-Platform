@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import StudentSidebar from "./StudentSidebar";
-import StudentTopbar from "./StudentTopbar";
+import { matchPath, Outlet, useLocation } from "react-router-dom";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
+import { studentPageHeaders } from "./studentNavigation";
 import { mockEnrolledClasses, mockStudent } from "../services/studentMockData";
 
 function StudentLayout() {
+  const { pathname } = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [enrolledClasses, setEnrolledClasses] = useState(mockEnrolledClasses);
+
+  const pageHeader = studentPageHeaders.find(({ href }) => matchPath(href, pathname));
 
   const joinClass = ({ id, name, teacher }) => {
     const joinedOn = new Date().toLocaleDateString("en-GB", {
@@ -19,20 +23,26 @@ function StudentLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-page text-left [color-scheme:light]">
-      <StudentSidebar
-        student={mockStudent}
+    <div className="min-h-screen bg-[#F8FAFC] text-left [color-scheme:light]">
+      <Sidebar
+        role="student"
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <StudentTopbar onMenuClick={() => setIsSidebarOpen(true)} />
+      <Navbar
+        user={{ name: mockStudent.name, role: "student", email: mockStudent.school }}
+        title={pageHeader?.title}
+        description={pageHeader?.description}
+        notificationsPath={null}
+        profilePath={null}
+        settingsPath={null}
+        onMenuClick={() => setIsSidebarOpen(true)}
+      />
 
-        <main className="flex-1 p-[16px] sm:px-[32px] sm:pb-[48px] sm:pt-[24px]">
-          <Outlet context={{ enrolledClasses, joinClass }} />
-        </main>
-      </div>
+      <main className="md:ml-28 pt-24 px-4 sm:px-6 md:px-8 pb-16 flex flex-col gap-6">
+        <Outlet context={{ enrolledClasses, joinClass }} />
+      </main>
     </div>
   );
 }

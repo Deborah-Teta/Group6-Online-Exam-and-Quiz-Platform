@@ -1,4 +1,4 @@
-﻿import { NavLink } from "react-router-dom"
+import { NavLink } from "react-router-dom";
 import {
   Home,
   Users,
@@ -7,7 +7,10 @@ import {
   Sparkles,
   ClipboardList,
   BarChart3,
+  CircleHelp,
   GraduationCap,
+  ListChecks,
+  Shield,
   Settings,
   X,
 } from "lucide-react";
@@ -25,7 +28,8 @@ const navigationByRole = {
   student: [
     { label: "Overview", icon: Home, href: "/student/dashboard" },
     { label: "My Classes", icon: GraduationCap, href: "/student/classes" },
-    { label: "Available Exams", icon: FileQuestion, href: "/student/exams" },
+    { label: "My Exams", icon: FileQuestion, href: "/student/exams" },
+    { label: "My Quizzes", icon: ListChecks, href: "/student/quizzes" },
     { label: "My Results", icon: BarChart3, href: "/student/results" },
   ],
 
@@ -34,18 +38,18 @@ const navigationByRole = {
     { label: "Teacher Approvals", icon: Users, href: "/admin/approvals" },
     { label: "Manage Users", icon: Users, href: "/admin/users" },
     { label: "Manage Classes", icon: GraduationCap, href: "/admin/classes" },
-    { label: "Statistics", icon: BarChart3, href: "/admin/statistics" },
+    { label: "Audit Logs", icon: Shield, href: "/admin/audit" },
   ],
 };
 
-const settingsItem = {
-  label: "Settings",
-  icon: Settings,
-  href: "/settings",
+const footerItemByRole = {
+  admin: { label: "Settings", icon: Settings, href: "/admin/settings" },
+  student: { label: "Help", icon: CircleHelp, href: "/student/help" },
 };
 
 function Sidebar({ role, isOpen = false, onClose }) {
   const navigation = navigationByRole[role] || [];
+  const settingsItem = footerItemByRole[role] || footerItemByRole.admin;
 
   return (
     <>
@@ -88,7 +92,7 @@ function Sidebar({ role, isOpen = false, onClose }) {
 
         {/* Desktop logo */}
         <div className="mb-8 hidden md:flex">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0B609D] text-white">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0B609D] text-white shadow-md">
             <GraduationCap size={25} />
           </div>
         </div>
@@ -99,7 +103,6 @@ function Sidebar({ role, isOpen = false, onClose }) {
             <NavLink
               key={href}
               to={href}
-              end
               onClick={onClose}
               title={label}
               aria-label={label}
@@ -125,7 +128,7 @@ function Sidebar({ role, isOpen = false, onClose }) {
                       md:h-12 md:w-12
                       ${
                         isActive
-                          ? "bg-[#0B609D] text-white"
+                          ? "bg-[#0B609D] text-white shadow-md"
                           : "bg-white text-[#0B609D] group-hover:bg-[#0B609D] group-hover:text-white"
                       }
                     `}
@@ -133,7 +136,7 @@ function Sidebar({ role, isOpen = false, onClose }) {
                     <Icon size={22} strokeWidth={1.8} />
                   </div>
 
-                  <span className="text-sm font-medium md:mt-1 md:text-[11px] md:font-normal">
+                  <span className="text-sm font-medium md:mt-1 md:text-[11px] md:font-normal text-center">
                     {label}
                   </span>
                 </>
@@ -146,7 +149,6 @@ function Sidebar({ role, isOpen = false, onClose }) {
         <div className="mt-6 border-t border-[#C9D7ED] pt-5 md:mt-auto md:w-full md:border-0 md:pt-0">
           <NavLink
             to={settingsItem.href}
-            end
             onClick={onClose}
             title={settingsItem.label}
             aria-label={settingsItem.label}
@@ -169,16 +171,16 @@ function Sidebar({ role, isOpen = false, onClose }) {
                     transition-all md:h-12 md:w-12
                     ${
                       isActive
-                        ? "bg-[#0B609D] text-white"
+                        ? "bg-[#0B609D] text-white shadow-md"
                         : "bg-white text-[#0B609D] group-hover:bg-[#0B609D] group-hover:text-white"
                     }
                   `}
                 >
-                  <Settings size={22} strokeWidth={1.8} />
+                  <settingsItem.icon size={22} strokeWidth={1.8} />
                 </div>
 
-                <span className="text-sm font-medium md:mt-1 md:text-[11px] md:font-normal">
-                  Settings
+                <span className="text-sm font-medium md:mt-1 md:text-[11px] md:font-normal text-center">
+                  {settingsItem.label}
                 </span>
               </>
             )}
