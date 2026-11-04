@@ -4,6 +4,7 @@ import { CalendarClock, CircleCheck, LockKeyhole, Send, Timer } from "lucide-rea
 import Button from "../../components/common/Button";
 import SectionCard from "../../components/common/SectionCard";
 import StatusBadge from "../../components/common/StatusBadge";
+import { loadAttempt } from "../../services/studentAttempts";
 import { mockExams } from "../../services/studentMockData";
 
 function ExamRule({ icon: Icon, title, children }) {
@@ -38,6 +39,11 @@ function StudentExamInstructions() {
   // Only an open exam can be started, so anything else goes back to the list.
   if (exam?.status !== "open") {
     return <Navigate to="/student/exams" replace />;
+  }
+
+  // There is only one attempt, so a submitted exam can't be started again.
+  if (loadAttempt(exam.id)?.submittedAt) {
+    return <Navigate to={`/student/exams/${exam.id}/submitted`} replace />;
   }
 
   const teacher = enrolledClasses.find((item) => item.name === exam.className)?.teacher;
@@ -108,7 +114,9 @@ function StudentExamInstructions() {
             <Button
               label="Start exam →"
               disabled={!hasAccepted}
-              onClick={() => navigate(`/student/exams/${exam.id}/attempt`)}
+              onClick={() =>
+                navigate(`/student/exams/${exam.id}/attempt`, { state: { hasAccepted: true } })
+              }
             />
           </div>
 

@@ -3,6 +3,7 @@ import './App.css';
 import StudentLayout from './layouts/StudentLayout';
 import StudentClasses from './pages/student/StudentClasses';
 import StudentDashboard from './pages/student/StudentDashboard';
+import StudentExamAttempt from './pages/student/StudentExamAttempt';
 import StudentExamInstructions from './pages/student/StudentExamInstructions';
 import StudentExams from './pages/student/StudentExams';
 import StudentJoinClass from './pages/student/StudentJoinClass';
@@ -20,7 +21,8 @@ function App() {
         <Route path="classes/join" element={<StudentJoinClass />} />
         <Route path="exams" element={<StudentExams />} />
         <Route path="exams/:examId/instructions" element={<StudentExamInstructions />} />
-        <Route path="exams/:examId/attempt" element={<StudentPlaceholder title="Exam in progress" />} />
+        <Route path="exams/:examId/attempt" element={<StudentExamAttempt />} />
+        <Route path="exams/:examId/submitted" element={<StudentPlaceholder title="Exam submitted" />} />
         <Route path="quizzes" element={<StudentPlaceholder title="My quizzes" />} />
         <Route path="results" element={<StudentPlaceholder title="Results" />} />
       </Route>
