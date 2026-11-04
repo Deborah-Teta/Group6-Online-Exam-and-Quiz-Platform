@@ -39,14 +39,9 @@ const navigationByRole = {
   ],
 };
 
-const settingsItem = {
-  label: "Settings",
-  icon: Settings,
-  href: "/admin/settings",
-};
-
-function Sidebar({ role, isOpen = false, onClose }) {
+function Sidebar({ role = "admin", isOpen = false, onClose }) {
   const navigation = navigationByRole[role] || [];
+  const settingsHref = role === "admin" ? "/admin/settings" : "/settings";
 
   return (
     <>
@@ -81,7 +76,7 @@ function Sidebar({ role, isOpen = false, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close sidebar"
-            className="rounded-lg p-2 text-[#0B609D] hover:bg-white/70"
+            className="rounded-lg p-2 text-[#0B609D] hover:bg-white/70 cursor-pointer"
           >
             <X size={22} />
           </button>
@@ -146,11 +141,11 @@ function Sidebar({ role, isOpen = false, onClose }) {
         {/* Settings */}
         <div className="mt-6 border-t border-[#C9D7ED] pt-5 md:mt-auto md:w-full md:border-0 md:pt-0">
           <NavLink
-            to={settingsItem.href}
+            to={settingsHref}
             end
             onClick={onClose}
-            title={settingsItem.label}
-            aria-label={settingsItem.label}
+            title="Settings"
+            aria-label="Settings"
             className={({ isActive }) => `
               group flex items-center gap-4 rounded-xl px-4 py-3
               text-[#0B609D] transition-all

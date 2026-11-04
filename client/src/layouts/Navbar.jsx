@@ -29,8 +29,10 @@ function Navbar({ user, onMenuClick, onLogout }) {
       };
     }
     return {
-      title: `Welcome back, ${user?.name || "Admin"}!`,
-      desc: "Administrative Control Center • Online Exam & Quiz Platform"
+      title: `Welcome back, ${user?.name || "User"}!`,
+      desc: user?.role === "admin"
+        ? "Administrative Control Center • Online Exam & Quiz Platform"
+        : "Here's what's happening in your workspace today."
     };
   };
 
