@@ -49,6 +49,109 @@ export const mockAvailableClasses = [
 
 export const mockNextExamNote = "Your next exam is tomorrow at 11:00";
 
+export const mockNextQuizNote = "Your next quiz is on 31 Oct at 14:00";
+
+export const mockQuizQuestions = {
+  "mitosis-quick-check": [
+    {
+      id: "q1",
+      type: "Multiple choice",
+      points: 2,
+      text: "During which stage of mitosis do chromosomes line up in the middle of the cell?",
+      options: ["Prophase", "Metaphase", "Anaphase", "Telophase"],
+    },
+    {
+      id: "q2",
+      type: "True / false",
+      points: 2,
+      text: "Mitosis produces two genetically identical daughter cells.",
+      options: ["True", "False"],
+    },
+    {
+      id: "q3",
+      type: "Multiple choice",
+      points: 2,
+      text: "What is the division of the cytoplasm called?",
+      options: ["Replication", "Interphase", "Cytokinesis", "Osmosis"],
+    },
+  ],
+};
+
+export const mockQuizzes = [
+  {
+    id: "mitosis-quick-check",
+    title: "Mitosis Quick Check",
+    details: "3 questions · 15 minutes · 6 points",
+    className: "Biology 10A",
+    schedule: "Today · 14:00–14:15",
+    closesAt: "14:15",
+    closesLabel: "Today · 14:15 GMT",
+    closesDate: "29 October 2026",
+    dateLabel: "Thursday, 29 October 2026",
+    windowLabel: "Thursday, 29 October 2026 · 14:00–14:15 GMT (Europe/London)",
+    summary: "This quick check covers the stages of mitosis. Choose one answer for each question.",
+    questionCount: 3,
+    totalPoints: 6,
+    questionTypes: "Multiple choice + True / false",
+    durationMinutes: 15,
+    status: "open",
+    statusLabel: "Open now",
+  },
+  {
+    id: "variables-quick-check",
+    title: "Variables Quick Check",
+    details: "4 questions · 15 minutes · 8 points",
+    className: "Science enrichment",
+    schedule: "31 Oct · 14:00–14:15",
+    status: "upcoming",
+    statusLabel: "Upcoming",
+    availability: "Not yet open",
+  },
+  {
+    id: "photosynthesis-quiz",
+    title: "Photosynthesis Quiz",
+    details: "5 questions · 15 minutes · 10 points",
+    className: "Biology 10A",
+    schedule: "3 Nov · 09:00–09:15",
+    status: "upcoming",
+    statusLabel: "Upcoming",
+    availability: "Not yet open",
+  },
+  {
+    id: "enzymes-recap",
+    title: "Enzymes Recap",
+    details: "5 questions · 15 minutes · 10 points",
+    className: "Biology 10A",
+    schedule: "20 Oct · 09:00–09:15",
+    date: "20 Oct",
+    score: 88,
+    status: "closed",
+    statusLabel: "Closed · Attempted",
+  },
+  {
+    id: "lab-equipment-quiz",
+    title: "Lab Equipment Quiz",
+    details: "4 questions · 10 minutes · 8 points",
+    className: "Science enrichment",
+    schedule: "13 Oct · 14:00–14:10",
+    date: "13 Oct",
+    score: 80,
+    status: "closed",
+    statusLabel: "Closed · Attempted",
+  },
+  {
+    id: "cell-parts-warm-up",
+    title: "Cell Parts Warm-up",
+    details: "5 questions · 10 minutes · 10 points",
+    className: "Biology 10A",
+    schedule: "6 Oct · 09:00–09:10",
+    date: "6 Oct",
+    score: 70,
+    status: "closed",
+    statusLabel: "Closed · Attempted",
+  },
+];
+
 export const mockExamQuestions = {
   "cell-biology-checkpoint": [
     {

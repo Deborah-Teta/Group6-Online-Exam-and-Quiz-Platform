@@ -6,57 +6,60 @@ import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
 import StatusBadge from "../../components/common/StatusBadge";
 import Tabs from "../../components/common/Tabs";
-import { mockExams, mockNextExamNote } from "../../services/studentMockData";
+import { assessmentTypes } from "../../services/studentAssessments";
 import { averageScore, formatPercent } from "../../utils/scores";
 
 const ALL_CLASSES = "all";
 
-const examTabs = [
-  { label: "All exams", value: "all" },
+const buildTabs = ({ plural }) => [
+  { label: `All ${plural}`, value: "all" },
   { label: "Open", value: "open" },
   { label: "Upcoming", value: "upcoming" },
   { label: "Completed", value: "closed" },
 ];
 
-const examColumns = [
+const buildColumns = ({ nounTitle }, type) => [
   {
     key: "title",
-    header: "Exam",
-    render: (exam) => (
+    header: nounTitle,
+    render: (item) => (
       <div className="flex flex-col gap-[4px]">
-        <p className="font-semibold">{exam.title}</p>
-        <p className="text-[11px] text-[#6d7180]">{exam.details}</p>
+        <p className="font-semibold">{item.title}</p>
+        <p className="text-[11px] text-[#6d7180]">{item.details}</p>
       </div>
     ),
   },
   {
     key: "className",
     header: "Class",
-    render: (exam) => <span className="whitespace-nowrap">{exam.className}</span>,
+    render: (item) => <span className="whitespace-nowrap">{item.className}</span>,
   },
   {
     key: "schedule",
     header: "Schedule · GMT",
-    render: (exam) => <span className="whitespace-nowrap">{exam.schedule}</span>,
+    render: (item) => <span className="whitespace-nowrap">{item.schedule}</span>,
   },
   {
     key: "status",
     header: "Status",
-    render: (exam) => <StatusBadge label={exam.statusLabel} variant={exam.status} />,
+    render: (item) => <StatusBadge label={item.statusLabel} variant={item.status} />,
   },
   {
     key: "score",
     header: "Score",
-    render: (exam) => (exam.score === undefined ? "—" : formatPercent(exam.score)),
+    render: (item) => (item.score === undefined ? "—" : formatPercent(item.score)),
   },
   {
     key: "action",
     header: "Action",
-    render: (exam) => <ExamAction exam={exam} />,
+    render: (item) => <ExamAction exam={item} type={type} />,
   },
 ];
 
-function StudentExams() {
+function StudentAssessments({ type }) {
+  const config = assessmentTypes[type];
+  const { items, noun, plural, nextNote } = config;
+
   const { enrolledClasses } = useOutletContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("all");
@@ -65,14 +68,14 @@ function StudentExams() {
   const requestedClass = searchParams.get("class");
   const activeClass = classNames.includes(requestedClass) ? requestedClass : ALL_CLASSES;
 
-  const openExams = mockExams.filter((exam) => exam.status === "open");
-  const upcomingExams = mockExams.filter((exam) => exam.status === "upcoming");
-  const completedExams = mockExams.filter((exam) => exam.status === "closed");
+  const openItems = items.filter((item) => item.status === "open");
+  const upcomingItems = items.filter((item) => item.status === "upcoming");
+  const completedItems = items.filter((item) => item.status === "closed");
 
-  const visibleExams = mockExams.filter(
-    (exam) =>
-      (activeTab === "all" || exam.status === activeTab) &&
-      (activeClass === ALL_CLASSES || exam.className === activeClass),
+  const visibleItems = items.filter(
+    (item) =>
+      (activeTab === "all" || item.status === activeTab) &&
+      (activeClass === ALL_CLASSES || item.className === activeClass),
   );
 
   const handleClassChange = (event) => {
@@ -84,39 +87,39 @@ function StudentExams() {
     <div className="flex flex-col gap-[28px]">
       {/* Page heading */}
       <div className="flex flex-col gap-[6px]">
-        <p className="text-[30px] leading-[1.2] text-[#202536]">My exams</p>
+        <p className="text-[30px] leading-[1.2] text-[#202536]">My {plural}</p>
         <p className="text-[14px] leading-[1.55] text-[#6d7180]">
-          Every exam from your classes, and what you can do next.
+          Every {noun} from your classes, and what you can do next.
         </p>
       </div>
 
       {/* Statistics */}
       <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="All exams"
-          value={mockExams.length}
+          title={`All ${plural}`}
+          value={items.length}
           subtext={`Across ${enrolledClasses.length} classes`}
         />
         <StatCard
           title="Open now"
-          value={openExams.length}
-          subtext={`${openExams[0].title} closes at ${openExams[0].closesAt}`}
+          value={openItems.length}
+          subtext={`${openItems[0].title} closes at ${openItems[0].closesAt}`}
         />
         <StatCard
           title="Coming up"
-          value={upcomingExams.length}
-          subtext={mockNextExamNote}
+          value={upcomingItems.length}
+          subtext={nextNote}
         />
         <StatCard
           title="Completed"
-          value={completedExams.length}
-          subtext={`Average score ${formatPercent(averageScore(completedExams))}`}
+          value={completedItems.length}
+          subtext={`Average score ${formatPercent(averageScore(completedItems))}`}
         />
       </div>
 
-      {/* Exams */}
+      {/* List */}
       <SectionCard
-        title="Your exams"
+        title={`Your ${plural}`}
         action={
           <label className="flex items-center gap-[8px]">
             Class
@@ -135,15 +138,15 @@ function StudentExams() {
           </label>
         }
       >
-        <Tabs tabs={examTabs} activeTab={activeTab} onChange={setActiveTab} />
+        <Tabs tabs={buildTabs(config)} activeTab={activeTab} onChange={setActiveTab} />
         <DataTable
-          columns={examColumns}
-          rows={visibleExams}
-          emptyMessage="No exams match this filter."
+          columns={buildColumns(config, type)}
+          rows={visibleItems}
+          emptyMessage={`No ${plural} match this filter.`}
         />
       </SectionCard>
     </div>
   );
 }
 
-export default StudentExams;
+export default StudentAssessments;

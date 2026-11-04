@@ -24,4 +24,5 @@ export const studentSubPages = [
     href: "/student/exams/:examId/attempt",
   },
   { label: "Submission received", href: "/student/exams/:examId/submitted" },
+  { label: "Before you begin", href: "/student/quizzes/:examId/instructions" },
 ];

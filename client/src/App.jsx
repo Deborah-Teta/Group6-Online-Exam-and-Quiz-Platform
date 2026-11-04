@@ -1,11 +1,11 @@
 ﻿import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
 import StudentLayout from './layouts/StudentLayout';
+import StudentAssessments from './pages/student/StudentAssessments';
 import StudentClasses from './pages/student/StudentClasses';
 import StudentDashboard from './pages/student/StudentDashboard';
 import StudentExamAttempt from './pages/student/StudentExamAttempt';
 import StudentExamInstructions from './pages/student/StudentExamInstructions';
-import StudentExams from './pages/student/StudentExams';
 import StudentExamSubmitted from './pages/student/StudentExamSubmitted';
 import StudentJoinClass from './pages/student/StudentJoinClass';
 import StudentPlaceholder from './pages/student/StudentPlaceholder';
@@ -20,11 +20,12 @@ function App() {
         <Route path="dashboard" element={<StudentDashboard />} />
         <Route path="classes" element={<StudentClasses />} />
         <Route path="classes/join" element={<StudentJoinClass />} />
-        <Route path="exams" element={<StudentExams />} />
+        <Route path="exams" element={<StudentAssessments key="exam" type="exam" />} />
         <Route path="exams/:examId/instructions" element={<StudentExamInstructions />} />
         <Route path="exams/:examId/attempt" element={<StudentExamAttempt />} />
         <Route path="exams/:examId/submitted" element={<StudentExamSubmitted />} />
-        <Route path="quizzes" element={<StudentPlaceholder title="My quizzes" />} />
+        <Route path="quizzes" element={<StudentAssessments key="quiz" type="quiz" />} />
+        <Route path="quizzes/:examId/instructions" element={<StudentPlaceholder title="Quiz instructions" />} />
         <Route path="results" element={<StudentPlaceholder title="Results" />} />
       </Route>
 

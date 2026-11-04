@@ -1,14 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
+import { assessmentTypes } from "../../services/studentAssessments";
 import { loadAttempt } from "../../services/studentAttempts";
 import Button from "./Button";
 
-function ExamAction({ exam }) {
+function ExamAction({ exam, type = "exam" }) {
   const navigate = useNavigate();
+  const { basePath, noun } = assessmentTypes[type];
 
   if (exam.status === "open" && loadAttempt(exam.id)?.submittedAt) {
     return (
       <Link
-        to={`/student/exams/${exam.id}/submitted`}
+        to={`${basePath}/${exam.id}/submitted`}
         className="text-[12px] whitespace-nowrap text-[#5149b8] hover:underline"
       >
         View submission →
@@ -19,8 +21,8 @@ function ExamAction({ exam }) {
   if (exam.status === "open") {
     return (
       <Button
-        label="View exam →"
-        onClick={() => navigate(`/student/exams/${exam.id}/instructions`)}
+        label={`View ${noun} →`}
+        onClick={() => navigate(`${basePath}/${exam.id}/instructions`)}
       />
     );
   }
