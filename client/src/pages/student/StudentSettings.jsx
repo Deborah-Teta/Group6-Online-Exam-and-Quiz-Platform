@@ -99,30 +99,30 @@ function StudentSettings() {
   return (
     <>
       {/* Account summary */}
-      <div className="flex flex-wrap items-center justify-between gap-6 rounded-3xl bg-gradient-to-r from-[#0B609D] to-[#1e3a8a] p-6 text-white shadow-sm sm:p-8">
-        <div className="flex min-w-0 items-center gap-5">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white/20 bg-white text-2xl font-black text-[#0B609D] shadow-lg">
+      <Card className="flex flex-wrap items-center justify-between gap-6 p-6 sm:p-7">
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0B609D] text-xl font-bold text-white">
             {student.initials}
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h2 className="text-2xl font-black">{student.name}</h2>
-              <span className="rounded-full bg-white/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md">
+              <h2 className="text-xl font-bold text-slate-900">{student.name}</h2>
+              <span className="rounded-full bg-[#EEF3FD] px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0B609D]">
                 {student.role}
               </span>
             </div>
-            <p className="mt-1 text-sm text-white/80">{student.email}</p>
+            <p className="mt-0.5 text-sm text-slate-500">{student.email}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
-          <GraduationCap className="text-emerald-300" size={24} />
+        <div className="flex items-center gap-3 rounded-2xl bg-[#EEF3FD] px-4 py-3">
+          <GraduationCap className="shrink-0 text-[#0B609D]" size={24} />
           <div>
-            <p className="text-xs font-bold text-white">{student.school}</p>
-            <p className="text-[11px] text-white/70">Academic year {student.academicYear}</p>
+            <p className="text-xs font-bold text-slate-900">{student.school}</p>
+            <p className="text-[11px] text-slate-500">Academic year {student.academicYear}</p>
           </div>
         </div>
-      </div>
+      </Card>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         {/* Personal information */}
