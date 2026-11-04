@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-const HEIGHT = 240;
 const PADDING = { top: 16, right: 40, bottom: 28, left: 34 };
 const MIN_LABEL_SPACING = 56;
 
 // data: [{ label, value, detail }]. Single-series line chart with hover and keyboard readout.
-function LineChart({ data, label, max = 100, formatValue = (value) => value }) {
+function LineChart({ data, label, max = 100, height = 240, formatValue = (value) => value }) {
   const containerRef = useRef(null);
   const [width, setWidth] = useState(0);
   const [activeIndex, setActiveIndex] = useState(null);
@@ -17,7 +16,7 @@ function LineChart({ data, label, max = 100, formatValue = (value) => value }) {
   }, []);
 
   const plotWidth = Math.max(width - PADDING.left - PADDING.right, 0);
-  const plotHeight = HEIGHT - PADDING.top - PADDING.bottom;
+  const plotHeight = height - PADDING.top - PADDING.bottom;
   const step = plotWidth / Math.max(data.length - 1, 1);
   const baseline = PADDING.top + plotHeight;
 
@@ -60,11 +59,11 @@ function LineChart({ data, label, max = 100, formatValue = (value) => value }) {
         onFocus={() => setActiveIndex(data.length - 1)}
         onBlur={() => setActiveIndex(null)}
         onKeyDown={handleKeyDown}
-        style={{ height: HEIGHT }}
+        style={{ height }}
         className="relative w-full rounded-[7px] outline-none focus-visible:ring-2 focus-visible:ring-[#5149b8]"
       >
         {width > 0 && (
-          <svg width={width} height={HEIGHT} aria-hidden="true" className="block">
+          <svg width={width} height={height} aria-hidden="true" className="block">
             {ticks.map((tick) => (
               <g key={tick}>
                 <line
@@ -90,7 +89,7 @@ function LineChart({ data, label, max = 100, formatValue = (value) => value }) {
                 <text
                   key={point.label}
                   x={getX(index)}
-                  y={HEIGHT - 8}
+                  y={height - 8}
                   textAnchor="middle"
                   className="fill-[#6d7180] text-[11px]"
                 >
