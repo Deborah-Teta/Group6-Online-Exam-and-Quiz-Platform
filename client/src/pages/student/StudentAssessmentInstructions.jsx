@@ -2,22 +2,11 @@ import { useState } from "react";
 import { Navigate, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { CalendarClock, CircleCheck, LockKeyhole, Send, Timer } from "lucide-react";
 import Button from "../../components/common/Button";
+import InfoRow from "../../components/common/InfoRow";
 import SectionCard from "../../components/common/SectionCard";
 import StatusBadge from "../../components/common/StatusBadge";
 import { assessmentTypes } from "../../services/studentAssessments";
 import { loadAttempt } from "../../services/studentAttempts";
-
-function AssessmentRule({ icon: Icon, title, children }) {
-  return (
-    <div className="flex items-start gap-[16px]">
-      <Icon size={21} strokeWidth={1.6} className="shrink-0 text-[#5149b8]" />
-      <div className="flex min-w-0 flex-col gap-[5px] leading-[1.55]">
-        <p className="text-[14px] font-semibold text-[#202536]">{title}</p>
-        <p className="text-[13px] text-[#6d7180]">{children}</p>
-      </div>
-    </div>
-  );
-}
 
 function AssessmentFact({ label, value }) {
   return (
@@ -71,24 +60,24 @@ function StudentAssessmentInstructions({ type }) {
           <p className="text-[14px] leading-[1.55] text-[#6d7180]">{assessment.summary}</p>
 
           <div className="flex flex-col gap-[24px]">
-            <AssessmentRule icon={CalendarClock} title="A scheduled window">
+            <InfoRow icon={CalendarClock} title="A scheduled window">
               {assessment.windowLabel}. You can only start while this window is open.
-            </AssessmentRule>
-            <AssessmentRule
+            </InfoRow>
+            <InfoRow
               icon={Timer}
               title={`${assessment.durationMinutes} minutes, ending at ${assessment.closesAt}`}
             >
               Starting late does not extend the closing time. Your countdown shows the time left until the {noun} ends.
-            </AssessmentRule>
-            <AssessmentRule icon={CircleCheck} title="One attempt. One final submission.">
+            </InfoRow>
+            <InfoRow icon={CircleCheck} title="One attempt. One final submission.">
               Your answers save automatically. You can move between questions before you submit, but you cannot retake the {noun}.
-            </AssessmentRule>
-            <AssessmentRule icon={Send} title="Automatic submission on expiry">
+            </InfoRow>
+            <InfoRow icon={Send} title="Automatic submission on expiry">
               At {assessment.closesAt} GMT your saved answers are submitted, including any unanswered questions. Unanswered questions earn 0 points.
-            </AssessmentRule>
-            <AssessmentRule icon={LockKeyhole} title={`Results after the ${noun} closes`}>
+            </InfoRow>
+            <InfoRow icon={LockKeyhole} title={`Results after the ${noun} closes`}>
               Your score and correct answers become available at {assessment.closesAt} GMT, not immediately after an early submission.
-            </AssessmentRule>
+            </InfoRow>
           </div>
         </SectionCard>
 
