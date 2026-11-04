@@ -60,7 +60,7 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
         onBlur={() => setActiveIndex(null)}
         onKeyDown={handleKeyDown}
         style={{ height }}
-        className="relative w-full rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="relative w-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         {width > 0 && (
           <svg width={width} height={height} aria-hidden="true" className="block">
@@ -146,7 +146,7 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
               left: Math.min(Math.max(getX(activeIndex), 80), width - 80),
               top: Math.max(getY(active.value) - 72, 0),
             }}
-            className="pointer-events-none absolute w-[150px] -translate-x-1/2 rounded-sm border border-line bg-white px-[10px] py-[6px] text-left shadow-sm"
+            className="pointer-events-none absolute w-[150px] -translate-x-1/2 rounded-xl border border-line bg-white px-[10px] py-[6px] text-left shadow-sm"
           >
             <p className="text-[13px] font-semibold leading-[1.55] text-main">
               {formatValue(active.value)}

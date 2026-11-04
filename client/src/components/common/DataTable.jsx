@@ -1,16 +1,16 @@
-// columns: [{ key, header, width, render(row) }]. Without render, shows row[key].
+// columns: [{ key, header, width, align, render(row) }]. Without render, shows row[key].
 function DataTable({ columns, rows, emptyMessage = "Nothing to show." }) {
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full border-collapse text-left text-[13px]">
+    <div className="overflow-x-auto">
+      <table className="w-full text-left text-xs border-collapse">
         <thead>
-          <tr>
-            {columns.map(({ key, header, width }) => (
+          <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase text-[11px] tracking-wider">
+            {columns.map(({ key, header, width, align }) => (
               <th
                 key={key}
                 scope="col"
                 style={{ width }}
-                className="border-b border-line bg-page px-[18px] py-[11px] text-[11px] font-semibold uppercase tracking-[0.5px] whitespace-nowrap text-muted"
+                className={`py-3 px-4 whitespace-nowrap ${align === "right" ? "text-right" : ""}`}
               >
                 {header}
               </th>
@@ -18,13 +18,13 @@ function DataTable({ columns, rows, emptyMessage = "Nothing to show." }) {
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="divide-y divide-slate-100">
           {rows.map((row) => (
-            <tr key={row.id} className="transition-colors hover:bg-surface-subtle">
-              {columns.map(({ key, render }) => (
+            <tr key={row.id} className="hover:bg-slate-50/60 transition">
+              {columns.map(({ key, align, render }) => (
                 <td
                   key={key}
-                  className="border-b border-line-subtle px-[18px] py-[13px] align-middle leading-normal text-main"
+                  className={`py-4 px-4 text-slate-700 ${align === "right" ? "text-right" : ""}`}
                 >
                   {render ? render(row) : row[key]}
                 </td>
@@ -34,10 +34,7 @@ function DataTable({ columns, rows, emptyMessage = "Nothing to show." }) {
 
           {rows.length === 0 && (
             <tr>
-              <td
-                colSpan={columns.length}
-                className="px-[20px] py-[40px] text-center text-[13px] leading-normal text-muted"
-              >
+              <td colSpan={columns.length} className="py-12 text-center text-xs text-slate-400">
                 {emptyMessage}
               </td>
             </tr>

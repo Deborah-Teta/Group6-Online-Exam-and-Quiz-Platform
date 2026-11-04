@@ -1,7 +1,8 @@
+// tabs: [{ label, value, icon, count }]. icon and count are optional.
 function Tabs({ tabs, activeTab, onChange }) {
   return (
-    <div role="tablist" className="flex shrink-0 overflow-x-auto border-b border-line bg-surface-subtle px-[16px]">
-      {tabs.map(({ label, value }) => {
+    <div role="tablist" className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-4">
+      {tabs.map(({ label, value, icon: Icon, count }) => {
         const isActive = value === activeTab;
 
         return (
@@ -12,16 +13,26 @@ function Tabs({ tabs, activeTab, onChange }) {
             aria-selected={isActive}
             onClick={() => onChange(value)}
             className={`
-              -mb-px shrink-0 cursor-pointer border-b-2 px-[18px] py-[14px]
-              text-[13.5px] font-semibold leading-normal whitespace-nowrap transition-colors duration-150
+              flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer
               ${
                 isActive
-                  ? "border-primary bg-card text-primary"
-                  : "border-transparent text-muted hover:bg-black/[0.02] hover:text-main"
+                  ? "bg-[#0B609D] text-white shadow-md"
+                  : "bg-[#EEF3FD] text-[#0B609D] hover:bg-[#dbe7f9]"
               }
             `}
           >
-            {label}
+            {Icon && <Icon size={16} />}
+            <span>{label}</span>
+            {count !== undefined && (
+              <span
+                className={`
+                  px-2 py-0.5 rounded-full text-[10px] font-black
+                  ${isActive ? "bg-white/20 text-white" : "bg-white text-[#0B609D] shadow-xs"}
+                `}
+              >
+                {count}
+              </span>
+            )}
           </button>
         );
       })}

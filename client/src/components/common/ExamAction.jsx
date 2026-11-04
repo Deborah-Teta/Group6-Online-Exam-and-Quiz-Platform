@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { assessmentTypes } from "../../services/studentAssessments";
 import { loadAttempt } from "../../services/studentAttempts";
-import Button from "./Button";
+import Button from "./ActionButton";
 
 function ExamAction({ exam, type = "exam" }) {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ function ExamAction({ exam, type = "exam" }) {
     return (
       <Link
         to={`${basePath}/${exam.id}/submitted`}
-        className="text-[12px] whitespace-nowrap text-primary hover:underline"
+        className="text-xs font-bold whitespace-nowrap text-[#0B609D] hover:underline"
       >
         View submission →
       </Link>
@@ -29,13 +29,13 @@ function ExamAction({ exam, type = "exam" }) {
 
   if (exam.status === "closed") {
     return (
-      <Link to="/student/results" className="text-[12px] whitespace-nowrap text-primary hover:underline">
+      <Link to="/student/results" className="text-xs font-bold whitespace-nowrap text-[#0B609D] hover:underline">
         View results →
       </Link>
     );
   }
 
-  return <span className="text-[12px] whitespace-nowrap text-muted">{exam.availability}</span>;
+  return <span className="text-xs whitespace-nowrap text-slate-500">{exam.availability}</span>;
 }
 
 export default ExamAction;

@@ -77,7 +77,7 @@ function ClassFilter({ classNames, value, onChange }) {
   };
 
   return (
-    <div className="flex shrink-0 items-center gap-[8px] text-[12px] leading-[1.55] text-muted">
+    <div className="flex shrink-0 items-center gap-[8px] text-xs text-slate-500">
       <span id={`${id}-label`}>Class</span>
 
       <div ref={containerRef} className="relative">
@@ -92,10 +92,10 @@ function ClassFilter({ classNames, value, onChange }) {
           onClick={() => (isOpen ? setIsOpen(false) : open())}
           onKeyDown={handleKeyDown}
           className={`
-            flex cursor-pointer items-center gap-[8px] rounded-sm border bg-card
-            py-[6px] pl-[10px] pr-[8px] text-[12.5px] font-medium leading-normal whitespace-nowrap text-main
-            outline-none transition-colors hover:bg-surface-hover focus-visible:border-primary
-            ${isOpen ? "border-primary" : "border-line"}
+            flex cursor-pointer items-center gap-2 rounded-xl border bg-white
+            px-3 py-2 text-xs whitespace-nowrap text-slate-700
+            outline-none transition-colors hover:bg-slate-50 focus-visible:border-[#0B609D]
+            ${isOpen ? "border-[#0B609D]" : "border-slate-200"}
           `}
         >
           {options[selectedIndex].label}
@@ -111,7 +111,7 @@ function ClassFilter({ classNames, value, onChange }) {
             id={`${id}-list`}
             role="listbox"
             aria-labelledby={`${id}-label`}
-            className={`absolute ${opensRight ? "left-0" : "right-0"} top-full z-30 mt-[6px] flex w-max min-w-full flex-col gap-[2px] rounded-md border border-line bg-card p-[6px] text-left shadow-lg`}
+            className={`absolute ${opensRight ? "left-0" : "right-0"} top-full z-30 mt-[6px] flex w-max min-w-full flex-col gap-[2px] rounded-2xl border border-slate-200 bg-white p-2 text-left shadow-xl`}
           >
             {options.map((option, index) => {
               const isSelected = index === selectedIndex;
@@ -125,10 +125,10 @@ function ClassFilter({ classNames, value, onChange }) {
                   onClick={() => choose(option)}
                   onPointerEnter={() => setActiveIndex(index)}
                   className={`
-                    flex h-[34px] cursor-pointer items-center justify-between gap-[16px] rounded-sm
-                    px-[10px] text-[12px] whitespace-nowrap transition-colors
-                    ${isSelected ? "font-semibold text-primary" : "text-main"}
-                    ${index === activeIndex ? "bg-primary-light" : ""}
+                    flex cursor-pointer items-center justify-between gap-4 rounded-xl px-3 py-2
+                    text-xs font-medium whitespace-nowrap transition
+                    ${isSelected ? "font-bold text-[#0B609D]" : "text-slate-600"}
+                    ${index === activeIndex ? "bg-[#EEF3FD]" : ""}
                   `}
                 >
                   {option.label}

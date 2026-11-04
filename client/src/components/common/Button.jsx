@@ -1,38 +1,28 @@
-﻿const variants = {
-  primary: {
-    base: 'border-transparent bg-primary text-white',
-    hover: 'hover:bg-primary-hover',
-  },
-  secondary: {
-    base: 'border-line bg-card text-main',
-    hover: 'hover:bg-surface-hover',
-  },
-};
-
+﻿ 
 function Button({
   label,
   type = 'button',
   onClick,
   disabled = false,
   icon,
-  variant = 'primary',
 }) {
-  const { base, hover } = variants[variant];
-
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
       className={`
-        flex items-center justify-center gap-[6px] rounded-sm border
-        px-[16px] py-[7px] text-[12.5px] font-semibold leading-normal whitespace-nowrap
-        transition-colors duration-150
-        ${base}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : `cursor-pointer ${hover}`}
+        px-6 py-3 bg-gradient-to-r from-[#0B609D] to-gray-500 
+        rounded-full text-white flex items-center justify-center 
+        gap-2.5 font-medium
+        w-44 sm:w-52 md:w-64 lg:w-72 
+        h-11 sm:h-12 md:h-14 
+        text-sm sm:text-base md:text-lg 
+        transition-all duration-200
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 hover:scale-105 active:scale-100'}
       `}
     >
-      {icon && <span className="shrink-0">{icon}</span>}
+      {icon && <span className="flex-shrink-0">{icon}</span>}
       <span>{label}</span>
     </button>
   )

@@ -1,23 +1,25 @@
-﻿function Input({
-  label,
-  name,
-  type = 'text',
-  value,
-  onChange,
-  placeholder,
-  required = false,
-  disabled = false,
-  error,
-  helperText,
-}) {
-  return (
-    <div className="flex w-full flex-col gap-[6px] text-left">
+﻿function Input({ 
+    label,
+    name,
+    type = 'text',
+    value,
+    onChange,
+    placeholder,
+    required = false,
+    disabled = false,
+    error,
+    helperText,   
+  }) {
+    return (
+            <div className="w-full flex flex-col gap-1.5">
       <label
         htmlFor={name}
-        className="text-[12.5px] font-semibold leading-normal text-main"
+        className="text-sm font-medium text-slate-700"
       >
         {label}
-        {required && " *"}
+        {required && (
+          <span className="ml-1 text-red-500">*</span>
+        )}
       </label>
 
       <input
@@ -29,23 +31,27 @@
         placeholder={placeholder}
         required={required}
         disabled={disabled}
-        aria-invalid={Boolean(error)}
         className={`
-          w-full rounded-sm border bg-card px-[12px] py-[8px]
-          text-[13px] leading-normal text-main placeholder:text-subtle
-          outline-none transition-colors duration-150
-          disabled:cursor-not-allowed disabled:bg-surface-hover disabled:text-muted
-          ${error ? "border-[var(--color-danger)]" : "border-line focus:border-primary"}
+          w-full rounded-lg border bg-white px-4 py-3
+          text-sm text-slate-900 placeholder:text-slate-400
+          outline-none transition-all duration-200
+          focus:ring-4 focus:ring-blue-100
+          disabled:cursor-not-allowed disabled:bg-slate-100
+          disabled:text-slate-400
+          ${
+            error
+              ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+              : "border-slate-200 focus:border-blue-600"
+          }
         `}
       />
-
       {error ? (
-        <p className="text-[12px] leading-[1.5] text-[var(--color-danger-text)]">{error}</p>
+        <p className="text-xs text-red-500">{error}</p>
       ) : helperText ? (
-        <p className="text-[12px] leading-[1.5] text-muted">{helperText}</p>
+        <p className="text-xs text-slate-500">{helperText}</p>
       ) : null}
-    </div>
-  );
-}
 
+    </div>
+    )
+}
 export default Input;

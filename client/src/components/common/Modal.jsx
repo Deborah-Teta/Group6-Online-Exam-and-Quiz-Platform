@@ -1,67 +1,59 @@
-﻿import { X } from "lucide-react";
-
+﻿
 function Modal({
   isOpen,
   onClose,
   title,
   children,
-  footer,
   size = "md",
   showCloseButton = true,
 }) {
   const sizes = {
-    sm: "max-w-[384px]",
-    md: "max-w-[460px]",
-    lg: "max-w-[672px]",
-    xl: "max-w-[896px]",
+    sm: "max-w-sm",
+    md: "max-w-lg",
+    lg: "max-w-2xl",
+    xl: "max-w-4xl",
   };
 
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(15,23,42,0.5)] p-[16px] backdrop-blur-[4px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
       onClick={onClose}
     >
       <div
         className={`
-          flex max-h-full w-full flex-col overflow-hidden ${sizes[size]}
-          animate-modal-pop rounded-lg bg-card text-left shadow-modal
+          relative w-full ${sizes[size]}
+          rounded-2xl bg-white p-6 shadow-xl
         `}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <div className="flex shrink-0 items-center justify-between gap-[16px] border-b border-line px-[22px] py-[18px]">
-          <p
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <h2
             id="modal-title"
-            className="text-[16px] font-bold leading-normal text-main"
+            className="text-lg font-semibold text-slate-900"
           >
             {title}
-          </p>
+          </h2>
 
           {showCloseButton && (
             <button
               type="button"
               onClick={onClose}
-              className="cursor-pointer rounded-[4px] p-[4px] text-subtle transition-colors hover:bg-surface-hover hover:text-main"
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Close modal"
             >
-              <X size={18} strokeWidth={1.6} />
+              ✕
             </button>
           )}
         </div>
 
-        <div className="overflow-y-auto px-[22px] py-[20px]">
+        <div>
           {children}
         </div>
-
-        {footer && (
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-[10px] border-t border-line bg-surface-subtle px-[22px] py-[14px]">
-            {footer}
-          </div>
-        )}
       </div>
     </div>
   );

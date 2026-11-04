@@ -1,9 +1,9 @@
 // data: [{ label, value, detail }]. Horizontal bars with the value at each bar's tip.
 function BarChart({ data, label, max = 100, formatValue = (value) => value }) {
   return (
-    <ul aria-label={label} className="flex flex-1 flex-col justify-center gap-[24px]">
+    <ul aria-label={label} className="flex flex-1 flex-col justify-center gap-6">
       {data.map((item) => (
-        <li key={item.label} tabIndex={0} className="group relative rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary">
+        <li key={item.label} tabIndex={0} className="group relative rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary">
           <div className="mb-[8px] flex items-baseline justify-between gap-[8px]">
             <span className="text-[13px] leading-[1.55] text-main">{item.label}</span>
             <span className="text-[11px] leading-[1.55] text-muted">{item.detail}</span>

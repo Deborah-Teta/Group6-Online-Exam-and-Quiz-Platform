@@ -27,9 +27,9 @@ function Accordion({ items, emptyMessage = "Nothing to show." }) {
               aria-expanded={isOpen}
               aria-controls={panelId}
               onClick={() => setOpenId(isOpen ? null : id)}
-              className="flex w-full cursor-pointer items-center justify-between gap-[16px] rounded-sm py-[14px] text-left outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="flex w-full cursor-pointer items-center justify-between gap-[16px] rounded-xl py-[14px] text-left outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <span className={`text-[14px] leading-[1.55] ${isOpen ? "font-semibold text-primary" : "font-semibold text-main"}`}>
+              <span className={`text-[14px] leading-[1.55] ${isOpen ? "font-semibold text-primary" : "font-bold text-slate-900"}`}>
                 {title}
               </span>
               <ChevronDown
