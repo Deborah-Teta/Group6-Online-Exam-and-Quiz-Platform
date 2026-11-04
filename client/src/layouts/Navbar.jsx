@@ -9,7 +9,16 @@ import {
   Settings,
 } from "lucide-react";
 
-function Navbar({ user, onMenuClick, onLogout }) {
+function Navbar({
+  user,
+  title,
+  description,
+  notificationsPath = "/admin/approvals",
+  profilePath = "/admin/profile",
+  settingsPath = "/admin/settings",
+  onMenuClick,
+  onLogout,
+}) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,7 +43,7 @@ function Navbar({ user, onMenuClick, onLogout }) {
     };
   };
 
-  const headerInfo = getHeaderInfo();
+  const headerInfo = title ? { title, desc: description } : getHeaderInfo();
 
   return (
     <header className="fixed px-6 top-0 left-0 right-0 z-40 pr-8 rounded-2xl md:left-28 md:pr-8 py-2 md:py-3 flex items-center justify-between bg-[#EEF3FD] shadow-xs">
@@ -66,7 +75,7 @@ function Navbar({ user, onMenuClick, onLogout }) {
         {/* Notifications */}
         <button
           type="button"
-          onClick={() => navigate('/admin/approvals')}
+          onClick={() => notificationsPath && navigate(notificationsPath)}
           className="relative rounded-full bg-white p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 shadow-xs cursor-pointer"
           aria-label="Notifications"
           title="View pending faculty approvals"
@@ -113,31 +122,35 @@ function Navbar({ user, onMenuClick, onLogout }) {
                 <p className="text-[11px] text-slate-500">{user?.email || "admin@examplatform.edu"}</p>
               </div>
 
-              <button
-                type="button"
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
-                onClick={() => {
-                  setIsProfileOpen(false);
-                  navigate('/admin/profile');
-                }}
-              >
-                <UserRound size={15} />
-                My Profile
-              </button>
+              {profilePath && (
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    navigate(profilePath);
+                  }}
+                >
+                  <UserRound size={15} />
+                  My Profile
+                </button>
+              )}
 
-              <button
-                type="button"
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
-                onClick={() => {
-                  setIsProfileOpen(false);
-                  navigate('/admin/settings');
-                }}
-              >
-                <Settings size={15} />
-                Settings
-              </button>
+              {settingsPath && (
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    navigate(settingsPath);
+                  }}
+                >
+                  <Settings size={15} />
+                  Settings
+                </button>
+              )}
 
-              <div className="my-1 border-t border-slate-100" />
+              {(profilePath || settingsPath) && <div className="my-1 border-t border-slate-100" />}
 
               <button
                 type="button"
