@@ -46,6 +46,7 @@ const settingsItem = { label: "Settings", icon: Settings };
 
 const footerItemsByRole = {
   admin: [{ ...settingsItem, href: "/admin/settings" }],
+  teacher: [{ ...settingsItem, href: "/settings" }],
   student: [
     { label: "Help", icon: CircleHelp, href: "/student/help" },
     { ...settingsItem, href: "/student/settings" },
@@ -89,7 +90,7 @@ function Sidebar({ role, isOpen = false, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close sidebar"
-            className="rounded-lg p-2 text-[#0B609D] hover:bg-white/70"
+            className="rounded-lg p-2 text-[#0B609D] hover:bg-white/70 cursor-pointer"
           >
             <X size={22} />
           </button>

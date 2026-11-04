@@ -1,6 +1,7 @@
 ﻿import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
 import StudentLayout from './layouts/StudentLayout';
+import { AdminDashboard } from './pages/AdminDashboard';
 import StudentAssessmentAttempt from './pages/student/StudentAssessmentAttempt';
 import StudentAssessmentInstructions from './pages/student/StudentAssessmentInstructions';
 import StudentAssessments from './pages/student/StudentAssessments';
@@ -34,6 +35,9 @@ function App() {
         <Route path="help" element={<StudentHelp />} />
         <Route path="settings" element={<StudentSettings />} />
       </Route>
+
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/*" element={<AdminDashboard />} />
 
       <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
     </Routes>
