@@ -8,7 +8,7 @@ import StudentAssessmentSubmitted from './pages/student/StudentAssessmentSubmitt
 import StudentClasses from './pages/student/StudentClasses';
 import StudentDashboard from './pages/student/StudentDashboard';
 import StudentJoinClass from './pages/student/StudentJoinClass';
-import StudentPlaceholder from './pages/student/StudentPlaceholder';
+import StudentResults from './pages/student/StudentResults';
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
         <Route path="quizzes/:examId/instructions" element={<StudentAssessmentInstructions key="quiz" type="quiz" />} />
         <Route path="quizzes/:examId/attempt" element={<StudentAssessmentAttempt key="quiz" type="quiz" />} />
         <Route path="quizzes/:examId/submitted" element={<StudentAssessmentSubmitted key="quiz" type="quiz" />} />
-        <Route path="results" element={<StudentPlaceholder title="Results" />} />
+        <Route path="results" element={<StudentResults />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
