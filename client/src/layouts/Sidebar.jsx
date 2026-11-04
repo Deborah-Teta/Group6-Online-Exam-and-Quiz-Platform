@@ -42,14 +42,19 @@ const navigationByRole = {
   ],
 };
 
-const footerItemByRole = {
-  admin: { label: "Settings", icon: Settings, href: "/admin/settings" },
-  student: { label: "Help", icon: CircleHelp, href: "/student/help" },
+const settingsItem = { label: "Settings", icon: Settings };
+
+const footerItemsByRole = {
+  admin: [{ ...settingsItem, href: "/admin/settings" }],
+  student: [
+    { label: "Help", icon: CircleHelp, href: "/student/help" },
+    { ...settingsItem, href: "/student/settings" },
+  ],
 };
 
 function Sidebar({ role, isOpen = false, onClose }) {
   const navigation = navigationByRole[role] || [];
-  const settingsItem = footerItemByRole[role] || footerItemByRole.admin;
+  const footerItems = footerItemsByRole[role] || footerItemsByRole.admin;
 
   return (
     <>
@@ -64,7 +69,7 @@ function Sidebar({ role, isOpen = false, onClose }) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed rounded-3xl left-0 top-0 z-50 flex h-screen w-72 flex-col
+          fixed rounded-3xl left-0 top-0 z-50 flex h-screen w-72 flex-col overflow-y-auto [scrollbar-width:none]
           bg-[#EEF3FD] px-4 py-6 shadow-xl
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
@@ -145,46 +150,49 @@ function Sidebar({ role, isOpen = false, onClose }) {
           ))}
         </nav>
 
-        {/* Settings */}
-        <div className="mt-6 border-t border-[#C9D7ED] pt-5 md:mt-auto md:w-full md:border-0 md:pt-0">
-          <NavLink
-            to={settingsItem.href}
-            onClick={onClose}
-            title={settingsItem.label}
-            aria-label={settingsItem.label}
-            className={({ isActive }) => `
-              group flex items-center gap-4 rounded-xl px-4 py-3
-              text-[#0B609D] transition-all
-              md:w-full md:flex-col md:gap-1 md:px-0 md:py-0
-              ${
-                isActive
-                  ? "bg-white/70 md:bg-transparent"
-                  : "hover:bg-white/60 md:hover:bg-transparent"
-              }
-            `}
-          >
-            {({ isActive }) => (
-              <>
-                <div
-                  className={`
-                    flex h-10 w-10 items-center justify-center rounded-full
-                    transition-all md:h-12 md:w-12
-                    ${
-                      isActive
-                        ? "bg-[#0B609D] text-white shadow-md"
-                        : "bg-white text-[#0B609D] group-hover:bg-[#0B609D] group-hover:text-white"
-                    }
-                  `}
-                >
-                  <settingsItem.icon size={22} strokeWidth={1.8} />
-                </div>
+        {/* Footer links */}
+        <div className="mt-6 flex flex-col gap-2 border-t border-[#C9D7ED] pt-5 md:mt-auto md:w-full md:gap-4 md:border-0 md:pt-0">
+          {footerItems.map(({ label, icon: Icon, href }) => (
+            <NavLink
+              key={href}
+              to={href}
+              onClick={onClose}
+              title={label}
+              aria-label={label}
+              className={({ isActive }) => `
+                group flex items-center gap-4 rounded-xl px-4 py-3
+                text-[#0B609D] transition-all
+                md:w-full md:flex-col md:gap-1 md:px-0 md:py-0
+                ${
+                  isActive
+                    ? "bg-white/70 md:bg-transparent"
+                    : "hover:bg-white/60 md:hover:bg-transparent"
+                }
+              `}
+            >
+              {({ isActive }) => (
+                <>
+                  <div
+                    className={`
+                      flex h-10 w-10 items-center justify-center rounded-full
+                      transition-all md:h-12 md:w-12
+                      ${
+                        isActive
+                          ? "bg-[#0B609D] text-white shadow-md"
+                          : "bg-white text-[#0B609D] group-hover:bg-[#0B609D] group-hover:text-white"
+                      }
+                    `}
+                  >
+                    <Icon size={22} strokeWidth={1.8} />
+                  </div>
 
-                <span className="text-sm font-medium md:mt-1 md:text-[11px] md:font-normal text-center">
-                  {settingsItem.label}
-                </span>
-              </>
-            )}
-          </NavLink>
+                  <span className="text-sm font-medium md:mt-1 md:text-[11px] md:font-normal text-center">
+                    {label}
+                  </span>
+                </>
+              )}
+            </NavLink>
+          ))}
         </div>
       </aside>
     </>

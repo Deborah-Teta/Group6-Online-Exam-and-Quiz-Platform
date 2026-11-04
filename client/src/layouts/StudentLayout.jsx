@@ -9,8 +9,13 @@ function StudentLayout() {
   const { pathname } = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [enrolledClasses, setEnrolledClasses] = useState(mockEnrolledClasses);
+  const [student, setStudent] = useState(mockStudent);
 
   const pageHeader = studentPageHeaders.find(({ href }) => matchPath(href, pathname));
+
+  const updateStudent = (changes) => {
+    setStudent((current) => ({ ...current, ...changes }));
+  };
 
   const joinClass = ({ id, name, teacher }) => {
     const joinedOn = new Date().toLocaleDateString("en-GB", {
@@ -31,17 +36,17 @@ function StudentLayout() {
       />
 
       <Navbar
-        user={{ name: mockStudent.name, role: "student", email: mockStudent.school }}
-        title={pageHeader?.title}
+        user={{ name: student.name, role: "student", email: student.email }}
+        title={typeof pageHeader?.title === "function" ? pageHeader.title(student) : pageHeader?.title}
         description={pageHeader?.description}
         notificationsPath={null}
         profilePath={null}
-        settingsPath={null}
+        settingsPath="/student/settings"
         onMenuClick={() => setIsSidebarOpen(true)}
       />
 
       <main className="md:ml-28 pt-24 px-4 sm:px-6 md:px-8 pb-16 flex flex-col gap-6">
-        <Outlet context={{ enrolledClasses, joinClass }} />
+        <Outlet context={{ enrolledClasses, joinClass, student, updateStudent }} />
       </main>
     </div>
   );

@@ -2,6 +2,7 @@
 export const mockStudent = {
   name: "Maya Patel",
   initials: "MP",
+  email: "maya.patel@oakfield.edu",
   role: "Student",
   school: "Oakfield Academy",
   academicYear: "2026–27",

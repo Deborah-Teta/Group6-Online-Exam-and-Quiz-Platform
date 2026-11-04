@@ -1,10 +1,8 @@
-import { mockStudent } from "../services/studentMockData";
-
 // What the shared Navbar shows for each student page.
 export const studentPageHeaders = [
   {
     href: "/student/dashboard",
-    title: `Welcome back, ${mockStudent.name.split(" ")[0]}!`,
+    title: (student) => `Welcome back, ${student.name.split(" ")[0]}!`,
     description: "Student Workspace • Online Exam & Quiz Platform",
   },
   {
@@ -66,5 +64,10 @@ export const studentPageHeaders = [
     href: "/student/help",
     title: "Help & guidelines",
     description: "How your exams and quizzes work, and what to do if something goes wrong.",
+  },
+  {
+    href: "/student/settings",
+    title: "Settings",
+    description: "Manage your personal information and password.",
   },
 ];
