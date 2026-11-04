@@ -79,13 +79,21 @@ function StudentSidebar({ student, isOpen = false, onClose }) {
 
         {/* Support and account */}
         <div className="mt-auto flex flex-col gap-[16px] pt-[30px]">
-          <button
-            type="button"
-            className="flex items-start gap-[10px] rounded-[7px] p-[10px] text-left text-[12px] leading-[1.55] text-[#6d7180] transition-colors hover:bg-[#f7f7f2]"
+          <NavLink
+            to="/student/help"
+            onClick={onClose}
+            className={({ isActive }) => `
+              flex items-start gap-[10px] rounded-[7px] p-[10px] text-[12px] leading-[1.55] transition-colors
+              ${
+                isActive
+                  ? "bg-[#eeedf9] font-semibold text-[#5149b8]"
+                  : "text-[#6d7180] hover:bg-[#f7f7f2]"
+              }
+            `}
           >
             <CircleHelp size={18} strokeWidth={1.6} className="shrink-0" />
             Help &amp; guidelines
-          </button>
+          </NavLink>
 
           <div className="h-px bg-[#e3e4e8]" />
 
