@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
+import ClassFilter, { ALL_CLASSES } from "../../components/common/ClassFilter";
 import DataTable from "../../components/common/DataTable";
 import ExamAction from "../../components/common/ExamAction";
 import SectionCard from "../../components/common/SectionCard";
@@ -8,8 +9,6 @@ import StatusBadge from "../../components/common/StatusBadge";
 import Tabs from "../../components/common/Tabs";
 import { assessmentTypes } from "../../services/studentAssessments";
 import { averageScore, formatPercent } from "../../utils/scores";
-
-const ALL_CLASSES = "all";
 
 const buildTabs = ({ plural }) => [
   { label: `All ${plural}`, value: "all" },
@@ -78,8 +77,7 @@ function StudentAssessments({ type }) {
       (activeClass === ALL_CLASSES || item.className === activeClass),
   );
 
-  const handleClassChange = (event) => {
-    const { value } = event.target;
+  const handleClassChange = (value) => {
     setSearchParams(value === ALL_CLASSES ? {} : { class: value });
   };
 
@@ -121,21 +119,11 @@ function StudentAssessments({ type }) {
       <SectionCard
         title={`Your ${plural}`}
         action={
-          <label className="flex items-center gap-[8px]">
-            Class
-            <select
-              value={activeClass}
-              onChange={handleClassChange}
-              className="h-[34px] cursor-pointer rounded-[7px] border border-[#e3e4e8] bg-white px-[8px] text-[12px] text-[#202536] outline-none focus:border-[#5149b8]"
-            >
-              <option value={ALL_CLASSES}>All classes</option>
-              {classNames.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <ClassFilter
+            classNames={classNames}
+            value={activeClass}
+            onChange={handleClassChange}
+          />
         }
       >
         <Tabs tabs={buildTabs(config)} activeTab={activeTab} onChange={setActiveTab} />
