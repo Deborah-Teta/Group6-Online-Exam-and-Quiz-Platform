@@ -1,8 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
+import { loadAttempt } from "../../services/studentAttempts";
 import Button from "./Button";
 
 function ExamAction({ exam }) {
   const navigate = useNavigate();
+
+  if (exam.status === "open" && loadAttempt(exam.id)?.submittedAt) {
+    return (
+      <Link
+        to={`/student/exams/${exam.id}/submitted`}
+        className="text-[12px] whitespace-nowrap text-[#5149b8] hover:underline"
+      >
+        View submission →
+      </Link>
+    );
+  }
 
   if (exam.status === "open") {
     return (

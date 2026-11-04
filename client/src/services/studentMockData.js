@@ -98,6 +98,8 @@ export const mockExams = [
     schedule: "Today · 10:00–10:30",
     closesAt: "10:30",
     closesLabel: "Today · 10:30 GMT",
+    closesDate: "29 October 2026",
+    dateLabel: "Thursday, 29 October 2026",
     windowLabel: "Thursday, 29 October 2026 · 10:00–10:30 GMT (Europe/London)",
     summary: "This checkpoint covers cell structures and their functions. Choose one answer for each question.",
     questionCount: 5,

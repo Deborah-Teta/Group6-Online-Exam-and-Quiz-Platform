@@ -30,5 +30,9 @@ export const recordAnswer = (examId, attempt, questionId, optionIndex) => {
   return nextAttempt;
 };
 
-export const submitAttempt = (examId) =>
-  saveAttempt(examId, { ...loadAttempt(examId), submittedAt: Date.now() });
+export const submitAttempt = (examId, { automatic = false } = {}) =>
+  saveAttempt(examId, {
+    ...loadAttempt(examId),
+    submittedAt: Date.now(),
+    submittedAutomatically: automatic,
+  });

@@ -121,7 +121,7 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
 
       // Time is up, so whatever has been saved is submitted automatically.
       if (current >= deadline) {
-        submitAttempt(exam.id);
+        submitAttempt(exam.id, { automatic: true });
         navigate(submittedPath, { replace: true });
       }
     }, 1000);
