@@ -1,36 +1,23 @@
-/* The one design system for every portal. These names match admin.css. */
+/* The shared ExamFlow colours, taken from layouts/Sidebar, layouts/Navbar and the admin dashboard. */
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #eef2ff;
-  --primary-border: #c7d2fe;
+  --primary: #0b609d;
+  --primary-hover: #084877;
+  --primary-light: #eef3fd;
+  --primary-border: #dbe7f9;
 
   --bg-page: #f8fafc;
   --bg-card: #ffffff;
   --bg-hover: #f1f5f9;
-  --bg-subtle: #fafbfc;
+  --bg-subtle: #f8fafc;
 
   --text-main: #0f172a;
   --text-muted: #64748b;
   --text-subtle: #94a3b8;
   --border-color: #e2e8f0;
   --border-subtle: #f1f5f9;
-
-  --color-success: #10b981;
-  --color-success-bg: #ecfdf5;
-  --color-success-border: #a7f3d0;
-  --color-success-text: #065f46;
-  --color-warning: #f59e0b;
-  --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
-  --color-warning-text: #92400e;
-  --color-danger: #ef4444;
-  --color-danger-bg: #fef2f2;
-  --color-danger-border: #fecaca;
-  --color-danger-text: #dc2626;
 }
 
-/* Lets Tailwind classes use the tokens, for example text-primary or border-line. */
+/* Lets Tailwind classes use the colours, for example text-primary or border-line. */
 @theme inline {
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
@@ -47,31 +34,4 @@
   --color-subtle: var(--text-subtle);
   --color-line: var(--border-color);
   --color-line-subtle: var(--border-subtle);
-}
-
-@theme {
-  --color-brand-start: #6366f1;
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-
-  --animate-modal-pop: modal-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-
-  @keyframes modal-pop {
-    from {
-      transform: scale(0.96);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
 }
