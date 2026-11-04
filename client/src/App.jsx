@@ -10,6 +10,7 @@ import StudentDashboard from './pages/student/StudentDashboard';
 import StudentHelp from './pages/student/StudentHelp';
 import StudentJoinClass from './pages/student/StudentJoinClass';
 import StudentResults from './pages/student/StudentResults';
+import StudentSettings from './pages/student/StudentSettings';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="quizzes/:examId/submitted" element={<StudentAssessmentSubmitted key="quiz" type="quiz" />} />
         <Route path="results" element={<StudentResults />} />
         <Route path="help" element={<StudentHelp />} />
+        <Route path="settings" element={<StudentSettings />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/student/dashboard" replace />} />

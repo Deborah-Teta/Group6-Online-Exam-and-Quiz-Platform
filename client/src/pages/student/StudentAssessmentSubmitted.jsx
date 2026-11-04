@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { Check, LockKeyhole } from "lucide-react";
 import Button from "../../components/common/ActionButton";
 import Card from "../../components/common/Card";
@@ -7,7 +7,6 @@ import SectionCard from "../../components/common/SectionCard";
 import StatusBadge from "../../components/common/StatusBadge";
 import { loadAttempt } from "../../services/studentAttempts";
 import { assessmentTypes } from "../../services/studentAssessments";
-import { mockStudent } from "../../services/studentMockData";
 
 // Scheduled times are shown in GMT, so the receipt uses the same clock.
 const formatSubmittedAt = (timestamp) => {
@@ -40,6 +39,7 @@ function StudentAssessmentSubmitted({ type }) {
   const { items, questions: allQuestions, noun, plural, basePath } = assessmentTypes[type];
 
   const navigate = useNavigate();
+  const { student } = useOutletContext();
   const { examId } = useParams();
 
   const assessment = items.find((item) => item.id === examId);
@@ -82,7 +82,7 @@ function StudentAssessmentSubmitted({ type }) {
             Your answers are in.
           </p>
           <p className="text-[15px] leading-[1.55] text-muted">
-            Thanks, {mockStudent.name.split(" ")[0]}. Your attempt has been submitted successfully. You can take a breath — there's nothing else to do.
+            Thanks, {student.name.split(" ")[0]}. Your attempt has been submitted successfully. You can take a breath — there's nothing else to do.
           </p>
 
           <div className="h-px bg-line" />

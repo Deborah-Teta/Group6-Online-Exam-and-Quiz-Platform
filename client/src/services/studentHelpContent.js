@@ -5,6 +5,7 @@ export const helpTopics = [
   { label: "Classes", value: "classes" },
   { label: "Exams & quizzes", value: "assessments" },
   { label: "Results", value: "results" },
+  { label: "Account", value: "account" },
 ];
 
 export const helpQuestions = [
@@ -90,6 +91,13 @@ export const helpQuestions = [
     title: "Where do I find my results?",
     content:
       "Open Results in the menu. You can filter by exams or quizzes and by class, and see how your scores change over time.",
+  },
+  {
+    id: "change-details",
+    topic: "account",
+    title: "How do I change my name or password?",
+    content:
+      "Open Settings at the bottom of the menu. You can update your full name and change your password there. If your email address needs to change, ask your school.",
   },
 ];
 
