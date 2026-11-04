@@ -71,8 +71,11 @@ const classColumns = [
   {
     key: "action",
     header: "Action",
-    render: () => (
-      <Link to="/student/exams" className="text-[12px] whitespace-nowrap text-[#5149b8] hover:underline">
+    render: (enrolledClass) => (
+      <Link
+        to={`/student/exams?class=${encodeURIComponent(enrolledClass.name)}`}
+        className="text-[12px] whitespace-nowrap text-[#5149b8] hover:underline"
+      >
         View exams →
       </Link>
     ),
