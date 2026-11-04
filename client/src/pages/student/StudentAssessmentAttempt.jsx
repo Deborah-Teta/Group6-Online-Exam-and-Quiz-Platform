@@ -11,7 +11,7 @@ import {
   startAttempt,
   submitAttempt,
 } from "../../services/studentAttempts";
-import { mockExamQuestions, mockExams } from "../../services/studentMockData";
+import { assessmentTypes } from "../../services/studentAssessments";
 
 const formatCountdown = (totalSeconds) => {
   const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
@@ -102,17 +102,19 @@ function UnansweredNotice({ questionNumbers }) {
   );
 }
 
-function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
+function AttemptWorkspace({ assessment, config, teacher, initialAttempt }) {
+  const { noun, basePath } = config;
+  const questions = config.questions[assessment.id];
   const navigate = useNavigate();
   const [attempt, setAttempt] = useState(
-    () => initialAttempt ?? startAttempt(exam.id, exam.durationMinutes),
+    () => initialAttempt ?? startAttempt(assessment.id, assessment.durationMinutes),
   );
   const [now, setNow] = useState(() => Date.now());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const { deadline, answers, savedAt } = attempt;
-  const submittedPath = `/student/exams/${exam.id}/submitted`;
+  const submittedPath = `${basePath}/${assessment.id}/submitted`;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -121,13 +123,13 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
 
       // Time is up, so whatever has been saved is submitted automatically.
       if (current >= deadline) {
-        submitAttempt(exam.id, { automatic: true });
+        submitAttempt(assessment.id, { automatic: true });
         navigate(submittedPath, { replace: true });
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [deadline, exam.id, navigate, submittedPath]);
+  }, [deadline, assessment.id, navigate, submittedPath]);
 
   const question = questions[currentIndex];
   const selectedOption = answers[question.id];
@@ -138,7 +140,7 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
   const secondsLeft = Math.max(Math.ceil((deadline - now) / 1000), 0);
 
   const handleSubmit = () => {
-    submitAttempt(exam.id);
+    submitAttempt(assessment.id);
     navigate(submittedPath, { replace: true });
   };
 
@@ -147,9 +149,9 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
       {/* Page heading */}
       <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between sm:gap-[24px]">
         <div className="flex min-w-0 flex-col gap-[6px]">
-          <p className="text-[30px] leading-[1.2] text-[#202536]">{exam.title}</p>
+          <p className="text-[30px] leading-[1.2] text-[#202536]">{assessment.title}</p>
           <p className="text-[14px] leading-[1.55] text-[#6d7180]">
-            {exam.className} · {teacher} · {exam.totalPoints} points
+            {assessment.className} · {teacher} · {assessment.totalPoints} points
           </p>
         </div>
 
@@ -166,9 +168,9 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
       <div className="flex items-start gap-[12px] rounded-[7px] bg-[#eeedf9] p-[16px] text-[#5149b8]">
         <Info size={19} strokeWidth={1.6} className="shrink-0" />
         <div className="flex flex-col gap-[4px] leading-[1.55]">
-          <p className="text-[13px] font-semibold">Your attempt ends at {exam.closesAt} GMT</p>
+          <p className="text-[13px] font-semibold">Your attempt ends at {assessment.closesAt} GMT</p>
           <p className="text-[12px]">
-            Answers save automatically. Your exam is submitted when time runs out, even if questions are unanswered.
+            Answers save automatically. Your {noun} is submitted when time runs out, even if questions are unanswered.
           </p>
         </div>
       </div>
@@ -194,7 +196,7 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
                 label={option}
                 isSelected={selectedOption === optionIndex}
                 onSelect={() =>
-                  setAttempt(recordAnswer(exam.id, attempt, question.id, optionIndex))
+                  setAttempt(recordAnswer(assessment.id, attempt, question.id, optionIndex))
                 }
               />
             ))}
@@ -263,7 +265,7 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
           )}
 
           <div>
-            <Button label="Submit exam" onClick={() => setIsConfirmOpen(true)} />
+            <Button label={`Submit ${noun}`} onClick={() => setIsConfirmOpen(true)} />
           </div>
 
           <p className="text-[11px] leading-[1.55] text-[#6d7180]">
@@ -275,7 +277,7 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
       <Modal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
-        title="Submit your exam?"
+        title={`Submit your ${noun}?`}
       >
         <div className="flex flex-col gap-[22px]">
           <p className="text-[14px] leading-[1.55] text-[#6d7180]">
@@ -294,12 +296,12 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
           </div>
 
           <p className="text-[12px] leading-[1.55] text-[#6d7180]">
-            Your score and correct answers will be available today at {exam.closesAt} GMT, after the exam closes.
+            Your score and correct answers will be available today at {assessment.closesAt} GMT, after the {noun} closes.
           </p>
 
           <div className="flex flex-wrap justify-end gap-[12px]">
             <Button label="Keep working" variant="secondary" onClick={() => setIsConfirmOpen(false)} />
-            <Button label="Submit exam" onClick={handleSubmit} />
+            <Button label={`Submit ${noun}`} onClick={handleSubmit} />
           </div>
         </div>
       </Modal>
@@ -307,39 +309,42 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
   );
 }
 
-function StudentExamAttempt() {
+function StudentAssessmentAttempt({ type }) {
+  const config = assessmentTypes[type];
+  const { items, basePath } = config;
+
   const { examId } = useParams();
   const location = useLocation();
   const { enrolledClasses } = useOutletContext();
 
-  const exam = mockExams.find((item) => item.id === examId);
-  const questions = mockExamQuestions[examId];
+  const assessment = items.find((item) => item.id === examId);
+  const questions = config.questions[examId];
   const attempt = loadAttempt(examId);
 
-  if (exam?.status !== "open" || !questions) {
-    return <Navigate to="/student/exams" replace />;
+  if (assessment?.status !== "open" || !questions) {
+    return <Navigate to={basePath} replace />;
   }
 
-  // There is only one attempt, so a submitted exam can't be opened again.
+  // There is only one attempt, so a submitted one can't be opened again.
   if (attempt?.submittedAt) {
-    return <Navigate to={`/student/exams/${examId}/submitted`} replace />;
+    return <Navigate to={`${basePath}/${examId}/submitted`} replace />;
   }
 
   // A new attempt only starts once the rules have been accepted.
   if (!attempt && !location.state?.hasAccepted) {
-    return <Navigate to={`/student/exams/${examId}/instructions`} replace />;
+    return <Navigate to={`${basePath}/${examId}/instructions`} replace />;
   }
 
-  const teacher = enrolledClasses.find((item) => item.name === exam.className)?.teacher;
+  const teacher = enrolledClasses.find((item) => item.name === assessment.className)?.teacher;
 
   return (
-    <ExamAttempt
-      exam={exam}
-      questions={questions}
+    <AttemptWorkspace
+      assessment={assessment}
+      config={config}
       teacher={teacher}
       initialAttempt={attempt}
     />
   );
 }
 
-export default StudentExamAttempt;
+export default StudentAssessmentAttempt;

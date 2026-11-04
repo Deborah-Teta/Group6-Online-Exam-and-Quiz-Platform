@@ -29,4 +29,5 @@ export const studentSubPages = [
     label: ({ examId }) => mockQuizzes.find((quiz) => quiz.id === examId)?.title,
     href: "/student/quizzes/:examId/attempt",
   },
+  { label: "Submission received", href: "/student/quizzes/:examId/submitted" },
 ];
