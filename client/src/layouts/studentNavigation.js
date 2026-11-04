@@ -5,7 +5,7 @@ import {
   ListChecks,
   Users,
 } from "lucide-react";
-import { mockExams } from "../services/studentMockData";
+import { mockExams, mockQuizzes } from "../services/studentMockData";
 
 export const studentNavigation = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/student/dashboard" },
@@ -25,4 +25,8 @@ export const studentSubPages = [
   },
   { label: "Submission received", href: "/student/exams/:examId/submitted" },
   { label: "Before you begin", href: "/student/quizzes/:examId/instructions" },
+  {
+    label: ({ examId }) => mockQuizzes.find((quiz) => quiz.id === examId)?.title,
+    href: "/student/quizzes/:examId/attempt",
+  },
 ];
