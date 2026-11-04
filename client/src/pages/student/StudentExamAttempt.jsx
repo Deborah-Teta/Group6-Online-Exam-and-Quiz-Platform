@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { CloudCheck, Info, Timer } from "lucide-react";
+import { CloudCheck, Info, Timer, TriangleAlert } from "lucide-react";
 import Button from "../../components/common/Button";
 import Modal from "../../components/common/Modal";
 import SectionCard from "../../components/common/SectionCard";
@@ -83,6 +83,25 @@ function QuestionNumber({ number, isCurrent, isAnswered, onClick }) {
   );
 }
 
+function UnansweredNotice({ questionNumbers }) {
+  const isSingle = questionNumbers.length === 1;
+  const numberList = new Intl.ListFormat("en-GB").format(questionNumbers.map(String));
+
+  return (
+    <div className="flex items-start gap-[12px] rounded-[7px] bg-[#fbf3e2] p-[16px] text-[#96651d]">
+      <TriangleAlert size={19} strokeWidth={1.6} className="shrink-0" />
+      <div className="flex flex-col gap-[4px] leading-[1.55]">
+        <p className="text-[13px] font-semibold">
+          {isSingle ? "1 question is unanswered" : `${questionNumbers.length} questions are unanswered`}
+        </p>
+        <p className="text-[12px]">
+          {isSingle ? "Question" : "Questions"} {numberList} will receive 0 points if you submit now.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
   const navigate = useNavigate();
   const [attempt, setAttempt] = useState(
@@ -113,7 +132,9 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
   const question = questions[currentIndex];
   const selectedOption = answers[question.id];
   const answeredCount = questions.filter((item) => answers[item.id] !== undefined).length;
-  const unansweredCount = questions.length - answeredCount;
+  const unansweredNumbers = questions.flatMap((item, index) =>
+    answers[item.id] === undefined ? [index + 1] : [],
+  );
   const secondsLeft = Math.max(Math.ceil((deadline - now) / 1000), 0);
 
   const handleSubmit = () => {
@@ -255,18 +276,31 @@ function ExamAttempt({ exam, questions, teacher, initialAttempt }) {
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         title="Submit your exam?"
-        size="sm"
       >
-        <p className="text-[14px] leading-[1.55] text-[#6d7180]">
-          {unansweredCount > 0
-            ? `You have ${unansweredCount} unanswered of ${questions.length} questions, and unanswered questions earn 0 points. `
-            : `You've answered all ${questions.length} questions. `}
-          You can't change your answers or retake the exam after submitting.
-        </p>
+        <div className="flex flex-col gap-[22px]">
+          <p className="text-[14px] leading-[1.55] text-[#6d7180]">
+            You can only submit once. You won't be able to return to your answers.
+          </p>
 
-        <div className="mt-[20px] flex flex-wrap justify-end gap-[12px]">
-          <Button label="Keep working" variant="secondary" onClick={() => setIsConfirmOpen(false)} />
-          <Button label="Submit exam" onClick={handleSubmit} />
+          {unansweredNumbers.length > 0 && (
+            <UnansweredNotice questionNumbers={unansweredNumbers} />
+          )}
+
+          <div className="flex items-start justify-between gap-[16px] text-[14px] leading-[1.55]">
+            <p className="text-[#6d7180]">Answered</p>
+            <p className="font-semibold text-[#202536]">
+              {answeredCount} of {questions.length} questions
+            </p>
+          </div>
+
+          <p className="text-[12px] leading-[1.55] text-[#6d7180]">
+            Your score and correct answers will be available today at {exam.closesAt} GMT, after the exam closes.
+          </p>
+
+          <div className="flex flex-wrap justify-end gap-[12px]">
+            <Button label="Keep working" variant="secondary" onClick={() => setIsConfirmOpen(false)} />
+            <Button label="Submit exam" onClick={handleSubmit} />
+          </div>
         </div>
       </Modal>
     </div>
