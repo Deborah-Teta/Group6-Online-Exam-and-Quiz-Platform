@@ -49,6 +49,46 @@ export const mockAvailableClasses = [
 
 export const mockNextExamNote = "Your next exam is tomorrow at 11:00";
 
+export const mockExamQuestions = {
+  "cell-biology-checkpoint": [
+    {
+      id: "q1",
+      type: "Multiple choice",
+      points: 2,
+      text: "Which organelle releases most of a cell's usable energy?",
+      options: ["Golgi apparatus", "Mitochondrion", "Lysosome", "Vacuole"],
+    },
+    {
+      id: "q2",
+      type: "True / false",
+      points: 2,
+      text: "Plant cells have a cell wall as well as a cell membrane.",
+      options: ["True", "False"],
+    },
+    {
+      id: "q3",
+      type: "Multiple choice",
+      points: 2,
+      text: "Where in a cell are proteins made?",
+      options: ["Ribosome", "Nucleus", "Cell membrane", "Chloroplast"],
+    },
+    {
+      id: "q4",
+      type: "Multiple choice",
+      points: 2,
+      text: "Which structure contains the genetic material of a cell?",
+      options: ["Cytoplasm", "Nucleus", "Cell membrane", "Ribosome"],
+    },
+    {
+      id: "q5",
+      type: "True / false",
+      points: 2,
+      text: "Animal cells contain chloroplasts.",
+      options: ["True", "False"],
+    },
+  ],
+};
+
 export const mockExams = [
   {
     id: "cell-biology-checkpoint",

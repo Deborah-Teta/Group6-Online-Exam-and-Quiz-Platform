@@ -14,6 +14,10 @@ function StudentTopbar({ onMenuClick }) {
   const currentPage = [...studentNavigation, ...studentSubPages].find(
     ({ href }) => matchPath(href, pathname),
   );
+  const pageLabel =
+    typeof currentPage?.label === "function"
+      ? currentPage.label(matchPath(currentPage.href, pathname).params)
+      : currentPage?.label;
 
   return (
     <header className="flex h-[76px] shrink-0 items-center justify-between gap-[16px] border-b border-[#e3e4e8] bg-white px-[20px] sm:px-[40px]">
@@ -31,7 +35,7 @@ function StudentTopbar({ onMenuClick }) {
         <div className="flex items-center gap-[10px] text-[12px] leading-[1.55]">
           <span className="text-[#6d7180]">Student</span>
           <ChevronRight size={12} strokeWidth={1.6} className="text-[#6d7180]" />
-          <span className="text-[#202536]">{currentPage?.label}</span>
+          <span className="text-[#202536]">{pageLabel}</span>
         </div>
       </div>
 
