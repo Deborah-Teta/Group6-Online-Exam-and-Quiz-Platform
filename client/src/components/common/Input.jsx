@@ -1,25 +1,23 @@
-﻿function Input({ 
-    label,
-    name,
-    type = 'text',
-    value,
-    onChange,
-    placeholder,
-    required = false,
-    disabled = false,
-    error,
-    helperText,   
-  }) {
-    return (
-            <div className="w-full flex flex-col gap-1.5">
+﻿function Input({
+  label,
+  name,
+  type = 'text',
+  value,
+  onChange,
+  placeholder,
+  required = false,
+  disabled = false,
+  error,
+  helperText,
+}) {
+  return (
+    <div className="flex w-full flex-col gap-[7px] text-left">
       <label
         htmlFor={name}
-        className="text-sm font-medium text-slate-700"
+        className="text-[12px] font-semibold leading-normal text-[#202536]"
       >
         {label}
-        {required && (
-          <span className="ml-1 text-red-500">*</span>
-        )}
+        {required && " *"}
       </label>
 
       <input
@@ -31,27 +29,23 @@
         placeholder={placeholder}
         required={required}
         disabled={disabled}
+        aria-invalid={Boolean(error)}
         className={`
-          w-full rounded-lg border bg-white px-4 py-3
-          text-sm text-slate-900 placeholder:text-slate-400
-          outline-none transition-all duration-200
-          focus:ring-4 focus:ring-blue-100
-          disabled:cursor-not-allowed disabled:bg-slate-100
-          disabled:text-slate-400
-          ${
-            error
-              ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-              : "border-slate-200 focus:border-blue-600"
-          }
+          h-[44px] w-full rounded-[7px] border bg-white px-[12px]
+          text-[14px] leading-[1.55] text-[#202536] placeholder:text-[#6d7180]
+          outline-none transition-colors duration-200
+          disabled:cursor-not-allowed disabled:bg-[#f0f0ea] disabled:text-[#6d7180]
+          ${error ? "border-red-600" : "border-[#e3e4e8] focus:border-[#5149b8]"}
         `}
       />
-      {error ? (
-        <p className="text-xs text-red-500">{error}</p>
-      ) : helperText ? (
-        <p className="text-xs text-slate-500">{helperText}</p>
-      ) : null}
 
+      {error ? (
+        <p className="text-[12px] leading-[1.55] text-red-600">{error}</p>
+      ) : helperText ? (
+        <p className="text-[12px] leading-[1.55] text-[#6d7180]">{helperText}</p>
+      ) : null}
     </div>
-    )
+  );
 }
+
 export default Input;
