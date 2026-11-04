@@ -60,7 +60,6 @@ function StudentSidebar({ student, isOpen = false, onClose }) {
             <NavLink
               key={href}
               to={href}
-              end
               onClick={onClose}
               className={({ isActive }) => `
                 flex h-[44px] items-center gap-[12px] rounded-[7px] px-[12px]

@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { Bell, ChevronRight, Menu } from "lucide-react";
-import { studentNavigation } from "./studentNavigation";
+import { studentNavigation, studentSubPages } from "./studentNavigation";
 
 const today = new Date().toLocaleDateString("en-GB", {
   weekday: "short",
@@ -11,7 +11,9 @@ const today = new Date().toLocaleDateString("en-GB", {
 
 function StudentTopbar({ onMenuClick }) {
   const { pathname } = useLocation();
-  const currentPage = studentNavigation.find(({ href }) => href === pathname);
+  const currentPage = [...studentNavigation, ...studentSubPages].find(
+    ({ href }) => href === pathname,
+  );
 
   return (
     <header className="flex h-[76px] shrink-0 items-center justify-between gap-[16px] border-b border-[#e3e4e8] bg-white px-[20px] sm:px-[40px]">

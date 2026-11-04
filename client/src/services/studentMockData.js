@@ -7,7 +7,45 @@ export const mockStudent = {
   academicYear: "2026–27",
 };
 
-export const mockClasses = ["Biology 10A", "Science enrichment"];
+export const mockEnrolledClasses = [
+  {
+    id: "biology-10a",
+    name: "Biology 10A",
+    teacher: "Dr. Sarah Morgan",
+    joinedOn: "8 Sep 2026",
+  },
+  {
+    id: "science-enrichment",
+    name: "Science enrichment",
+    teacher: "Alex Moore",
+    joinedOn: "12 Sep 2026",
+  },
+];
+
+// Every class a joining code can find, whether or not the student is in it yet.
+export const mockAvailableClasses = [
+  {
+    id: "biology-10a",
+    code: "BIO10A",
+    name: "Biology 10A",
+    description: "Year 10 · Biology",
+    teacher: "Dr. Sarah Morgan",
+  },
+  {
+    id: "science-enrichment",
+    code: "SCI10E",
+    name: "Science enrichment",
+    description: "Year 10 · Science",
+    teacher: "Alex Moore",
+  },
+  {
+    id: "chemistry-10b",
+    code: "CHEM10B",
+    name: "Chemistry 10B",
+    description: "Year 10 · Chemistry",
+    teacher: "Priya Nair",
+  },
+];
 
 export const mockNextExamNote = "Your next exam is tomorrow at 11:00";
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import BarChart from "../../components/common/BarChart";
 import Button from "../../components/common/Button";
 import DataTable from "../../components/common/DataTable";
@@ -10,11 +9,11 @@ import StatCard from "../../components/common/statuscard";
 import StatusBadge from "../../components/common/StatusBadge";
 import Tabs from "../../components/common/Tabs";
 import {
-  mockClasses,
   mockExams,
   mockNextExamNote,
   mockStudent,
 } from "../../services/studentMockData";
+import { averageScore, formatPercent } from "../../utils/scores";
 
 const VISIBLE_ROWS = 5;
 
@@ -24,11 +23,6 @@ const examTabs = [
   { label: "Upcoming", value: "upcoming" },
   { label: "Completed", value: "closed" },
 ];
-
-const formatPercent = (value) => `${value}%`;
-
-const averageScore = (exams) =>
-  Math.round(exams.reduce((total, exam) => total + exam.score, 0) / exams.length);
 
 function ExamAction({ exam }) {
   const navigate = useNavigate();
@@ -77,8 +71,10 @@ const examColumns = [
 ];
 
 function StudentDashboard() {
+  const { enrolledClasses } = useOutletContext();
   const [activeTab, setActiveTab] = useState("all");
 
+  const classNames = enrolledClasses.map((enrolledClass) => enrolledClass.name);
   const openExams = mockExams.filter((exam) => exam.status === "open");
   const upcomingExams = mockExams.filter((exam) => exam.status === "upcoming");
   const completedExams = mockExams.filter((exam) => exam.status === "closed");
@@ -94,40 +90,36 @@ function StudentDashboard() {
     detail: exam.title,
   }));
 
-  const scoreByClass = mockClasses.map((name) => {
-    const classExams = completedExams.filter((exam) => exam.className === name);
-
-    return {
+  const scoreByClass = classNames
+    .map((name) => ({
+      name,
+      classExams: completedExams.filter((exam) => exam.className === name),
+    }))
+    .filter(({ classExams }) => classExams.length > 0)
+    .map(({ name, classExams }) => ({
       label: name,
       value: averageScore(classExams),
       detail: `${classExams.length} exams`,
-    };
-  });
+    }));
 
   return (
     <div className="flex flex-col gap-[28px]">
       {/* Page heading */}
-      <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between sm:gap-[24px]">
-        <div className="flex flex-col gap-[6px]">
-          <p className="text-[30px] leading-[1.2] text-[#202536]">
-            Ready when you are, {mockStudent.name.split(" ")[0]}.
-          </p>
-          <p className="text-[14px] leading-[1.55] text-[#6d7180]">
-            Your classes and exams, all in one place.
-          </p>
-        </div>
-
-        <div className="shrink-0">
-          <Button label="Join a class" icon={<Plus size={16} />} />
-        </div>
+      <div className="flex flex-col gap-[6px]">
+        <p className="text-[30px] leading-[1.2] text-[#202536]">
+          Ready when you are, {mockStudent.name.split(" ")[0]}.
+        </p>
+        <p className="text-[14px] leading-[1.55] text-[#6d7180]">
+          Your classes and exams, all in one place.
+        </p>
       </div>
 
       {/* Row 1: statistics */}
       <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="My classes"
-          value={mockClasses.length}
-          subtext={mockClasses.join(" · ")}
+          value={enrolledClasses.length}
+          subtext={classNames.join(" · ")}
         />
         <StatCard
           title="Open now"

@@ -13,3 +13,8 @@ export const studentNavigation = [
   { label: "My quizzes", icon: ListChecks, href: "/student/quizzes" },
   { label: "Results", icon: ChartNoAxesCombined, href: "/student/results" },
 ];
+
+// Pages reached from another page, so they have a breadcrumb but no sidebar link.
+export const studentSubPages = [
+  { label: "Join class", href: "/student/classes/join" },
+];
