@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { matchPath, useLocation } from "react-router-dom";
 import { Bell, ChevronRight, Menu } from "lucide-react";
 import { studentNavigation, studentSubPages } from "./studentNavigation";
 
@@ -12,7 +12,7 @@ const today = new Date().toLocaleDateString("en-GB", {
 function StudentTopbar({ onMenuClick }) {
   const { pathname } = useLocation();
   const currentPage = [...studentNavigation, ...studentSubPages].find(
-    ({ href }) => href === pathname,
+    ({ href }) => matchPath(href, pathname),
   );
 
   return (

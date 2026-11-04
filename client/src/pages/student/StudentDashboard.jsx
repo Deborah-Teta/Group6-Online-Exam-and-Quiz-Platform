@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import BarChart from "../../components/common/BarChart";
-import Button from "../../components/common/Button";
 import DataTable from "../../components/common/DataTable";
+import ExamAction from "../../components/common/ExamAction";
 import LineChart from "../../components/common/LineChart";
 import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
@@ -23,24 +23,6 @@ const examTabs = [
   { label: "Upcoming", value: "upcoming" },
   { label: "Completed", value: "closed" },
 ];
-
-function ExamAction({ exam }) {
-  const navigate = useNavigate();
-
-  if (exam.status === "open") {
-    return <Button label="View exam →" onClick={() => navigate("/student/exams")} />;
-  }
-
-  if (exam.status === "closed") {
-    return (
-      <Link to="/student/results" className="text-[12px] whitespace-nowrap text-[#5149b8] hover:underline">
-        View results →
-      </Link>
-    );
-  }
-
-  return <span className="text-[12px] whitespace-nowrap text-[#6d7180]">{exam.availability}</span>;
-}
 
 const examColumns = [
   {

@@ -17,4 +17,5 @@ export const studentNavigation = [
 // Pages reached from another page, so they have a breadcrumb but no sidebar link.
 export const studentSubPages = [
   { label: "Join class", href: "/student/classes/join" },
+  { label: "Exam instructions", href: "/student/exams/:examId/instructions" },
 ];

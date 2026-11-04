@@ -63,6 +63,7 @@ export const mockExams = [
   {
     id: "cell-transport-quiz",
     title: "Cell Transport Quiz",
+    details: "10 questions · 20 minutes · 20 points",
     className: "Biology 10A",
     schedule: "30 Oct · 11:00–11:20",
     status: "upcoming",
@@ -72,6 +73,7 @@ export const mockExams = [
   {
     id: "scientific-method",
     title: "Scientific Method",
+    details: "8 questions · 20 minutes · 16 points",
     className: "Science enrichment",
     schedule: "2 Nov · 15:30–15:50",
     status: "upcoming",
@@ -81,6 +83,7 @@ export const mockExams = [
   {
     id: "microscopy-basics",
     title: "Microscopy Basics",
+    details: "10 questions · 20 minutes · 20 points",
     className: "Biology 10A",
     schedule: "22 Oct · 10:00–10:20",
     date: "22 Oct",
@@ -91,6 +94,7 @@ export const mockExams = [
   {
     id: "hypothesis-testing",
     title: "Hypothesis Testing",
+    details: "8 questions · 20 minutes · 16 points",
     className: "Science enrichment",
     schedule: "15 Oct · 15:30–15:50",
     date: "15 Oct",
@@ -101,6 +105,7 @@ export const mockExams = [
   {
     id: "organelles-quiz",
     title: "Organelles Quiz",
+    details: "10 questions · 20 minutes · 20 points",
     className: "Biology 10A",
     schedule: "9 Oct · 11:00–11:20",
     date: "9 Oct",
@@ -111,6 +116,7 @@ export const mockExams = [
   {
     id: "measuring-and-data",
     title: "Measuring and Data",
+    details: "8 questions · 20 minutes · 16 points",
     className: "Science enrichment",
     schedule: "2 Oct · 15:30–15:50",
     date: "2 Oct",
@@ -121,6 +127,7 @@ export const mockExams = [
   {
     id: "cell-structure",
     title: "Cell Structure",
+    details: "15 questions · 30 minutes · 30 points",
     className: "Biology 10A",
     schedule: "25 Sep · 10:00–10:30",
     date: "25 Sep",
@@ -131,6 +138,7 @@ export const mockExams = [
   {
     id: "lab-safety",
     title: "Lab Safety",
+    details: "8 questions · 20 minutes · 16 points",
     className: "Science enrichment",
     schedule: "18 Sep · 15:30–15:50",
     date: "18 Sep",
