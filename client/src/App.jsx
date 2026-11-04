@@ -6,6 +6,7 @@ import StudentDashboard from './pages/student/StudentDashboard';
 import StudentExamAttempt from './pages/student/StudentExamAttempt';
 import StudentExamInstructions from './pages/student/StudentExamInstructions';
 import StudentExams from './pages/student/StudentExams';
+import StudentExamSubmitted from './pages/student/StudentExamSubmitted';
 import StudentJoinClass from './pages/student/StudentJoinClass';
 import StudentPlaceholder from './pages/student/StudentPlaceholder';
 
@@ -22,7 +23,7 @@ function App() {
         <Route path="exams" element={<StudentExams />} />
         <Route path="exams/:examId/instructions" element={<StudentExamInstructions />} />
         <Route path="exams/:examId/attempt" element={<StudentExamAttempt />} />
-        <Route path="exams/:examId/submitted" element={<StudentPlaceholder title="Exam submitted" />} />
+        <Route path="exams/:examId/submitted" element={<StudentExamSubmitted />} />
         <Route path="quizzes" element={<StudentPlaceholder title="My quizzes" />} />
         <Route path="results" element={<StudentPlaceholder title="Results" />} />
       </Route>
