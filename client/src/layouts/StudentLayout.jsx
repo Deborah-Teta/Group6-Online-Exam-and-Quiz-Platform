@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import StudentFooter from "./StudentFooter";
 import StudentSidebar from "./StudentSidebar";
 import StudentTopbar from "./StudentTopbar";
 import { mockEnrolledClasses, mockStudent } from "../services/studentMockData";
@@ -20,7 +19,7 @@ function StudentLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#f7f7f2] text-left font-['DM_Sans',system-ui,sans-serif] [color-scheme:light] [font-variation-settings:'opsz'_14]">
+    <div className="flex min-h-screen bg-page text-left [color-scheme:light]">
       <StudentSidebar
         student={mockStudent}
         isOpen={isSidebarOpen}
@@ -30,11 +29,9 @@ function StudentLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <StudentTopbar onMenuClick={() => setIsSidebarOpen(true)} />
 
-        <main className="flex-1 p-[20px] sm:p-[40px]">
+        <main className="flex-1 p-[16px] sm:px-[32px] sm:pb-[48px] sm:pt-[24px]">
           <Outlet context={{ enrolledClasses, joinClass }} />
         </main>
-
-        <StudentFooter student={mockStudent} />
       </div>
     </div>
   );

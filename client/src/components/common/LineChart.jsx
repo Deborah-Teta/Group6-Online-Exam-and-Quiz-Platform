@@ -60,7 +60,7 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
         onBlur={() => setActiveIndex(null)}
         onKeyDown={handleKeyDown}
         style={{ height }}
-        className="relative w-full rounded-[7px] outline-none focus-visible:ring-2 focus-visible:ring-[#5149b8]"
+        className="relative w-full rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         {width > 0 && (
           <svg width={width} height={height} aria-hidden="true" className="block">
@@ -71,13 +71,13 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
                   x2={width - PADDING.right}
                   y1={getY(tick)}
                   y2={getY(tick)}
-                  stroke="#e3e4e8"
+                  stroke="var(--border-color)"
                 />
                 <text
                   x={PADDING.left - 8}
                   y={getY(tick) + 4}
                   textAnchor="end"
-                  className="fill-[#6d7180] text-[11px] tabular-nums"
+                  className="fill-muted text-[11px] tabular-nums"
                 >
                   {tick}
                 </text>
@@ -91,18 +91,18 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
                   x={getX(index)}
                   y={height - 8}
                   textAnchor="middle"
-                  className="fill-[#6d7180] text-[11px]"
+                  className="fill-muted text-[11px]"
                 >
                   {point.label}
                 </text>
               ) : null,
             )}
 
-            <path d={areaPath} fill="#5149b8" fillOpacity={0.1} />
+            <path d={areaPath} fill="var(--primary)" fillOpacity={0.1} />
             <path
               d={linePath}
               fill="none"
-              stroke="#5149b8"
+              stroke="var(--primary)"
               strokeWidth={2}
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -114,7 +114,7 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
                 x2={getX(activeIndex)}
                 y1={PADDING.top}
                 y2={baseline}
-                stroke="#6d7180"
+                stroke="var(--text-subtle)"
               />
             )}
 
@@ -124,8 +124,8 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
                 cx={getX(index)}
                 cy={getY(point.value)}
                 r={index === activeIndex ? 5 : 4}
-                fill="#5149b8"
-                stroke="#ffffff"
+                fill="var(--primary)"
+                stroke="var(--bg-card)"
                 strokeWidth={2}
               />
             ))}
@@ -133,7 +133,7 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
             <text
               x={getX(data.length - 1) + 10}
               y={getY(data[data.length - 1].value) + 4}
-              className="fill-[#202536] text-[12px] font-semibold"
+              className="fill-main text-[12px] font-semibold"
             >
               {formatValue(data[data.length - 1].value)}
             </text>
@@ -146,12 +146,12 @@ function LineChart({ data, label, max = 100, height = 240, formatValue = (value)
               left: Math.min(Math.max(getX(activeIndex), 80), width - 80),
               top: Math.max(getY(active.value) - 72, 0),
             }}
-            className="pointer-events-none absolute w-[150px] -translate-x-1/2 rounded-[7px] border border-[#e3e4e8] bg-white px-[10px] py-[6px] text-left shadow-sm"
+            className="pointer-events-none absolute w-[150px] -translate-x-1/2 rounded-sm border border-line bg-white px-[10px] py-[6px] text-left shadow-sm"
           >
-            <p className="text-[13px] font-semibold leading-[1.55] text-[#202536]">
+            <p className="text-[13px] font-semibold leading-[1.55] text-main">
               {formatValue(active.value)}
             </p>
-            <p className="truncate text-[11px] leading-[1.55] text-[#6d7180]">
+            <p className="truncate text-[11px] leading-[1.55] text-muted">
               {active.detail} · {active.label}
             </p>
           </div>

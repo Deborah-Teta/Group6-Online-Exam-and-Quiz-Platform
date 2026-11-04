@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
+import { ChartNoAxesCombined, CalendarClock, ClipboardCheck, Users } from "lucide-react";
 import BarChart from "../../components/common/BarChart";
 import DataTable from "../../components/common/DataTable";
 import ExamAction from "../../components/common/ExamAction";
@@ -11,7 +12,6 @@ import Tabs from "../../components/common/Tabs";
 import {
   mockExams,
   mockNextExamNote,
-  mockStudent,
 } from "../../services/studentMockData";
 import { averageScore, formatPercent } from "../../utils/scores";
 
@@ -31,7 +31,7 @@ const examColumns = [
     render: (exam) => (
       <div className="flex flex-col gap-[4px]">
         <p className="font-semibold">{exam.title}</p>
-        <p className="text-[11px] text-[#6d7180]">{exam.className}</p>
+        <p className="text-[11px] text-muted">{exam.className}</p>
       </div>
     ),
   },
@@ -85,35 +85,33 @@ function StudentDashboard() {
     }));
 
   return (
-    <div className="flex flex-col gap-[28px]">
-      {/* Page heading */}
-      <div className="flex flex-col gap-[6px]">
-        <p className="text-[30px] leading-[1.2] text-[#202536]">
-          Ready when you are, {mockStudent.name.split(" ")[0]}.
-        </p>
-        <p className="text-[14px] leading-[1.55] text-[#6d7180]">
-          Your classes and exams, all in one place.
-        </p>
-      </div>
-
+    <div className="flex flex-col gap-[24px]">
       {/* Row 1: statistics */}
-      <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
+          icon={<Users size={20} strokeWidth={1.6} />}
+          color="indigo"
           title="My classes"
           value={enrolledClasses.length}
           subtext={classNames.join(" · ")}
         />
         <StatCard
+          icon={<ClipboardCheck size={20} strokeWidth={1.6} />}
+          color="emerald"
           title="Open now"
           value={openExams.length}
           subtext={`${openExams[0].title} closes at ${openExams[0].closesAt}`}
         />
         <StatCard
+          icon={<CalendarClock size={20} strokeWidth={1.6} />}
+          color="blue"
           title="Coming up"
           value={upcomingExams.length}
           subtext={mockNextExamNote}
         />
         <StatCard
+          icon={<ChartNoAxesCombined size={20} strokeWidth={1.6} />}
+          color="purple"
           title="Average score"
           value={formatPercent(averageScore(completedExams))}
           subtext={`Across ${completedExams.length} completed exams`}
@@ -121,7 +119,7 @@ function StudentDashboard() {
       </div>
 
       {/* Row 2: charts */}
-      <div className="grid grid-cols-1 gap-[16px] xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-[24px] xl:grid-cols-3">
         <SectionCard title="Score trend" action="Completed exams" className="xl:col-span-2">
           <LineChart
             data={scoreTrend}
@@ -140,11 +138,12 @@ function StudentDashboard() {
       </div>
 
       {/* Row 3: exams and results */}
-      <div className="grid grid-cols-1 gap-[16px] xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-[24px] xl:grid-cols-3">
         <SectionCard
           title="Your exams"
+          flush
           action={
-            <Link to="/student/exams" className="text-[#5149b8] hover:underline">
+            <Link to="/student/exams" className="text-primary hover:underline">
               View all exams →
             </Link>
           }
@@ -161,23 +160,23 @@ function StudentDashboard() {
         <SectionCard
           title="Recent results"
           action={
-            <Link to="/student/results" className="text-[#5149b8] hover:underline">
+            <Link to="/student/results" className="text-primary hover:underline">
               View all →
             </Link>
           }
         >
-          <ul className="flex flex-1 flex-col justify-between divide-y divide-[#e3e4e8]">
+          <ul className="-my-[14px] flex flex-1 flex-col justify-between divide-y divide-line-subtle">
             {completedExams.slice(0, VISIBLE_ROWS).map((exam) => (
               <li key={exam.id} className="flex items-center justify-between gap-[12px] py-[14px]">
                 <div className="min-w-0">
-                  <p className="text-[13px] font-semibold leading-[1.55] text-[#202536]">
+                  <p className="text-[13px] font-semibold leading-[1.55] text-main">
                     {exam.title}
                   </p>
-                  <p className="text-[11px] leading-[1.55] text-[#6d7180]">
+                  <p className="text-[11px] leading-[1.55] text-muted">
                     {exam.className} · {exam.date}
                   </p>
                 </div>
-                <p className="shrink-0 text-[15px] font-semibold leading-normal text-[#202536]">
+                <p className="shrink-0 text-[15px] font-semibold leading-normal text-main">
                   {formatPercent(exam.score)}
                 </p>
               </li>

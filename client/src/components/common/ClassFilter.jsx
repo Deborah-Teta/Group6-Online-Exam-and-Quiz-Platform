@@ -77,7 +77,7 @@ function ClassFilter({ classNames, value, onChange }) {
   };
 
   return (
-    <div className="flex shrink-0 items-center gap-[8px] text-[12px] leading-[1.55] text-[#6d7180]">
+    <div className="flex shrink-0 items-center gap-[8px] text-[12px] leading-[1.55] text-muted">
       <span id={`${id}-label`}>Class</span>
 
       <div ref={containerRef} className="relative">
@@ -92,17 +92,17 @@ function ClassFilter({ classNames, value, onChange }) {
           onClick={() => (isOpen ? setIsOpen(false) : open())}
           onKeyDown={handleKeyDown}
           className={`
-            flex h-[34px] cursor-pointer items-center gap-[8px] rounded-[7px] border bg-white
-            pl-[12px] pr-[10px] text-[12px] font-semibold whitespace-nowrap text-[#202536]
-            outline-none transition-colors hover:bg-[#f7f7f2] focus-visible:border-[#5149b8]
-            ${isOpen ? "border-[#5149b8]" : "border-[#e3e4e8]"}
+            flex cursor-pointer items-center gap-[8px] rounded-sm border bg-card
+            py-[6px] pl-[10px] pr-[8px] text-[12.5px] font-medium leading-normal whitespace-nowrap text-main
+            outline-none transition-colors hover:bg-surface-hover focus-visible:border-primary
+            ${isOpen ? "border-primary" : "border-line"}
           `}
         >
           {options[selectedIndex].label}
           <ChevronDown
             size={14}
             strokeWidth={1.6}
-            className={`shrink-0 text-[#6d7180] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            className={`shrink-0 text-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           />
         </button>
 
@@ -111,7 +111,7 @@ function ClassFilter({ classNames, value, onChange }) {
             id={`${id}-list`}
             role="listbox"
             aria-labelledby={`${id}-label`}
-            className={`absolute ${opensRight ? "left-0" : "right-0"} top-full z-30 mt-[6px] flex w-max min-w-full flex-col gap-[2px] rounded-[10px] border border-[#e3e4e8] bg-white p-[6px] text-left shadow-[0px_16px_64px_0px_rgba(32,37,54,0.13)]`}
+            className={`absolute ${opensRight ? "left-0" : "right-0"} top-full z-30 mt-[6px] flex w-max min-w-full flex-col gap-[2px] rounded-md border border-line bg-card p-[6px] text-left shadow-lg`}
           >
             {options.map((option, index) => {
               const isSelected = index === selectedIndex;
@@ -125,10 +125,10 @@ function ClassFilter({ classNames, value, onChange }) {
                   onClick={() => choose(option)}
                   onPointerEnter={() => setActiveIndex(index)}
                   className={`
-                    flex h-[34px] cursor-pointer items-center justify-between gap-[16px] rounded-[7px]
+                    flex h-[34px] cursor-pointer items-center justify-between gap-[16px] rounded-sm
                     px-[10px] text-[12px] whitespace-nowrap transition-colors
-                    ${isSelected ? "font-semibold text-[#5149b8]" : "text-[#202536]"}
-                    ${index === activeIndex ? "bg-[#eeedf9]" : ""}
+                    ${isSelected ? "font-semibold text-primary" : "text-main"}
+                    ${index === activeIndex ? "bg-primary-light" : ""}
                   `}
                 >
                   {option.label}

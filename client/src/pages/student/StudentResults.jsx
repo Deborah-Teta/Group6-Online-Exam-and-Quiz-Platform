@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
+import { ChartNoAxesCombined, LockKeyhole, TrendingDown, Trophy } from "lucide-react";
 import BarChart from "../../components/common/BarChart";
+import Card from "../../components/common/Card";
 import ClassFilter, { ALL_CLASSES } from "../../components/common/ClassFilter";
 import DataTable from "../../components/common/DataTable";
 import LineChart from "../../components/common/LineChart";
@@ -57,11 +59,11 @@ const resultColumns = [
       <div className="flex flex-col gap-[4px]">
         <p className="font-semibold">{result.title}</p>
         {result.isLocked ? (
-          <Link to={result.submissionPath} className="text-[11px] whitespace-nowrap text-[#5149b8] hover:underline">
+          <Link to={result.submissionPath} className="text-[11px] whitespace-nowrap text-primary hover:underline">
             View submission →
           </Link>
         ) : (
-          <p className="text-[11px] text-[#6d7180]">{result.details}</p>
+          <p className="text-[11px] text-muted">{result.details}</p>
         )}
       </div>
     ),
@@ -98,10 +100,10 @@ const resultColumns = [
       ) : (
         <div className="flex items-center gap-[10px]">
           <span className="w-[32px] font-semibold">{formatPercent(result.score)}</span>
-          <div className="h-[5px] w-[72px] overflow-hidden rounded-[3px] bg-[#ededf1]">
+          <div className="h-[5px] w-[72px] overflow-hidden rounded-full bg-line">
             <div
               style={{ width: `${result.score}%` }}
-              className="h-full rounded-[3px] bg-[#5149b8]"
+              className="h-full rounded-full bg-primary"
             />
           </div>
         </div>
@@ -111,7 +113,7 @@ const resultColumns = [
 
 function EmptyChart() {
   return (
-    <p className="flex flex-1 items-center justify-center py-[40px] text-center text-[13px] leading-[1.55] text-[#6d7180]">
+    <p className="flex flex-1 items-center justify-center py-[40px] text-center text-[13px] leading-[1.55] text-muted">
       No released results match these filters.
     </p>
   );
@@ -156,41 +158,43 @@ function StudentResults() {
   };
 
   return (
-    <div className="flex flex-col gap-[28px]">
-      {/* Page heading */}
-      <div className="flex flex-col gap-[6px]">
-        <p className="text-[30px] leading-[1.2] text-[#202536]">Results</p>
-        <p className="text-[14px] leading-[1.55] text-[#6d7180]">
-          Your scores from exams and quizzes, and how they're changing over time.
-        </p>
-      </div>
-
+    <div className="flex flex-col gap-[24px]">
       {/* Filters */}
-      <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex-1">
+      <Card className="flex flex-col sm:flex-row sm:items-stretch">
+        <div className="min-w-0 flex-1 overflow-hidden rounded-t-md sm:rounded-r-none sm:rounded-l-md [&_[role=tablist]]:h-full [&_[role=tablist]]:border-b-0">
           <Tabs tabs={typeTabs} activeTab={activeType} onChange={setActiveType} />
         </div>
+        <div className="flex items-center px-[16px] py-[10px]">
         <ClassFilter classNames={classNames} value={activeClass} onChange={handleClassChange} />
-      </div>
+        </div>
+      </Card>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
+          icon={<ChartNoAxesCombined size={20} strokeWidth={1.6} />}
+          color="indigo"
           title="Average score"
           value={released.length ? formatPercent(averageScore(released)) : "—"}
           subtext={`Across ${released.length} released results`}
         />
         <StatCard
+          icon={<Trophy size={20} strokeWidth={1.6} />}
+          color="emerald"
           title="Best score"
           value={best ? formatPercent(best.score) : "—"}
           subtext={best ? best.title : "No results yet"}
         />
         <StatCard
+          icon={<TrendingDown size={20} strokeWidth={1.6} />}
+          color="blue"
           title="Lowest score"
           value={lowest ? formatPercent(lowest.score) : "—"}
           subtext={lowest ? lowest.title : "No results yet"}
         />
         <StatCard
+          icon={<LockKeyhole size={20} strokeWidth={1.6} />}
+          color="purple"
           title="Awaiting results"
           value={lockedResults.length}
           subtext={lockedResults.length ? "Unlock when they close" : "Nothing waiting right now"}
@@ -198,13 +202,13 @@ function StudentResults() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 gap-[16px] xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-[24px] xl:grid-cols-3">
         <SectionCard title="Score trend" action="Released results" className="xl:col-span-2">
           {released.length ? (
             <LineChart
               data={scoreTrend}
               label="Score on each released result, oldest to newest"
-              height={356}
+              height={348}
               formatValue={formatPercent}
             />
           ) : (
@@ -226,7 +230,7 @@ function StudentResults() {
       </div>
 
       {/* All results */}
-      <SectionCard title="All results" action={`${results.length} shown`}>
+      <SectionCard title="All results" flush action={`${results.length} shown`}>
         <DataTable
           columns={resultColumns}
           rows={[...lockedResults, ...released]}

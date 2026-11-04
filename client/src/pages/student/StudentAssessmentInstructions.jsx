@@ -11,8 +11,8 @@ import { loadAttempt } from "../../services/studentAttempts";
 function AssessmentFact({ label, value }) {
   return (
     <div className="flex flex-col gap-[3px] leading-[1.55]">
-      <p className="text-[11px] text-[#6d7180]">{label}</p>
-      <p className="text-[14px] font-semibold text-[#202536]">{value}</p>
+      <p className="text-[11px] text-muted">{label}</p>
+      <p className="text-[14px] font-semibold text-main">{value}</p>
     </div>
   );
 }
@@ -40,12 +40,12 @@ function StudentAssessmentInstructions({ type }) {
   const teacher = enrolledClasses.find((item) => item.name === assessment.className)?.teacher;
 
   return (
-    <div className="flex flex-col gap-[28px]">
+    <div className="flex flex-col gap-[24px]">
       {/* Page heading */}
       <div className="flex items-start justify-between gap-[24px] sm:items-center">
         <div className="flex min-w-0 flex-col gap-[6px]">
-          <p className="text-[30px] leading-[1.2] text-[#202536]">{assessment.title}</p>
-          <p className="text-[14px] leading-[1.55] text-[#6d7180]">
+          <p className="text-[20px] font-bold leading-[1.3] tracking-[-0.3px] text-main">{assessment.title}</p>
+          <p className="text-[13px] leading-normal text-muted">
             {assessment.className} · {teacher}
           </p>
         </div>
@@ -57,7 +57,7 @@ function StudentAssessmentInstructions({ type }) {
       <div className="grid grid-cols-1 items-start gap-[24px] xl:grid-cols-[minmax(0,1fr)_350px]">
         {/* Rules */}
         <SectionCard title="A moment before you begin">
-          <p className="text-[14px] leading-[1.55] text-[#6d7180]">{assessment.summary}</p>
+          <p className="text-[14px] leading-[1.55] text-muted">{assessment.summary}</p>
 
           <div className="flex flex-col gap-[24px]">
             <InfoRow icon={CalendarClock} title="A scheduled window">
@@ -89,14 +89,14 @@ function StudentAssessmentInstructions({ type }) {
           <AssessmentFact label="Duration" value={`${assessment.durationMinutes} minutes`} />
           <AssessmentFact label="Closes" value={assessment.closesLabel} />
 
-          <div className="h-px bg-[#e3e4e8]" />
+          <div className="h-px bg-line" />
 
-          <label className="flex cursor-pointer items-start gap-[8px] text-[12px] leading-[1.55] text-[#202536]">
+          <label className="flex cursor-pointer items-start gap-[8px] text-[12px] leading-[1.55] text-main">
             <input
               type="checkbox"
               checked={hasAccepted}
               onChange={(event) => setHasAccepted(event.target.checked)}
-              className="mt-[2px] size-[14px] shrink-0 cursor-pointer accent-[#5149b8]"
+              className="mt-[2px] size-[14px] shrink-0 cursor-pointer accent-primary"
             />
             I understand the rules and that I have only one attempt.
           </label>
@@ -111,7 +111,7 @@ function StudentAssessmentInstructions({ type }) {
             />
           </div>
 
-          <p className="text-[11px] leading-[1.55] text-[#6d7180]">
+          <p className="text-[11px] leading-[1.55] text-muted">
             Starting now opens your only attempt.
           </p>
         </SectionCard>

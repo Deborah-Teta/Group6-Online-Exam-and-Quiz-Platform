@@ -1,6 +1,6 @@
 function Tabs({ tabs, activeTab, onChange }) {
   return (
-    <div role="tablist" className="flex gap-[24px] overflow-x-auto border-b border-[#e3e4e8]">
+    <div role="tablist" className="flex shrink-0 overflow-x-auto border-b border-line bg-surface-subtle px-[16px]">
       {tabs.map(({ label, value }) => {
         const isActive = value === activeTab;
 
@@ -12,12 +12,12 @@ function Tabs({ tabs, activeTab, onChange }) {
             aria-selected={isActive}
             onClick={() => onChange(value)}
             className={`
-              shrink-0 cursor-pointer border-b-2 pb-[14px] pt-[6px]
-              text-[13px] font-semibold leading-[1.55] whitespace-nowrap transition-colors
+              -mb-px shrink-0 cursor-pointer border-b-2 px-[18px] py-[14px]
+              text-[13.5px] font-semibold leading-normal whitespace-nowrap transition-colors duration-150
               ${
                 isActive
-                  ? "border-[#5149b8] text-[#5149b8]"
-                  : "border-transparent text-[#6d7180] hover:text-[#202536]"
+                  ? "border-primary bg-card text-primary"
+                  : "border-transparent text-muted hover:bg-black/[0.02] hover:text-main"
               }
             `}
           >

@@ -1,12 +1,12 @@
 const variants = {
-  open: "bg-[#eaf4ee] text-[#25715b]",
-  upcoming: "bg-[#eeedf9] text-[#5149b8]",
-  closed: "bg-[#f0f0ea] text-[#6d7180]",
+  open: "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text)]",
+  upcoming: "border-primary-border bg-primary-light text-primary",
+  closed: "border-slate-300 bg-surface-hover text-slate-700",
 };
 
 function StatusBadge({ label, variant = "closed" }) {
   return (
-    <span className={`inline-flex rounded-full px-[9px] py-[4px] text-[11px] leading-normal font-semibold whitespace-nowrap ${variants[variant]}`}>
+    <span className={`inline-flex items-center rounded-full border px-[8px] py-[2px] text-[11px] font-semibold leading-normal whitespace-nowrap ${variants[variant]}`}>
       {label}
     </span>
   );

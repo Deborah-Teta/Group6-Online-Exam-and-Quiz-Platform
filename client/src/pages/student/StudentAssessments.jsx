@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
+import { CalendarClock, CircleCheck, ClipboardCheck, ClipboardList } from "lucide-react";
 import ClassFilter, { ALL_CLASSES } from "../../components/common/ClassFilter";
 import DataTable from "../../components/common/DataTable";
 import ExamAction from "../../components/common/ExamAction";
@@ -24,7 +25,7 @@ const buildColumns = ({ nounTitle }, type) => [
     render: (item) => (
       <div className="flex flex-col gap-[4px]">
         <p className="font-semibold">{item.title}</p>
-        <p className="text-[11px] text-[#6d7180]">{item.details}</p>
+        <p className="text-[11px] text-muted">{item.details}</p>
       </div>
     ),
   },
@@ -57,7 +58,7 @@ const buildColumns = ({ nounTitle }, type) => [
 
 function StudentAssessments({ type }) {
   const config = assessmentTypes[type];
-  const { items, noun, plural, nextNote } = config;
+  const { items, plural, nextNote } = config;
 
   const { enrolledClasses } = useOutletContext();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -82,33 +83,33 @@ function StudentAssessments({ type }) {
   };
 
   return (
-    <div className="flex flex-col gap-[28px]">
-      {/* Page heading */}
-      <div className="flex flex-col gap-[6px]">
-        <p className="text-[30px] leading-[1.2] text-[#202536]">My {plural}</p>
-        <p className="text-[14px] leading-[1.55] text-[#6d7180]">
-          Every {noun} from your classes, and what you can do next.
-        </p>
-      </div>
-
+    <div className="flex flex-col gap-[24px]">
       {/* Statistics */}
-      <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
+          icon={<ClipboardList size={20} strokeWidth={1.6} />}
+          color="indigo"
           title={`All ${plural}`}
           value={items.length}
           subtext={`Across ${enrolledClasses.length} classes`}
         />
         <StatCard
+          icon={<ClipboardCheck size={20} strokeWidth={1.6} />}
+          color="emerald"
           title="Open now"
           value={openItems.length}
           subtext={`${openItems[0].title} closes at ${openItems[0].closesAt}`}
         />
         <StatCard
+          icon={<CalendarClock size={20} strokeWidth={1.6} />}
+          color="blue"
           title="Coming up"
           value={upcomingItems.length}
           subtext={nextNote}
         />
         <StatCard
+          icon={<CircleCheck size={20} strokeWidth={1.6} />}
+          color="purple"
           title="Completed"
           value={completedItems.length}
           subtext={`Average score ${formatPercent(averageScore(completedItems))}`}
@@ -118,6 +119,7 @@ function StudentAssessments({ type }) {
       {/* List */}
       <SectionCard
         title={`Your ${plural}`}
+        flush
         action={
           <ClassFilter
             classNames={classNames}

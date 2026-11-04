@@ -1,6 +1,10 @@
 import { matchPath, useLocation } from "react-router-dom";
-import { Bell, ChevronRight, Menu } from "lucide-react";
-import { studentNavigation, studentSubPages } from "./studentNavigation";
+import { Bell, Menu } from "lucide-react";
+import {
+  studentNavigation,
+  studentSubPages,
+  studentSupportNavigation,
+} from "./studentNavigation";
 
 const today = new Date().toLocaleDateString("en-GB", {
   weekday: "short",
@@ -9,46 +13,44 @@ const today = new Date().toLocaleDateString("en-GB", {
   year: "numeric",
 });
 
+const allPages = [...studentNavigation, ...studentSupportNavigation, ...studentSubPages];
+
 function StudentTopbar({ onMenuClick }) {
   const { pathname } = useLocation();
-  const currentPage = [...studentNavigation, ...studentSubPages].find(
-    ({ href }) => matchPath(href, pathname),
-  );
-  const pageLabel =
-    typeof currentPage?.label === "function"
-      ? currentPage.label(matchPath(currentPage.href, pathname).params)
-      : currentPage?.label;
+  const currentPage = allPages.find(({ href }) => matchPath(href, pathname));
 
   return (
-    <header className="flex h-[76px] shrink-0 items-center justify-between gap-[16px] border-b border-[#e3e4e8] bg-white px-[20px] sm:px-[40px]">
-      <div className="flex items-center gap-[12px]">
+    <header className="sticky top-0 z-20 flex min-h-[64px] shrink-0 items-center justify-between gap-[16px] border-b border-line bg-card px-[16px] py-[10px] sm:px-[32px]">
+      <div className="flex min-w-0 items-center gap-[12px]">
         <button
           type="button"
           onClick={onMenuClick}
           aria-label="Open navigation menu"
-          className="rounded-[8px] p-[4px] text-[#6d7180] hover:bg-[#f7f7f2] lg:hidden"
+          className="shrink-0 cursor-pointer rounded-sm p-[4px] text-muted hover:bg-surface-hover lg:hidden"
         >
           <Menu size={22} />
         </button>
 
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-[10px] text-[12px] leading-[1.55]">
-          <span className="text-[#6d7180]">Student</span>
-          <ChevronRight size={12} strokeWidth={1.6} className="text-[#6d7180]" />
-          <span className="text-[#202536]">{pageLabel}</span>
+        <div className="min-w-0">
+          <p className="text-[18px] font-bold leading-[1.3] tracking-[-0.3px] text-main">
+            {currentPage?.title ?? currentPage?.label}
+          </p>
+          <p className="hidden text-[12.5px] leading-normal text-muted sm:block">
+            {currentPage?.description}
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-[22px]">
-        <p className="hidden text-[12px] leading-[1.55] text-[#6d7180] sm:block">
+      <div className="flex shrink-0 items-center gap-[12px]">
+        <p className="hidden rounded-full bg-line-subtle px-[12px] py-[5px] text-[12px] font-semibold leading-normal text-muted sm:block">
           {today}
         </p>
         <button
           type="button"
           aria-label="Notifications"
-          className="rounded text-[#6d7180] transition-colors hover:text-[#202536]"
+          className="cursor-pointer rounded-sm border border-line bg-card p-[7px] text-main transition-colors duration-150 hover:bg-surface-hover"
         >
-          <Bell size={18} strokeWidth={1.6} />
+          <Bell size={14} strokeWidth={1.6} />
         </button>
       </div>
     </header>

@@ -11,10 +11,10 @@
   helperText,
 }) {
   return (
-    <div className="flex w-full flex-col gap-[7px] text-left">
+    <div className="flex w-full flex-col gap-[6px] text-left">
       <label
         htmlFor={name}
-        className="text-[12px] font-semibold leading-normal text-[#202536]"
+        className="text-[12.5px] font-semibold leading-normal text-main"
       >
         {label}
         {required && " *"}
@@ -31,18 +31,18 @@
         disabled={disabled}
         aria-invalid={Boolean(error)}
         className={`
-          h-[44px] w-full rounded-[7px] border bg-white px-[12px]
-          text-[14px] leading-[1.55] text-[#202536] placeholder:text-[#6d7180]
-          outline-none transition-colors duration-200
-          disabled:cursor-not-allowed disabled:bg-[#f0f0ea] disabled:text-[#6d7180]
-          ${error ? "border-red-600" : "border-[#e3e4e8] focus:border-[#5149b8]"}
+          w-full rounded-sm border bg-card px-[12px] py-[8px]
+          text-[13px] leading-normal text-main placeholder:text-subtle
+          outline-none transition-colors duration-150
+          disabled:cursor-not-allowed disabled:bg-surface-hover disabled:text-muted
+          ${error ? "border-[var(--color-danger)]" : "border-line focus:border-primary"}
         `}
       />
 
       {error ? (
-        <p className="text-[12px] leading-[1.55] text-red-600">{error}</p>
+        <p className="text-[12px] leading-[1.5] text-[var(--color-danger-text)]">{error}</p>
       ) : helperText ? (
-        <p className="text-[12px] leading-[1.55] text-[#6d7180]">{helperText}</p>
+        <p className="text-[12px] leading-[1.5] text-muted">{helperText}</p>
       ) : null}
     </div>
   );

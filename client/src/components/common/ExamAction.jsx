@@ -11,7 +11,7 @@ function ExamAction({ exam, type = "exam" }) {
     return (
       <Link
         to={`${basePath}/${exam.id}/submitted`}
-        className="text-[12px] whitespace-nowrap text-[#5149b8] hover:underline"
+        className="text-[12px] whitespace-nowrap text-primary hover:underline"
       >
         View submission →
       </Link>
@@ -29,13 +29,13 @@ function ExamAction({ exam, type = "exam" }) {
 
   if (exam.status === "closed") {
     return (
-      <Link to="/student/results" className="text-[12px] whitespace-nowrap text-[#5149b8] hover:underline">
+      <Link to="/student/results" className="text-[12px] whitespace-nowrap text-primary hover:underline">
         View results →
       </Link>
     );
   }
 
-  return <span className="text-[12px] whitespace-nowrap text-[#6d7180]">{exam.availability}</span>;
+  return <span className="text-[12px] whitespace-nowrap text-muted">{exam.availability}</span>;
 }
 
 export default ExamAction;

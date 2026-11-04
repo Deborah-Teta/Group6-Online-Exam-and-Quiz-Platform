@@ -1,11 +1,11 @@
 ﻿const variants = {
   primary: {
-    base: 'border-transparent bg-[#5149b8] text-white',
-    hover: 'hover:bg-[#443da0]',
+    base: 'border-transparent bg-primary text-white',
+    hover: 'hover:bg-primary-hover',
   },
   secondary: {
-    base: 'border-[#e3e4e8] bg-white text-[#202536]',
-    hover: 'hover:bg-[#f7f7f2]',
+    base: 'border-line bg-card text-main',
+    hover: 'hover:bg-surface-hover',
   },
 };
 
@@ -25,9 +25,9 @@ function Button({
       onClick={onClick}
       disabled={disabled}
       className={`
-        flex h-[42px] items-center justify-center gap-[8px] rounded-[7px] border
-        px-[16px] text-[13px] font-semibold whitespace-nowrap
-        transition-colors duration-200
+        flex items-center justify-center gap-[6px] rounded-sm border
+        px-[16px] py-[7px] text-[12.5px] font-semibold leading-normal whitespace-nowrap
+        transition-colors duration-150
         ${base}
         ${disabled ? 'opacity-50 cursor-not-allowed' : `cursor-pointer ${hover}`}
       `}

@@ -1,18 +1,16 @@
-const cellSpacing = "px-[8px] first:pl-[14px] last:pr-[14px]";
-
 // columns: [{ key, header, width, render(row) }]. Without render, shows row[key].
 function DataTable({ columns, rows, emptyMessage = "Nothing to show." }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left">
+    <div className="w-full overflow-x-auto">
+      <table className="w-full border-collapse text-left text-[13px]">
         <thead>
-          <tr className="h-[42px] border-b border-[#e3e4e8] bg-[#f7f7f2]">
+          <tr>
             {columns.map(({ key, header, width }) => (
               <th
                 key={key}
                 scope="col"
                 style={{ width }}
-                className={`${cellSpacing} text-[11px] font-semibold leading-normal text-[#6d7180]`}
+                className="border-b border-line bg-page px-[18px] py-[11px] text-[11px] font-semibold uppercase tracking-[0.5px] whitespace-nowrap text-muted"
               >
                 {header}
               </th>
@@ -22,11 +20,11 @@ function DataTable({ columns, rows, emptyMessage = "Nothing to show." }) {
 
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id} className="h-[62px] border-b border-[#e3e4e8]">
+            <tr key={row.id} className="transition-colors hover:bg-surface-subtle">
               {columns.map(({ key, render }) => (
                 <td
                   key={key}
-                  className={`${cellSpacing} py-[13px] text-[13px] leading-[1.55] text-[#202536]`}
+                  className="border-b border-line-subtle px-[18px] py-[13px] align-middle leading-normal text-main"
                 >
                   {render ? render(row) : row[key]}
                 </td>
@@ -35,10 +33,10 @@ function DataTable({ columns, rows, emptyMessage = "Nothing to show." }) {
           ))}
 
           {rows.length === 0 && (
-            <tr className="border-b border-[#e3e4e8]">
+            <tr>
               <td
                 colSpan={columns.length}
-                className="px-[14px] py-[24px] text-center text-[13px] leading-[1.55] text-[#6d7180]"
+                className="px-[20px] py-[40px] text-center text-[13px] leading-normal text-muted"
               >
                 {emptyMessage}
               </td>
