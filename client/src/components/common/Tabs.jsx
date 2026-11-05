@@ -16,8 +16,8 @@ function Tabs({ tabs, activeTab, onChange }) {
               flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer
               ${
                 isActive
-                  ? "bg-[#0B609D] text-white shadow-md"
-                  : "bg-[#EEF3FD] text-[#0B609D] hover:bg-[#dbe7f9]"
+                  ? "bg-[#5149B8] text-white shadow-md"
+                  : "bg-[#FFFFFF] text-[#5149B8] hover:bg-[#dbe7f9]"
               }
             `}
           >
@@ -27,7 +27,7 @@ function Tabs({ tabs, activeTab, onChange }) {
               <span
                 className={`
                   px-2 py-0.5 rounded-full text-[10px] font-black
-                  ${isActive ? "bg-white/20 text-white" : "bg-white text-[#0B609D] shadow-xs"}
+                  ${isActive ? "bg-white/20 text-white" : "bg-white text-[#5149B8] shadow-xs"}
                 `}
               >
                 {count}

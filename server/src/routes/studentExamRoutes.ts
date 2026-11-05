@@ -1,10 +1,23 @@
 import express from "express";
 import {authenticate} from "../middleware/authMiddleware.js";
 import {authorize} from "../middleware/roleMiddleware.js";
-import {getAttemptResult, saveAnswer, startExam, submitExam} from "../controller/studentExamController.js";
+import {
+    getAttemptResult,
+    getStudentAttempt,
+    saveAnswer,
+    startExam,
+    submitExam
+} from "../controller/studentExamController.js";
 
 
 const router = express.Router();
+
+router.get(
+    "/attempts/exam/:examId",
+    authenticate,
+    authorize("student"),
+    getStudentAttempt
+);
 
 router.post(
     "/:examId/start",

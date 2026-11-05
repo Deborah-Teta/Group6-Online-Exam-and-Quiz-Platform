@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, Plus, Sparkles } from "lucide-react";
 import ActionButton from "../../components/common/ActionButton";
@@ -6,154 +6,97 @@ import Notice from "../../components/common/Notice";
 import AddQuestion from "../../components/Teacher/Question Bank/Add question";
 import EditQuestion from "../../components/Teacher/Question Bank/Edit question";
 import QuestionsList from "../../components/Teacher/Question Bank/Questions list";
-
-const initialQuestions = [
-  {
-    id: "q1",
-    questionText: "Which organelle releases energy during aerobic respiration?",
-    type: "multiple_choice",
-    topic: "Cell organelles",
-    points: 2,
-    difficulty: "medium",
-    source: "manual",
-    options: [
-      { text: "Nucleus", isCorrect: false },
-      { text: "Mitochondrion", isCorrect: true },
-    ],
-  },
-  {
-    id: "q2",
-    questionText: "Plant and animal cells both have a cell membrane.",
-    type: "true_false",
-    topic: "Cell structures",
-    points: 2,
-    difficulty: "easy",
-    source: "ai",
-    options: [
-      { text: "True", isCorrect: true },
-      { text: "False", isCorrect: false },
-    ],
-  },
-  {
-    id: "q3",
-    questionText: "What controls the movement of substances into and out of a cell?",
-    type: "multiple_choice",
-    topic: "Cell transport",
-    points: 2,
-    difficulty: "medium",
-    source: "manual",
-    options: [
-      { text: "Cell membrane", isCorrect: true },
-      { text: "Nucleus", isCorrect: false },
-    ],
-  },
-  {
-    id: "q4",
-    questionText: "Which structure contains the genetic material of a cell?",
-    type: "multiple_choice",
-    topic: "Cell organelles",
-    points: 2,
-    difficulty: "easy",
-    source: "ai",
-    options: [
-      { text: "Nucleus", isCorrect: true },
-      { text: "Ribosome", isCorrect: false },
-    ],
-  },
-  {
-    id: "q5",
-    questionText: "Chloroplasts are found in animal cells.",
-    type: "true_false",
-    topic: "Plant cells",
-    points: 2,
-    difficulty: "easy",
-    source: "manual",
-    options: [
-      { text: "True", isCorrect: false },
-      { text: "False", isCorrect: true },
-    ],
-  },
-  {
-    id: "q6",
-    questionText: "Which cell structure is the site of protein synthesis?",
-    type: "multiple_choice",
-    topic: "Cell organelles",
-    points: 2,
-    difficulty: "medium",
-    source: "manual",
-    options: [
-      { text: "Ribosome", isCorrect: true },
-      { text: "Vacuole", isCorrect: false },
-    ],
-  },
-  {
-    id: "q7",
-    questionText: "The cell wall is made of cellulose in plant cells.",
-    type: "true_false",
-    topic: "Plant cells",
-    points: 2,
-    difficulty: "easy",
-    source: "ai",
-    options: [
-      { text: "True", isCorrect: true },
-      { text: "False", isCorrect: false },
-    ],
-  },
-  {
-    id: "q8",
-    questionText: "What is the role of cytoplasm?",
-    type: "multiple_choice",
-    topic: "Cell structures",
-    points: 2,
-    difficulty: "medium",
-    source: "manual",
-    options: [
-      { text: "Site of many chemical reactions", isCorrect: true },
-      { text: "Stores genetic information", isCorrect: false },
-    ],
-  },
-];
+import {
+  createTeacherQuestion,
+  deleteTeacherQuestion,
+  getTeacherQuestions,
+  updateTeacherQuestion,
+} from "../../services/teacherService";
 
 function TeacherQuestionBank() {
   const navigate = useNavigate();
-  const [questions, setQuestions] = useState(initialQuestions);
+  const [questions, setQuestions] = useState([]);
+  const [pendingDraftCount, setPendingDraftCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
-  const [deleteError, setDeleteError] = useState("");
+  const [error, setError] = useState("");
+
+  const loadQuestions = useCallback(async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const data = await getTeacherQuestions();
+      setQuestions(data.questions);
+      setPendingDraftCount(data.pendingDraftCount);
+    } catch (requestError) {
+      setError(requestError.message || "Could not load your questions.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isCurrent = true;
+    getTeacherQuestions()
+      .then((data) => {
+        if (!isCurrent) return;
+        setQuestions(data.questions);
+        setPendingDraftCount(data.pendingDraftCount);
+      })
+      .catch((requestError) => {
+        if (isCurrent) {
+          setError(requestError.message || "Could not load your questions.");
+        }
+      })
+      .finally(() => {
+        if (isCurrent) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [loadQuestions]);
 
   const topicsCount = new Set(questions.map((question) => question.topic)).size;
-  const pendingDraftCount = 3;
 
-  function handleAdd(question) {
-    setQuestions((current) => [
-      { ...question, id: `question-${Date.now()}` },
-      ...current,
-    ]);
-    setIsAddOpen(false);
+  async function handleAdd(question) {
+    setError("");
+    try {
+      const created = await createTeacherQuestion(question);
+      setQuestions((current) => [created, ...current]);
+      setIsAddOpen(false);
+    } catch (requestError) {
+      setError(requestError.message || "Could not add the question.");
+    }
   }
 
-  function handleEdit(updatedQuestion) {
-    setQuestions((current) =>
-      current.map((question) =>
-        question.id === editingQuestion.id
-          ? { ...updatedQuestion, id: editingQuestion.id }
-          : question,
-      ),
-    );
-    setEditingQuestion(null);
+  async function handleEdit(updatedQuestion) {
+    setError("");
+    try {
+      const updated = await updateTeacherQuestion(editingQuestion.id, updatedQuestion);
+      setQuestions((current) =>
+        current.map((question) => question.id === updated.id ? updated : question),
+      );
+      setEditingQuestion(null);
+    } catch (requestError) {
+      setError(requestError.message || "Could not update the question.");
+    }
   }
 
-  function handleDelete(question) {
+  async function handleDelete(question) {
     const confirmed = window.confirm(
       `Delete this question?\n\n"${question.questionText}"`,
     );
-
     if (!confirmed) return;
 
-    setQuestions((current) =>
-      current.filter((item) => item.id !== question.id),
-    );
-    setDeleteError("");
+    setError("");
+    try {
+      await deleteTeacherQuestion(question.id);
+      setQuestions((current) => current.filter((item) => item.id !== question.id));
+    } catch (requestError) {
+      setError(requestError.message || "Could not delete the question.");
+    }
   }
 
   return (
@@ -164,8 +107,9 @@ function TeacherQuestionBank() {
             Your question bank
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Ready-to-use questions, reviewed by you. {questions.length} questions
-            · {topicsCount} topics.
+            {isLoading
+              ? "Loading your questions…"
+              : `Ready-to-use questions, reviewed by you. ${questions.length} questions · ${topicsCount} topics.`}
           </p>
         </div>
 
@@ -179,36 +123,60 @@ function TeacherQuestionBank() {
           <ActionButton
             label="Add question"
             icon={<Plus size={14} />}
-            onClick={() => setIsAddOpen(true)}
+            onClick={() => {
+              setError("");
+              setIsAddOpen(true);
+            }}
           />
         </div>
       </header>
 
-      <Notice icon={Info} title={`${pendingDraftCount} AI drafts are waiting for your review`}>
-        Unreviewed drafts stay out of your bank and exams. Open AI drafts to edit,
-        confirm answers, and approve them individually.
-      </Notice>
+      {pendingDraftCount > 0 && (
+        <Notice
+          icon={Info}
+          title={`${pendingDraftCount} AI ${pendingDraftCount === 1 ? "draft is" : "drafts are"} waiting for your review`}
+        >
+          Unreviewed drafts stay out of your bank and exams. Review and approve
+          generated questions before using them in an assessment.
+        </Notice>
+      )}
 
-      {deleteError && (
-        <p role="alert" className="text-sm text-red-600">{deleteError}</p>
+      {error && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <span>{error}</span>
+          {!isLoading && questions.length === 0 && (
+            <button type="button" onClick={loadQuestions} className="font-semibold underline">
+              Try again
+            </button>
+          )}
+        </div>
       )}
 
       <QuestionsList
         questions={questions}
-        onEdit={setEditingQuestion}
+        onEdit={(question) => {
+          setError("");
+          setEditingQuestion(question);
+        }}
         onDelete={handleDelete}
+        isLoading={isLoading}
       />
 
       <AddQuestion
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         onAdd={handleAdd}
+        error={isAddOpen ? error : ""}
       />
 
       <EditQuestion
         question={editingQuestion}
         onClose={() => setEditingQuestion(null)}
         onSave={handleEdit}
+        error={editingQuestion ? error : ""}
       />
     </div>
   );

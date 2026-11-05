@@ -1,54 +1,72 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { ArrowRight, Eye, EyeOff, GraduationCap, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
 import AuthLayout from "../../layouts/AuthLayout";
-import { register } from "../../services/authService";
+import { register as registerUser } from "../../services/authService";
+
+const signUpSchema = z.object({
+  fullName: z
+    .string()
+    .trim()
+    .min(2, "Enter your full name.")
+    .max(100, "Name must be 100 characters or fewer."),
+  email: z.string().trim().email("Enter a valid email address."),
+  password: z
+    .string()
+    .min(8, "Use at least 8 characters.")
+    .regex(/\d/, "Include at least one number."),
+  role: z.enum(["teacher", "student"]),
+});
 
 function SignUp() {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("teacher");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    control,
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      role: "teacher",
+    },
+  });
+  const role = useWatch({ control, name: "role" });
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setError("");
-
-    if (!/(?=.*\d).{8,}/.test(password)) {
-      setError("Use at least 8 characters and include at least one number.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
+  async function onSubmit(values) {
     try {
-      await register({
-        fullName: fullName.trim(),
-        email: email.trim(),
-        password,
-        role,
+      await registerUser({
+        fullName: values.fullName,
+        email: values.email,
+        password: values.password,
+        role: values.role,
       });
 
       const notice =
-        role === "teacher"
+        values.role === "teacher"
           ? "Your account was created. A platform administrator must approve your teacher account before you can sign in."
           : "Your account was created. You can now sign in.";
 
       navigate("/login", { replace: true, state: { notice } });
     } catch (submitError) {
-      setError(submitError.message || "Could not create your account.");
-    } finally {
-      setIsSubmitting(false);
+      setError("root.server", {
+        type: "server",
+        message: submitError.message || "Could not create your account.",
+      });
     }
   }
 
   return (
     <AuthLayout sidePosition="right">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#0B609D]">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#5149B8]">
         A fresh start
       </p>
       <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
@@ -58,28 +76,32 @@ function SignUp() {
         Create your account. Find your people.
       </p>
 
-      {error && (
+      {errors.root?.server && (
         <p
           role="alert"
           className="mt-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
         >
-          {error}
+          {errors.root.server.message}
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4">
         <label className="flex flex-col gap-2 text-xs font-semibold text-slate-700">
           Full name
           <input
             type="text"
             autoComplete="name"
-            required
             maxLength={100}
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
             placeholder="Your full name"
-            className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-sm font-normal text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            aria-invalid={Boolean(errors.fullName)}
+            {...register("fullName")}
+            className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-sm font-normal text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           />
+          {errors.fullName && (
+            <span className="text-xs font-normal text-red-600">
+              {errors.fullName.message}
+            </span>
+          )}
         </label>
 
         <label className="flex flex-col gap-2 text-xs font-semibold text-slate-700">
@@ -87,12 +109,16 @@ function SignUp() {
           <input
             type="email"
             autoComplete="email"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
             placeholder="you@school.edu"
-            className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-sm font-normal text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            aria-invalid={Boolean(errors.email)}
+            {...register("email")}
+            className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-sm font-normal text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           />
+          {errors.email && (
+            <span className="text-xs font-normal text-red-600">
+              {errors.email.message}
+            </span>
+          )}
         </label>
 
         <label className="flex flex-col gap-2 text-xs font-semibold text-slate-700">
@@ -101,12 +127,10 @@ function SignUp() {
             <input
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
               placeholder="At least 8 characters"
-              className="w-full rounded-lg border border-slate-200 px-3.5 py-3 pr-11 text-sm font-normal text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+              aria-invalid={Boolean(errors.password)}
+              {...register("password")}
+              className="w-full rounded-lg border border-slate-200 px-3.5 py-3 pr-11 text-sm font-normal text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
             />
             <button
               type="button"
@@ -117,9 +141,15 @@ function SignUp() {
               {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
             </button>
           </span>
-          <span className="font-normal text-slate-500">
-            Use at least 8 characters, including a number.
-          </span>
+          {errors.password ? (
+            <span className="text-xs font-normal text-red-600">
+              {errors.password.message}
+            </span>
+          ) : (
+            <span className="font-normal text-slate-500">
+              Use at least 8 characters, including a number.
+            </span>
+          )}
         </label>
 
         <fieldset>
@@ -145,19 +175,17 @@ function SignUp() {
                 key={value}
                 className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition ${
                   role === value
-                    ? "border-[#0B609D] bg-[#EEF3FD]"
+                    ? "border-[#5149B8] bg-[#FFFFFF]"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 <input
                   type="radio"
-                  name="role"
                   value={value}
-                  checked={role === value}
-                  onChange={() => setRole(value)}
+                  {...register("role")}
                   className="sr-only"
                 />
-                <Icon size={20} className="shrink-0 text-[#0B609D]" />
+                <Icon size={20} className="shrink-0 text-[#5149B8]" />
                 <span>
                   <span className="block text-xs font-semibold text-slate-800">
                     {title}
@@ -180,7 +208,7 @@ function SignUp() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-[#0B609D] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#084877] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-[#5149B8] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#413B9A] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <ArrowRight size={16} />
           {isSubmitting ? "Creating account..." : "Create account"}
@@ -193,7 +221,7 @@ function SignUp() {
 
       <p className="mt-4 text-center text-xs text-slate-500">
         Already have an account?{" "}
-        <Link to="/login" className="font-semibold text-[#0B609D] hover:underline">
+        <Link to="/login" className="font-semibold text-[#5149B8] hover:underline">
           Sign in
         </Link>
       </p>

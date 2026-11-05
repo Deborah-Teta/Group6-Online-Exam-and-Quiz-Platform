@@ -4,7 +4,7 @@ import DataTable from "../../common/DataTable";
 
 const PAGE_SIZE = 8;
 
-function QuestionsList({ questions, onEdit, onDelete }) {
+function QuestionsList({ questions, onEdit, onDelete, isLoading = false }) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [topicFilter, setTopicFilter] = useState("all");
@@ -43,7 +43,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
         <div className="max-w-xl">
           <p className="font-medium text-slate-800">{question.questionText}</p>
           {question.source === "ai" && (
-            <span className="mt-1 inline-block rounded-full bg-[#EEF3FD] px-2 py-0.5 text-[10px] font-medium text-[#0B609D]">
+            <span className="mt-1 inline-block rounded-full bg-[#FFFFFF] px-2 py-0.5 text-[10px] font-medium text-[#5149B8]">
               AI-drafted · Approved
             </span>
           )}
@@ -66,7 +66,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
           <button
             type="button"
             onClick={() => onEdit(question)}
-            className="text-xs font-medium text-[#0B609D] hover:underline"
+            className="text-xs font-medium text-[#5149B8] hover:underline"
           >
             Edit
           </button>
@@ -96,7 +96,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
             value={search}
             onChange={(event) => resetPageAnd(setSearch, event.target.value)}
             placeholder="Search questions..."
-            className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           />
         </label>
 
@@ -105,7 +105,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
           <select
             value={typeFilter}
             onChange={(event) => resetPageAnd(setTypeFilter, event.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           >
             <option value="all">All types</option>
             <option value="multiple_choice">Multiple choice</option>
@@ -118,7 +118,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
           <select
             value={topicFilter}
             onChange={(event) => resetPageAnd(setTopicFilter, event.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           >
             <option value="all">All topics</option>
             {topics.map((topic) => (
@@ -132,7 +132,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
           <select
             value={sourceFilter}
             onChange={(event) => resetPageAnd(setSourceFilter, event.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           >
             <option value="all">All sources</option>
             <option value="manual">Manual</option>
@@ -144,7 +144,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
       <DataTable
         columns={columns}
         rows={visibleQuestions}
-        emptyMessage="No questions match these filters."
+        emptyMessage={isLoading ? "Loading your questions…" : "No questions match these filters."}
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
@@ -160,7 +160,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
             type="button"
             disabled={page === 1}
             onClick={() => setPage((current) => current - 1)}
-            className="rounded-lg px-2 py-1 text-[#0B609D] hover:bg-[#EEF3FD] disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg px-2 py-1 text-[#5149B8] hover:bg-[#FFFFFF] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Previous
           </button>
@@ -169,7 +169,7 @@ function QuestionsList({ questions, onEdit, onDelete }) {
             type="button"
             disabled={page >= pageCount}
             onClick={() => setPage((current) => current + 1)}
-            className="rounded-lg px-2 py-1 text-[#0B609D] hover:bg-[#EEF3FD] disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg px-2 py-1 text-[#5149B8] hover:bg-[#FFFFFF] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next
           </button>

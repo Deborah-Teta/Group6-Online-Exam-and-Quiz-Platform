@@ -2,7 +2,7 @@ import ActionButton from "../../common/ActionButton";
 import Card from "../../common/Card";
 import DataTable from "../../common/DataTable";
 
-const studentColumns = [
+const studentColumns = (totalPoints) => [
   {
     key: "student",
     header: "Student",
@@ -16,16 +16,26 @@ const studentColumns = [
   {
     key: "score",
     header: "Score",
-    render: (student) => `${student.score} / 10`,
+    render: (student) =>
+      student.score === null ? "—" : `${student.score} / ${totalPoints}`,
   },
   {
     key: "percent",
     header: "Percent",
-    render: (student) => `${student.percent}%`,
+    render: (student) => student.percent === null ? "—" : `${student.percent}%`,
   },
   {
     key: "submittedAt",
     header: "Submitted · GMT",
+  },
+  {
+    key: "status",
+    header: "Status",
+    render: (student) => student.status === "in_progress"
+      ? "In progress"
+      : student.status === "auto_submitted"
+        ? "Auto-submitted"
+        : "Submitted",
   },
 ];
 
@@ -71,18 +81,18 @@ function ExamResults({ exam, onExport }) {
         />
         <SummaryCard
           label="Submitted"
-          value={`${exam.students.length} / ${exam.students.length}`}
-          detail="100% participation"
+          value={`${exam.submittedCount} / ${exam.classStudentCount}`}
+          detail={`${exam.classStudentCount > 0 ? Math.round((exam.submittedCount / exam.classStudentCount) * 100) : 0}% class participation`}
         />
         <SummaryCard
           label="Highest score"
           value={`${exam.highestScore} / ${exam.totalPoints}`}
-          detail={`${exam.fullMarkCount} students earned full marks`}
+          detail={`${exam.fullMarkCount} ${exam.fullMarkCount === 1 ? "student" : "students"} earned full marks`}
         />
         <SummaryCard
-          label="Result status"
-          value={exam.resultStatus}
-          detail={`Available since ${exam.releaseTime}`}
+          label="Still in progress"
+          value={exam.inProgressCount}
+          detail="Attempts not yet submitted"
         />
       </section>
 
@@ -91,18 +101,18 @@ function ExamResults({ exam, onExport }) {
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-sm font-bold text-slate-900">Student scores</h2>
             <span className="text-[11px] text-slate-500">
-              {exam.students.length} students
+              {exam.students.length} started attempts
             </span>
           </div>
 
           <DataTable
-            columns={studentColumns}
+            columns={studentColumns(exam.totalPoints)}
             rows={exam.students}
             emptyMessage="No submitted attempts yet."
           />
 
           <p className="mt-3 text-[10px] leading-5 text-slate-500">
-            All attempts are final. Select a student to inspect their answers.
+            Scores reflect submitted attempts; in-progress attempts are not included in the class average.
           </p>
         </Card>
 
@@ -115,15 +125,12 @@ function ExamResults({ exam, onExport }) {
           </div>
 
           <p className="mb-4 text-[10px] leading-5 text-slate-500">
-            Identify concepts to revisit. Each question is worth{" "}
-            {exam.pointsPerQuestion} points.
+            Correct-answer rates are calculated from submitted attempts.
           </p>
 
           <div className="flex flex-col divide-y divide-slate-100">
             {exam.questions.map((question, index) => {
-              const percent = Math.round(
-                (question.correctCount / exam.students.length) * 100,
-              );
+              const percent = question.correctPercentage;
               const needsReview = percent < 70;
 
               return (
@@ -134,7 +141,7 @@ function ExamResults({ exam, onExport }) {
                     </p>
                     <span
                       className={`shrink-0 text-[10px] font-semibold ${
-                        needsReview ? "text-amber-700" : "text-[#0B609D]"
+                        needsReview ? "text-amber-700" : "text-[#5149B8]"
                       }`}
                     >
                       {percent}%
@@ -155,14 +162,14 @@ function ExamResults({ exam, onExport }) {
                   >
                     <div
                       className={`h-full rounded-full ${
-                        needsReview ? "bg-amber-600" : "bg-[#0B609D]"
+                        needsReview ? "bg-amber-600" : "bg-[#5149B8]"
                       }`}
                       style={{ width: `${percent}%` }}
                     />
                   </div>
 
                   <p className="mt-1 text-[10px] text-slate-500">
-                    {question.correctCount} of {exam.students.length} students
+                    {question.correctCount} of {question.totalStudents} students
                     correct
                   </p>
                 </div>
@@ -172,14 +179,22 @@ function ExamResults({ exam, onExport }) {
         </Card>
       </section>
 
-      <Card className="flex items-start gap-3 bg-[#EEF3FD] p-4">
-        <span className="text-[#0B609D]" aria-hidden="true">▣</span>
+      <Card className="flex items-start gap-3 bg-[#FFFFFF] p-4">
+        <span className="text-[#5149B8]" aria-hidden="true">▣</span>
         <div>
           <p className="text-xs font-semibold text-slate-700">
-            A useful next lesson: {exam.lessonSuggestion}
+            {exam.reviewQuestions.length
+              ? "Questions students found most challenging"
+              : "Question performance"}
           </p>
           <p className="mt-1 text-[11px] leading-5 text-slate-600">
-            {exam.lessonNote}
+            {exam.submittedCount === 0
+              ? "There are no submitted attempts to analyze yet."
+              : exam.reviewQuestions.length
+                ? exam.reviewQuestions
+                    .map((question) => `${question.topic} (${Math.round(question.correctPercentage)}% correct)`)
+                    .join(" · ")
+                : "Every question was answered correctly by at least 70% of submitted students."}
           </p>
         </div>
       </Card>

@@ -1,10 +1,10 @@
 const variants = {
-  primary: "bg-[#0B609D] text-white shadow-xs",
+  primary: "bg-[#5149B8] text-white shadow-xs",
   secondary: "border border-slate-200 bg-white text-slate-600",
 };
 
 const hovers = {
-  primary: "hover:bg-[#084877]",
+  primary: "hover:bg-[#413B9A]",
   secondary: "hover:bg-slate-50",
 };
 

@@ -1,7 +1,7 @@
 import Modal from "../../common/Modal";
 import QuestionForm from "./QuestionForm";
 
-function EditQuestion({ question, onClose, onSave }) {
+function EditQuestion({ question, onClose, onSave, error }) {
   return (
     <Modal
       isOpen={Boolean(question)}
@@ -10,14 +10,17 @@ function EditQuestion({ question, onClose, onSave }) {
       size="xl"
     >
       {question && (
-        <QuestionForm
-          key={question.id}
-          isOpen={Boolean(question)}
-          initialQuestion={question}
-          onSubmit={onSave}
-          onCancel={onClose}
-          submitLabel="Save changes"
-        />
+        <>
+          {error && <p role="alert" className="mb-3 text-sm text-red-600">{error}</p>}
+          <QuestionForm
+            key={question.id}
+            isOpen={Boolean(question)}
+            initialQuestion={question}
+            onSubmit={onSave}
+            onCancel={onClose}
+            submitLabel="Save changes"
+          />
+        </>
       )}
     </Modal>
   );

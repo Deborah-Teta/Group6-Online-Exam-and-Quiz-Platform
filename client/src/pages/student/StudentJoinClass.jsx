@@ -7,9 +7,9 @@ import Input from "../../components/common/Input";
 import Notice from "../../components/common/Notice";
 import SectionCard from "../../components/common/SectionCard";
 import StatusBadge from "../../components/common/StatusBadge";
-import { mockAvailableClasses, mockStudent } from "../../services/studentMockData";
+import { findClassByCode, joinClass } from "../../services/studentService";
 
-function FoundClass({ foundClass, onConfirm }) {
+function FoundClass({ foundClass, onConfirm, isJoining }) {
   return (
     <Card className="flex flex-col items-start gap-[16px] p-[20px]">
       <StatusBadge label="Class found" variant="open" />
@@ -27,7 +27,6 @@ function FoundClass({ foundClass, onConfirm }) {
 
       <div className="text-[13px] leading-[1.55] text-main">
         <p>Teacher: {foundClass.teacher}</p>
-        <p>School: {mockStudent.school}</p>
         <p>Joining code: {foundClass.code}</p>
       </div>
 
@@ -37,17 +36,23 @@ function FoundClass({ foundClass, onConfirm }) {
         </Notice>
       </div>
 
-      <Button label="Confirm & join class" onClick={onConfirm} />
+      <Button
+        label={isJoining ? "Joining..." : "Confirm & join class"}
+        onClick={onConfirm}
+        disabled={isJoining}
+      />
     </Card>
   );
 }
 
 function StudentJoinClass() {
   const navigate = useNavigate();
-  const { enrolledClasses, joinClass } = useOutletContext();
+  const { refreshStudentData } = useOutletContext();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [foundClass, setFoundClass] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const handleCodeChange = (event) => {
     setCode(event.target.value);
@@ -55,7 +60,7 @@ function StudentJoinClass() {
     setFoundClass(null);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const enteredCode = code.trim().toUpperCase();
 
@@ -64,20 +69,35 @@ function StudentJoinClass() {
       return;
     }
 
-    const match = mockAvailableClasses.find((item) => item.code === enteredCode);
-
-    if (!match) {
-      setError("We couldn't find a class with that code. Check it with your teacher.");
-    } else if (enrolledClasses.some((item) => item.id === match.id)) {
-      setError(`You're already in ${match.name}.`);
-    } else {
-      setFoundClass(match);
+    setIsSearching(true);
+    try {
+      const match = await findClassByCode(enteredCode);
+      if (match.alreadyJoined) {
+        setError(`You're already in ${match.name}.`);
+        setFoundClass(null);
+      } else {
+        setFoundClass(match);
+      }
+    } catch (requestError) {
+      setError(requestError.message || "We couldn't find a class with that code.");
+      setFoundClass(null);
+    } finally {
+      setIsSearching(false);
     }
   };
 
-  const handleConfirm = () => {
-    joinClass(foundClass);
-    navigate("/student/classes");
+  const handleConfirm = async () => {
+    setIsJoining(true);
+    setError("");
+    try {
+      await joinClass(foundClass.code);
+      await refreshStudentData();
+      navigate("/student/classes");
+    } catch (requestError) {
+      setError(requestError.message || "We couldn't join this class.");
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   return (
@@ -100,7 +120,12 @@ function StudentJoinClass() {
             />
 
             <div className="flex flex-wrap gap-[12px]">
-              <Button type="submit" label="Find class" icon={<Search size={16} strokeWidth={1.6} />} />
+              <Button
+                type="submit"
+                label={isSearching ? "Searching..." : "Find class"}
+                icon={<Search size={16} strokeWidth={1.6} />}
+                disabled={isSearching}
+              />
               <Button
                 label="Cancel"
                 variant="secondary"
@@ -116,7 +141,13 @@ function StudentJoinClass() {
           </p>
         </SectionCard>
 
-        {foundClass && <FoundClass foundClass={foundClass} onConfirm={handleConfirm} />}
+        {foundClass && (
+          <FoundClass
+            foundClass={foundClass}
+            onConfirm={handleConfirm}
+            isJoining={isJoining}
+          />
+        )}
       </div>
     </>
   );

@@ -1,17 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import { assessmentTypes } from "../../services/studentAssessments";
-import { loadAttempt } from "../../services/studentAttempts";
 import Button from "./ActionButton";
 
 function ExamAction({ exam, type = "exam" }) {
   const navigate = useNavigate();
   const { basePath, noun } = assessmentTypes[type];
 
-  if (exam.status === "open" && loadAttempt(exam.id)?.submittedAt) {
+  if (exam.attempt && exam.attempt.status !== "in_progress") {
     return (
       <Link
         to={`${basePath}/${exam.id}/submitted`}
-        className="text-xs font-bold whitespace-nowrap text-[#0B609D] hover:underline"
+        className="text-xs font-bold whitespace-nowrap text-[#5149B8] hover:underline"
       >
         View submission →
       </Link>
@@ -21,7 +20,7 @@ function ExamAction({ exam, type = "exam" }) {
   if (exam.status === "open") {
     return (
       <Button
-        label={`View ${noun} →`}
+        label={exam.attempt ? `Continue ${noun} →` : `View ${noun} →`}
         onClick={() => navigate(`${basePath}/${exam.id}/instructions`)}
       />
     );
@@ -29,7 +28,7 @@ function ExamAction({ exam, type = "exam" }) {
 
   if (exam.status === "closed") {
     return (
-      <Link to="/student/results" className="text-xs font-bold whitespace-nowrap text-[#0B609D] hover:underline">
+      <Link to="/student/results" className="text-xs font-bold whitespace-nowrap text-[#5149B8] hover:underline">
         View results →
       </Link>
     );

@@ -3,6 +3,8 @@ import { Outlet, useLocation } from "react-router-dom";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import { useAuth } from "../context/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const pageHeaders = {
   "/teacher/dashboard": {
@@ -34,16 +36,18 @@ const pageHeaders = {
 function TeacherLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const pageHeader = pageHeaders[pathname] ?? pageHeaders["/teacher/dashboard"];
 
   const teacher = {
-    name: "Sarah Morgan",
-    email: "sarah.morgan@oakfield.edu",
+    name: user?.name || user?.fullName || "Teacher",
+    email: user?.email || "",
     role: "teacher",
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-left [color-scheme:light]">
+    <div className="min-h-screen bg-[#FFFFFF] text-left [color-scheme:light]">
       <Sidebar
         role="teacher"
         isOpen={isSidebarOpen}
@@ -58,9 +62,13 @@ function TeacherLayout() {
         profilePath={null}
         settingsPath={null}
         onMenuClick={() => setIsSidebarOpen(true)}
+        onLogout={() => {
+          signOut();
+          navigate("/login", { replace: true });
+        }}
       />
 
-      <main className="flex flex-col gap-6 px-4 pb-24 pt-24 sm:px-6 md:ml-28 md:px-8">
+      <main className="flex flex-col gap-6 px-4 pb-24 pt-24 sm:px-6 md:ml-64 md:px-8">
         <Outlet />
       </main>
 

@@ -13,7 +13,7 @@ function AuthLayout({ children, sidePosition = "left" }) {
         }`}
       >
         <Link to="/" className="flex w-fit items-center gap-2 text-lg font-bold">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#0B609D]">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#5149B8]">
             <BookOpenCheck size={19} />
           </span>
           ExamFlow
@@ -54,7 +54,7 @@ function AuthLayout({ children, sidePosition = "left" }) {
         <div className="flex justify-end">
           <a
             href="mailto:support@examflow.edu"
-            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#0B609D]"
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#5149B8]"
           >
             <CircleHelp size={14} />
             Need a hand?

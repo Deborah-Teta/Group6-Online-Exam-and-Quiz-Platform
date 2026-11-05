@@ -58,9 +58,9 @@ const buildColumns = ({ nounTitle }, type) => [
 
 function StudentAssessments({ type }) {
   const config = assessmentTypes[type];
-  const { items, plural, nextNote } = config;
-
-  const { enrolledClasses } = useOutletContext();
+  const { enrolledClasses, exams, isLoading } = useOutletContext();
+  const items = exams.filter((exam) => exam.type === type);
+  const { plural } = config;
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("all");
 
@@ -87,25 +87,33 @@ function StudentAssessments({ type }) {
       {/* Statistics */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<ClipboardList size={28} className="text-[#0B609D]" />}
+          icon={<ClipboardList size={28} className="text-[#5149B8]" />}
           title={`All ${plural}`}
-          value={items.length}
+          value={isLoading ? "…" : items.length}
           subtext={`Across ${enrolledClasses.length} classes`}
         />
         <StatCard
-          icon={<ClipboardCheck size={28} className="text-[#0B609D]" />}
+          icon={<ClipboardCheck size={28} className="text-[#5149B8]" />}
           title="Open now"
           value={openItems.length}
-          subtext={`${openItems[0].title} closes at ${openItems[0].closesAt}`}
+          subtext={
+            openItems[0]
+              ? `${openItems[0].title} closes at ${openItems[0].closesTime}`
+              : "No assessments open right now"
+          }
         />
         <StatCard
-          icon={<CalendarClock size={28} className="text-[#0B609D]" />}
+          icon={<CalendarClock size={28} className="text-[#5149B8]" />}
           title="Coming up"
           value={upcomingItems.length}
-          subtext={nextNote}
+          subtext={
+            upcomingItems[0]
+              ? `${upcomingItems[0].title} · ${upcomingItems[0].schedule}`
+              : "Nothing scheduled"
+          }
         />
         <StatCard
-          icon={<CircleCheck size={28} className="text-[#0B609D]" />}
+          icon={<CircleCheck size={28} className="text-[#5149B8]" />}
           title="Completed"
           value={completedItems.length}
           subtext={`Average score ${formatPercent(averageScore(completedItems))}`}
@@ -125,11 +133,17 @@ function StudentAssessments({ type }) {
         }
       >
         <Tabs tabs={buildTabs(config)} activeTab={activeTab} onChange={setActiveTab} />
-        <DataTable
-          columns={buildColumns(config, type)}
-          rows={visibleItems}
-          emptyMessage={`No ${plural} match this filter.`}
-        />
+        {isLoading ? (
+          <p className="py-8 text-center text-sm text-muted">
+            Loading your {plural}…
+          </p>
+        ) : (
+          <DataTable
+            columns={buildColumns(config, type)}
+            rows={visibleItems}
+            emptyMessage={`No ${plural} match this filter.`}
+          />
+        )}
       </SectionCard>
     </>
   );

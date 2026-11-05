@@ -6,7 +6,7 @@
   --primary-light: #eef2ff;
   --primary-border: #c7d2fe;
 
-  --bg-page: #f8fafc;
+  --bg-page: #FFFFFF;
   --bg-card: #ffffff;
   --bg-sidebar: #ffffff;
   --bg-hover: #f1f5f9;
@@ -641,7 +641,7 @@ html, body {
 }
 
 .data-table th {
-  background-color: #f8fafc;
+  background-color: #FFFFFF;
   color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
@@ -893,7 +893,7 @@ html, body {
 }
 
 .modal-user-preview {
-  background-color: #f8fafc;
+  background-color: #FFFFFF;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 10px 14px;

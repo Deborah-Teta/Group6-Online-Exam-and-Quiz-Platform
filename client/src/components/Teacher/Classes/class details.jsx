@@ -7,53 +7,70 @@ import DataTable from "../../common/DataTable";
 import StatusBadge from "../../common/StatusBadge";
 import Tabs from "../../common/Tabs";
 
-const students = [
-  { id: "s1", name: "Amelia Brooks", email: "amelia.b@oakfield.edu", joined: "08 Sep 2026" },
-  { id: "s2", name: "Ethan Chen", email: "ethan.c@oakfield.edu", joined: "08 Sep 2026" },
-  { id: "s3", name: "Maya Patel", email: "maya.p@oakfield.edu", joined: "08 Sep 2026" },
-  { id: "s4", name: "Noah Williams", email: "noah.w@oakfield.edu", joined: "08 Sep 2026" },
-  { id: "s5", name: "Sofia Garcia", email: "sofia.g@oakfield.edu", joined: "08 Sep 2026" },
-  { id: "s6", name: "Oliver James", email: "oliver.j@oakfield.edu", joined: "08 Sep 2026" },
-  { id: "s7", name: "Isla Thompson", email: "isla.t@oakfield.edu", joined: "08 Sep 2026" },
-  { id: "s8", name: "Leo Wilson", email: "leo.w@oakfield.edu", joined: "08 Sep 2026" },
-];
+function formatDateTime(dateValue) {
+  return new Date(dateValue).toLocaleString("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  }) + " GMT";
+}
 
-const exams = [
-  { id: "exam-1", title: "Cell Biology Checkpoint", schedule: "Today · 10:00 GMT", status: "upcoming", statusLabel: "Upcoming" },
-  { id: "exam-2", title: "Plant Cells Practice", schedule: "Today · 14:00 GMT", status: "upcoming", statusLabel: "Upcoming" },
-  { id: "exam-3", title: "Cell Transport Quiz", schedule: "30 Oct · 11:00 GMT", status: "closed", statusLabel: "Completed" },
-];
+function getExamStatus(exam) {
+  if (exam.status === "draft") return { status: "closed", label: "Draft" };
+  if (exam.status === "closed") return { status: "closed", label: "Closed" };
+  const endTime = new Date(exam.startTime).getTime() + exam.durationMinutes * 60_000;
+  if (endTime < Date.now()) return { status: "closed", label: "Completed" };
+  if (new Date(exam.startTime).getTime() <= Date.now()) {
+    return { status: "open", label: "In progress" };
+  }
+  return { status: "upcoming", label: "Upcoming" };
+}
 
 const studentColumns = [
   { key: "name", header: "Student" },
   { key: "email", header: "School email" },
-  { key: "joined", header: "Joined class" },
+  {
+    key: "joinedAt",
+    header: "Joined class",
+    render: (student) => formatDateTime(student.joinedAt),
+  },
   {
     key: "status",
     header: "Status",
-    render: () => <StatusBadge label="Active" variant="open" />,
+    render: () => <StatusBadge label="Enrolled" variant="open" />,
   },
 ];
 
 const examColumns = [
-  { key: "title", header: "Exam" },
-  { key: "schedule", header: "Schedule · GMT" },
+  { key: "title", header: "Assessment" },
+  {
+    key: "startTime",
+    header: "Schedule · GMT",
+    render: (exam) => formatDateTime(exam.startTime),
+  },
   {
     key: "status",
     header: "Status",
-    render: (exam) => (
-      <StatusBadge label={exam.statusLabel} variant={exam.status} />
-    ),
+    render: (exam) => {
+      const { status, label } = getExamStatus(exam);
+      return <StatusBadge label={label} variant={status} />;
+    },
   },
 ];
 
 function ClassDetails({ teacherClass, onCopyCode, copied }) {
   const [activeTab, setActiveTab] = useState("students");
   const navigate = useNavigate();
-
+  const upcomingExams = teacherClass.exams.filter((exam) => {
+    const examStatus = getExamStatus(exam);
+    return examStatus.status === "upcoming" || examStatus.status === "open";
+  });
+  const completedExams = teacherClass.exams.filter(
+    (exam) => getExamStatus(exam).status === "closed" && exam.status !== "draft",
+  );
   const tabs = [
-    { label: "Students", value: "students", count: teacherClass.students },
-    { label: "Exams", value: "exams", count: exams.length },
+    { label: "Students", value: "students", count: teacherClass.students.length },
+    { label: "Exams", value: "exams", count: teacherClass.exams.length },
     { label: "Class settings", value: "settings" },
   ];
 
@@ -65,13 +82,12 @@ function ClassDetails({ teacherClass, onCopyCode, copied }) {
             {teacherClass.name}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            {teacherClass.description} · Dr. Sarah Morgan
+            {teacherClass.description || "No class description"}
           </p>
         </div>
-
         <ActionButton
           label="Create exam"
-          onClick={() => navigate("/teacher/exams")}
+          onClick={() => navigate(`/teacher/exams?classId=${teacherClass.id}`)}
         />
       </section>
 
@@ -79,30 +95,27 @@ function ClassDetails({ teacherClass, onCopyCode, copied }) {
         <Card className="p-5">
           <p className="text-xs text-slate-500">Enrolled students</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">
-            {teacherClass.students}
+            {teacherClass.students.length}
           </p>
-          <p className="mt-1 text-[11px] text-slate-500">
-            Students in this class
-          </p>
+          <p className="mt-1 text-[11px] text-slate-500">Students in this class</p>
         </Card>
 
         <Card className="p-5">
-          <p className="text-xs text-slate-500">Class exams</p>
+          <p className="text-xs text-slate-500">Class assessments</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">
-            {exams.length}
+            {teacherClass.exams.length}
           </p>
           <p className="mt-1 text-[11px] text-slate-500">
-            {exams.filter((exam) => exam.status === "upcoming").length} upcoming
-            · {exams.filter((exam) => exam.status === "closed").length} completed
+            {upcomingExams.length} upcoming · {completedExams.length} completed
           </p>
         </Card>
 
-        <Card className="flex items-center justify-between gap-3 bg-[#EEF3FD] p-5">
+        <Card className="flex items-center justify-between gap-3 bg-[#F0EFFD] p-5">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0B609D]">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5149B8]">
               Share with your students
             </p>
-            <p className="mt-2 text-lg font-semibold text-[#0B609D]">
+            <p className="mt-2 text-lg font-semibold text-[#5149B8]">
               {teacherClass.code}
             </p>
             <p className="mt-1 text-[11px] text-slate-600">
@@ -125,16 +138,14 @@ function ClassDetails({ teacherClass, onCopyCode, copied }) {
       {activeTab === "students" && (
         <Card className="p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-900">
-              Student roster
-            </h2>
+            <h2 className="text-base font-semibold text-slate-900">Student roster</h2>
             <span className="text-xs text-slate-500">
-              {teacherClass.students} students
+              {teacherClass.students.length} students
             </span>
           </div>
           <DataTable
             columns={studentColumns}
-            rows={students.slice(0, teacherClass.students)}
+            rows={teacherClass.students}
             emptyMessage="No students have joined this class yet."
           />
         </Card>
@@ -143,31 +154,28 @@ function ClassDetails({ teacherClass, onCopyCode, copied }) {
       {activeTab === "exams" && (
         <Card className="p-5 sm:p-6">
           <h2 className="mb-4 text-base font-semibold text-slate-900">
-            Class exams
+            Class assessments
           </h2>
           <DataTable
             columns={examColumns}
-            rows={exams}
-            emptyMessage="There are no exams for this class yet."
+            rows={teacherClass.exams}
+            emptyMessage="There are no assessments for this class yet."
           />
         </Card>
       )}
 
       {activeTab === "settings" && (
         <Card className="flex flex-col gap-4 p-5 sm:p-6">
-          <h2 className="text-base font-semibold text-slate-900">
-            Class settings
-          </h2>
+          <h2 className="text-base font-semibold text-slate-900">Class settings</h2>
           <div className="flex items-center gap-3 text-sm text-slate-600">
-            <GraduationCap size={18} className="text-[#0B609D]" />
-            <span>{teacherClass.description}</span>
+            <GraduationCap size={18} className="text-[#5149B8]" />
+            <span>{teacherClass.description || "No class description"}</span>
           </div>
           <p className="text-sm text-slate-600">
             Joining code: <strong>{teacherClass.code}</strong>
           </p>
-          <p className="text-xs text-slate-500">
-            Class editing and archiving can be connected when those actions are
-            available in the backend.
+          <p className="text-sm text-slate-600">
+            Status: <strong>{teacherClass.active ? "Active" : "Inactive"}</strong>
           </p>
         </Card>
       )}

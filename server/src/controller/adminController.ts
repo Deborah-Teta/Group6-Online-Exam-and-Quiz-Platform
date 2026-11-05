@@ -5,6 +5,7 @@ import { auditLogModel } from "../models/AuditLog.js";
 import { classModel } from "../models/ClassSchema.js";
 import { examModel } from "../models/ExamSchema.js";
 import { aiGenerationModel } from "../models/AIgenerationSchema.js";
+import { classMemberModel } from "../models/ClassMember.js";
 
 // 1. Get Platform Stats (Teachers, Students, Exams this week, AI Generations)
 export const getPlatformStats = async (
@@ -12,22 +13,27 @@ export const getPlatformStats = async (
     res: express.Response
 ) => {
     try {
-        const totalTeachers = await userModel.countDocuments({ role: "teacher" });
-        const pendingTeachers = await userModel.countDocuments({ role: "teacher", approvalStatus: "pending" });
-        const approvedTeachers = await userModel.countDocuments({ role: "teacher", approvalStatus: "approved" });
-        const totalStudents = await userModel.countDocuments({ role: "student" });
-        const blockedUsers = await userModel.countDocuments({ isBlocked: true });
-
-        // Exams this week
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        const examsThisWeek = await examModel.countDocuments({
-            createdAt: { $gte: oneWeekAgo }
-        }).catch(() => 0);
-
-        // AI generations count
-        const aiGenerationsCount = await aiGenerationModel.countDocuments().catch(() => 0);
-        const totalClasses = await classModel.countDocuments().catch(() => 0);
+        const [
+            totalTeachers,
+            pendingTeachers,
+            approvedTeachers,
+            totalStudents,
+            blockedUsers,
+            examsThisWeek,
+            aiGenerationsCount,
+            totalClasses
+        ] = await Promise.all([
+            userModel.countDocuments({ role: "teacher" }),
+            userModel.countDocuments({ role: "teacher", approvalStatus: "pending" }),
+            userModel.countDocuments({ role: "teacher", approvalStatus: "approved" }),
+            userModel.countDocuments({ role: "student" }),
+            userModel.countDocuments({ isBlocked: true }),
+            examModel.countDocuments({ createdAt: { $gte: oneWeekAgo } }),
+            aiGenerationModel.countDocuments(),
+            classModel.countDocuments({ isActive: true })
+        ]);
 
         return res.status(200).json({
             stats: {
@@ -78,6 +84,7 @@ export const approveTeacher = async (
     res: express.Response
 ) => {
     try {
+        const teacherId = req.params.teacherId;
         const { teacherId } = req.params;
         if (typeof teacherId !== "string") {
             return res.status(400).json({
@@ -85,7 +92,7 @@ export const approveTeacher = async (
             });
         }
 
-        if (!mongoose.Types.ObjectId.isValid(teacherId)) {
+        if (typeof teacherId !== "string" || !mongoose.Types.ObjectId.isValid(teacherId)) {
             return res.status(400).json({
                 error: "Invalid teacher ID"
             });
@@ -142,11 +149,14 @@ export const rejectTeacher = async (
     res: express.Response
 ) => {
     try {
-        const { teacherId } = req.params;
+        const teacherId = req.params.teacherId;
         const { reason } = req.body;
 
-        if (!mongoose.Types.ObjectId.isValid(teacherId)) {
+        if (typeof teacherId !== "string" || !mongoose.Types.ObjectId.isValid(teacherId)) {
             return res.status(400).json({ error: "Invalid teacher ID" });
+        }
+        if (typeof reason !== "string" || !reason.trim()) {
+            return res.status(400).json({ error: "A reason is required to reject a teacher." });
         }
 
         const teacher = await userModel.findOneAndUpdate(
@@ -158,7 +168,7 @@ export const rejectTeacher = async (
             {
                 $set: {
                     approvalStatus: "rejected",
-                    blockedReason: reason || "Teacher registration request rejected"
+                    blockedReason: reason.trim()
                 }
             },
             { new: true }
@@ -174,7 +184,7 @@ export const rejectTeacher = async (
                 adminId,
                 targetUserId: teacher._id,
                 action: "reject_teacher",
-                reason: reason || "Teacher application rejected"
+                reason: reason.trim()
             });
         }
 
@@ -210,7 +220,8 @@ export const getAllUsers = async (
         }
 
         if (search) {
-            const searchRegex = new RegExp(String(search), "i");
+            const escapedSearch = String(search).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const searchRegex = new RegExp(escapedSearch, "i");
             filter.$or = [
                 { fullName: searchRegex },
                 { email: searchRegex }
@@ -237,15 +248,26 @@ export const blockUser = async (
     res: express.Response
 ) => {
     try {
-        const { userId } = req.params;
+        const userId = req.params.userId;
         const { reason } = req.body;
 
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
+        if (typeof userId !== "string" || !mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ error: "Invalid user ID" });
         }
 
-        if (!reason || reason.trim() === "") {
+        if (typeof reason !== "string" || !reason.trim()) {
             return res.status(400).json({ error: "A valid reason is required to block an account" });
+        }
+
+        const currentUser = await userModel.findById(userId);
+        if (!currentUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (currentUser.role === "admin") {
+            return res.status(403).json({ error: "Admin accounts cannot be blocked." });
+        }
+        if (currentUser.isBlocked) {
+            return res.status(409).json({ error: "User is already blocked." });
         }
 
         const user = await userModel.findByIdAndUpdate(
@@ -289,10 +311,21 @@ export const unblockUser = async (
     res: express.Response
 ) => {
     try {
-        const { userId } = req.params;
+        const userId = req.params.userId;
 
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
+        if (typeof userId !== "string" || !mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ error: "Invalid user ID" });
+        }
+
+        const currentUser = await userModel.findById(userId);
+        if (!currentUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (currentUser.role === "admin") {
+            return res.status(403).json({ error: "Admin accounts cannot be changed." });
+        }
+        if (!currentUser.isBlocked) {
+            return res.status(409).json({ error: "User is not blocked." });
         }
 
         const user = await userModel.findByIdAndUpdate(
@@ -339,10 +372,22 @@ export const getAllClasses = async (
         const classes = await classModel.find()
             .populate("teacherId", "fullName email")
             .sort({ createdAt: -1 });
+        const studentCounts = await classMemberModel.aggregate([
+            { $group: { _id: "$classId", studentCount: { $sum: 1 } } }
+        ]);
+        const countsByClassId = new Map(
+            studentCounts.map((item: { _id: mongoose.Types.ObjectId; studentCount: number }) => [
+                item._id.toString(),
+                item.studentCount
+            ])
+        );
 
         return res.status(200).json({
             count: classes.length,
-            classes
+            classes: classes.map((item) => ({
+                ...item.toObject(),
+                studentCount: countsByClassId.get(item._id.toString()) || 0
+            }))
         });
     } catch (error) {
         console.error(error);

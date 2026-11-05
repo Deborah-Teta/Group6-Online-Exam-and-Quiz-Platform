@@ -1,8 +1,8 @@
 const variants = {
   info: {
-    box: "border-[#dbe7f9] bg-[#EEF3FD]",
-    icon: "text-[#0B609D]",
-    text: "text-[#0B609D]",
+    box: "border-[#dbe7f9] bg-[#FFFFFF]",
+    icon: "text-[#5149B8]",
+    text: "text-[#5149B8]",
   },
   warning: {
     box: "border-amber-200 bg-amber-50",

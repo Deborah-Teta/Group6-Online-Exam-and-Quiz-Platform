@@ -10,13 +10,14 @@ function ExamPreview({
   startLabel,
   endLabel,
   message,
+  isSaving,
   onAction,
 }) {
   return (
     <div className="flex flex-col gap-4">
       <section className="rounded-3xl border border-slate-100 bg-white p-5 text-left shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-900">Ready to publish</h2>
+          <h2 className="text-sm font-bold text-slate-900">Assessment preview</h2>
           <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] text-slate-600">
             Draft
           </span>
@@ -70,14 +71,16 @@ function ExamPreview({
 
         <div className="mt-5 flex flex-col gap-2">
           <ActionButton
-            label="Publish exam"
+            label={isSaving ? "Saving…" : "Publish exam"}
             icon={<Send size={14} />}
             onClick={() => onAction("publish")}
+            disabled={isSaving}
           />
           <ActionButton
-            label="Save as draft"
+            label={isSaving ? "Saving…" : "Save as draft"}
             variant="secondary"
             onClick={() => onAction("draft")}
+            disabled={isSaving}
           />
         </div>
 
@@ -88,14 +91,14 @@ function ExamPreview({
         )}
       </section>
 
-      <section className="rounded-2xl border border-[#dbe7f9] bg-[#EEF3FD] p-4 text-left">
-        <p className="text-xs font-semibold text-[#0B609D]">
+      <section className="rounded-2xl border border-[#dbe7f9] bg-[#FFFFFF] p-4 text-left">
+        <p className="text-xs font-semibold text-[#5149B8]">
           One window. One attempt.
         </p>
         <p className="mt-1 text-[11px] leading-5 text-slate-600">
           Students can enter only during the scheduled window. Their attempts
-          auto-submit when time ends. Scores and correct answers release at the
-          configured time.
+          auto-submit when time ends. Scores are calculated when students submit
+          their attempts.
         </p>
       </section>
     </div>

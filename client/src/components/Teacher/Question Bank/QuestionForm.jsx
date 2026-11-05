@@ -16,7 +16,7 @@ const emptyQuestion = {
 };
 
 const fieldClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100";
 
 function QuestionForm({ initialQuestion, isOpen, onSubmit, onCancel, submitLabel }) {
   const [form, setForm] = useState(emptyQuestion);
@@ -191,7 +191,7 @@ function QuestionForm({ initialQuestion, isOpen, onSubmit, onCancel, submitLabel
                 }))
               }
               aria-label={`Mark option ${index + 1} as correct`}
-              className="accent-[#0B609D]"
+              className="accent-[#5149B8]"
             />
 
             <input
@@ -222,7 +222,7 @@ function QuestionForm({ initialQuestion, isOpen, onSubmit, onCancel, submitLabel
           <button
             type="button"
             onClick={addOption}
-            className="w-fit text-xs font-semibold text-[#0B609D] hover:text-[#084877]"
+            className="w-fit text-xs font-semibold text-[#5149B8] hover:text-[#413B9A]"
           >
             + Add option
           </button>
@@ -239,7 +239,7 @@ function QuestionForm({ initialQuestion, isOpen, onSubmit, onCancel, submitLabel
         </button>
         <button
           type="submit"
-          className="rounded-xl bg-[#0B609D] px-4 py-2 text-xs font-bold text-white hover:bg-[#084877]"
+          className="rounded-xl bg-[#5149B8] px-4 py-2 text-xs font-bold text-white hover:bg-[#413B9A]"
         >
           {submitLabel}
         </button>

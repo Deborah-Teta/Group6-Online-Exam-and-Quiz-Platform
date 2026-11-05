@@ -1,4 +1,4 @@
-﻿ 
+ 
 function Button({
   label,
   type = 'button',
@@ -12,7 +12,7 @@ function Button({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-6 py-3 bg-gradient-to-r from-[#0B609D] to-gray-500 
+        px-6 py-3 bg-gradient-to-r from-[#5149B8] to-gray-500 
         rounded-full text-white flex items-center justify-center 
         gap-2.5 font-medium
         w-44 sm:w-52 md:w-64 lg:w-72 

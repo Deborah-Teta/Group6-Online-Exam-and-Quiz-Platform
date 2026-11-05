@@ -21,7 +21,7 @@ export const AdminSettingsTab = ({ onShowToast }) => {
         
         {/* Category Pill */}
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-[#EEF3FD] text-[#0B609D]">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-[#FFFFFF] text-[#5149B8]">
             <Sparkles size={14} />
             <span>AI & LLM Configuration</span>
           </span>
@@ -39,7 +39,7 @@ export const AdminSettingsTab = ({ onShowToast }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-1">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-700">
-              Daily AI Limit per Teacher <span className="text-[#0B609D]">*</span>
+              Daily AI Limit per Teacher <span className="text-[#5149B8]">*</span>
             </label>
             <input
               type="number"
@@ -47,7 +47,7 @@ export const AdminSettingsTab = ({ onShowToast }) => {
               max="50"
               value={dailyAiLimit}
               onChange={(e) => setDailyAiLimit(Number(e.target.value))}
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#0B609D] text-slate-900 bg-slate-50/50"
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#5149B8] text-slate-900 bg-slate-50/50"
             />
             <p className="text-[11px] text-slate-500">
               Controls API billing costs (Project brief specifies 10 daily generations).
@@ -64,7 +64,7 @@ export const AdminSettingsTab = ({ onShowToast }) => {
               max="10"
               value={maxQuestionsPerDraft}
               onChange={(e) => setMaxQuestionsPerDraft(Number(e.target.value))}
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#0B609D] text-slate-900 bg-slate-50/50"
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#5149B8] text-slate-900 bg-slate-50/50"
             />
             <p className="text-[11px] text-slate-500">
               Upper limit for a single teacher prompt (hard-capped at 10).
@@ -77,7 +77,7 @@ export const AdminSettingsTab = ({ onShowToast }) => {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 bg-[#0B609D] hover:bg-[#084877] text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#5149B8] hover:bg-[#413B9A] text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition cursor-pointer"
           >
             <Save size={15} />
             <span>{isSaving ? 'Saving...' : 'Save Settings'}</span>
