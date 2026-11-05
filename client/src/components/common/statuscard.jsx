@@ -1,4 +1,4 @@
-﻿const StatCard = ({ icon, title, value, subtext }) => {
+﻿const StatCard = ({title, value, subtext }) => {
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center gap-4 transition-transform hover:-translate-y-1 duration-300">
       

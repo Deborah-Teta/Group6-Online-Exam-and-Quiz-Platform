@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -70,6 +70,7 @@ export const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isLiveServer, setIsLiveServer] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   // Data states
   const [stats, setStats] = useState({});
@@ -101,10 +102,8 @@ export const AdminDashboard = () => {
 
   const loadData = async () => {
     setLoading(true);
+    setLoadError('');
     try {
-      const isOnline = await adminService.checkHealth();
-      setIsLiveServer(isOnline);
-
       const [statsRes, pendingRes, usersRes, classesRes, logsRes] = await Promise.all([
         adminService.getStats(),
         adminService.getPendingTeachers(),
@@ -118,23 +117,55 @@ export const AdminDashboard = () => {
       setUsers(usersRes.data || []);
       setClasses(classesRes.data || []);
       setAuditLogs(logsRes.data || []);
+      setIsLiveServer(true);
     } catch (err) {
-      console.error('Failed to load admin data:', err);
+      setIsLiveServer(false);
+      setLoadError(err.message || 'Failed to load administrator data.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    let isCurrent = true;
+    Promise.all([
+      adminService.getStats(),
+      adminService.getPendingTeachers(),
+      adminService.getUsers(),
+      adminService.getClasses(),
+      adminService.getAuditLogs()
+    ])
+      .then(([statsRes, pendingRes, usersRes, classesRes, logsRes]) => {
+        if (!isCurrent) return;
+        setStats(statsRes.data || {});
+        setPendingTeachers(pendingRes.data || []);
+        setUsers(usersRes.data || []);
+        setClasses(classesRes.data || []);
+        setAuditLogs(logsRes.data || []);
+        setIsLiveServer(true);
+      })
+      .catch((err) => {
+        if (!isCurrent) return;
+        setIsLiveServer(false);
+        setLoadError(err.message || 'Failed to load administrator data.');
+      })
+      .finally(() => {
+        if (isCurrent) setLoading(false);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
   }, []);
 
   // Action Handlers
   const handleApproveTeacher = async (teacherId) => {
-    const res = await adminService.approveTeacher(teacherId);
-    if (res.success) {
+    try {
+      await adminService.approveTeacher(teacherId);
       showToast('Teacher approved successfully! Faculty account activated.');
-      loadData();
+      await loadData();
+    } catch (err) {
+      setLoadError(err.message || 'Failed to approve teacher.');
     }
   };
 
@@ -144,10 +175,12 @@ export const AdminDashboard = () => {
       'Unverified educational domain or missing institutional credentials.'
     );
     if (reason !== null) {
-      const res = await adminService.rejectTeacher(teacherId, reason);
-      if (res.success) {
+      try {
+        await adminService.rejectTeacher(teacherId, reason);
         showToast('Teacher registration rejected.');
-        loadData();
+        await loadData();
+      } catch (err) {
+        setLoadError(err.message || 'Failed to reject teacher.');
       }
     }
   };
@@ -162,13 +195,11 @@ export const AdminDashboard = () => {
     try {
       setIsSubmittingBlock(true);
       setBlockError('');
-      const res = await adminService.blockUser(blockingUser._id, blockReason.trim());
-      if (res.success) {
-        showToast('User account has been blocked and session revoked.');
-        setBlockingUser(null);
-        setBlockReason('');
-        loadData();
-      }
+      await adminService.blockUser(blockingUser._id, blockReason.trim());
+      showToast('User account has been blocked.');
+      setBlockingUser(null);
+      setBlockReason('');
+      await loadData();
     } catch (err) {
       setBlockError(err.message || 'Failed to block account.');
     } finally {
@@ -178,10 +209,12 @@ export const AdminDashboard = () => {
 
   const handleUnblockUser = async (userId) => {
     if (window.confirm('Restore this account and reinstate platform privileges?')) {
-      const res = await adminService.unblockUser(userId);
-      if (res.success) {
+      try {
+        await adminService.unblockUser(userId);
         showToast('User account successfully unblocked.');
-        loadData();
+        await loadData();
+      } catch (err) {
+        setLoadError(err.message || 'Failed to unblock user.');
       }
     }
   };
@@ -212,6 +245,7 @@ export const AdminDashboard = () => {
     if (userStatusFilter === 'blocked') matchStatus = !!u.isBlocked;
     else if (userStatusFilter === 'pending') matchStatus = u.approvalStatus === 'pending' && !u.isBlocked;
     else if (userStatusFilter === 'approved') matchStatus = u.approvalStatus === 'approved' && !u.isBlocked;
+    else if (userStatusFilter === 'rejected') matchStatus = u.approvalStatus === 'rejected' && !u.isBlocked;
     return matchSearch && matchRole && matchStatus;
   });
 
@@ -310,7 +344,7 @@ export const AdminDashboard = () => {
               <div className="flex items-center gap-2">
                 <span className={`inline-block h-2.5 w-2.5 rounded-full ${isLiveServer ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
                 <span className="text-xs font-semibold text-slate-700">
-                  {isLiveServer ? 'Backend Server Online (Port 5000)' : 'Interactive Preview Mode'}
+                  {isLiveServer ? 'Live platform data' : 'Backend unavailable'}
                 </span>
               </div>
 
@@ -324,6 +358,23 @@ export const AdminDashboard = () => {
                 <span>{loading ? 'Refreshing...' : 'Refresh Records'}</span>
               </button>
             </div>
+
+            {loadError && (
+              <div
+                role="alert"
+                className="flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              >
+                <span>{loadError}</span>
+                <button
+                  type="button"
+                  onClick={loadData}
+                  disabled={loading}
+                  className="shrink-0 font-semibold underline disabled:opacity-50"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
 
             {/* 4 Key StatCards Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -437,8 +488,10 @@ export const AdminDashboard = () => {
                       <div className="w-14 h-14 rounded-full bg-[#FFFFFF] text-[#5149B8] flex items-center justify-center mb-3">
                         <Check size={28} />
                       </div>
-                      <p className="font-bold text-slate-700">No Pending Faculty Approvals</p>
-                      <p className="text-xs mt-1">All teacher applicants have been reviewed and approved.</p>
+                      <p className="font-bold text-slate-700">
+                        {loading ? 'Loading teacher applications...' : 'No Pending Faculty Approvals'}
+                      </p>
+                      {!loading && <p className="text-xs mt-1">There are no pending teacher applications to review.</p>}
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
@@ -545,6 +598,7 @@ export const AdminDashboard = () => {
                         <option value="all">All Statuses</option>
                         <option value="approved">Approved & Active</option>
                         <option value="pending">Pending</option>
+                        <option value="rejected">Rejected</option>
                         <option value="blocked">Blocked / Suspended</option>
                       </select>
                     </div>
@@ -565,6 +619,7 @@ export const AdminDashboard = () => {
                         {filteredUsers.map((u) => {
                           const isBlocked = !!u.isBlocked;
                           const isPending = u.role === 'teacher' && u.approvalStatus === 'pending';
+                          const isRejected = u.role === 'teacher' && u.approvalStatus === 'rejected';
 
                           return (
                             <tr key={u._id} className="hover:bg-slate-50/60 transition">
@@ -612,6 +667,10 @@ export const AdminDashboard = () => {
                                 ) : isPending ? (
                                   <span className="inline-block bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full font-bold text-[11px]">
                                     Pending Review
+                                  </span>
+                                ) : isRejected ? (
+                                  <span className="inline-block bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-full font-bold text-[11px]">
+                                    Rejected
                                   </span>
                                 ) : (
                                   <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-bold text-[11px]">
@@ -716,8 +775,8 @@ export const AdminDashboard = () => {
                                     {teacher?.fullName ? teacher.fullName.charAt(0).toUpperCase() : 'T'}
                                   </div>
                                   <div>
-                                    <div className="font-bold text-slate-800">{teacher?.fullName || 'Faculty Member'}</div>
-                                    <div className="text-slate-400 text-[11px]">{teacher?.email || 'faculty@edu.org'}</div>
+                                    <div className="font-bold text-slate-800">{teacher?.fullName || 'Instructor unavailable'}</div>
+                                    {teacher?.email && <div className="text-slate-400 text-[11px]">{teacher.email}</div>}
                                   </div>
                                 </div>
                               </td>
@@ -739,8 +798,8 @@ export const AdminDashboard = () => {
                                 {c.studentCount ?? 0} students
                               </td>
                               <td className="py-4 px-4">
-                                <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-bold text-[11px]">
-                                  Active
+                                <span className={`inline-block border px-3 py-1 rounded-full font-bold text-[11px] ${c.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                                {c.isActive ? 'Active' : 'Inactive'}
                                 </span>
                               </td>
                             </tr>
