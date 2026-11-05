@@ -190,7 +190,10 @@ let mockAuditLogs = [
 ];
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token') || 'demo_admin_token';
+  const token =
+    localStorage.getItem('token') ||
+    sessionStorage.getItem('token') ||
+    'demo_admin_token';
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`
@@ -461,4 +464,3 @@ export const adminService = {
     return { source: 'mock', data: [...mockAuditLogs] };
   }
 };
-

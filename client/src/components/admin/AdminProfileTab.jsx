@@ -65,9 +65,9 @@ export const AdminProfileTab = ({ onShowToast }) => {
   return (
     <div className="flex flex-col gap-6">
       {/* 1. Header Profile Banner */}
-      <div className="bg-gradient-to-r from-[#0B609D] to-[#1e3a8a] rounded-3xl p-6 sm:p-8 text-white shadow-sm flex flex-wrap items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#5149B8] to-[#1e3a8a] rounded-3xl p-6 sm:p-8 text-white shadow-sm flex flex-wrap items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-white text-[#0B609D] font-black text-2xl flex items-center justify-center shadow-lg border-4 border-white/20">
+          <div className="w-20 h-20 rounded-full bg-white text-[#5149B8] font-black text-2xl flex items-center justify-center shadow-lg border-4 border-white/20">
             BN
           </div>
           <div>
@@ -95,7 +95,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
         {/* 2. Personal Information Form */}
         <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col gap-5">
           <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <User className="text-[#0B609D]" size={20} />
+            <User className="text-[#5149B8]" size={20} />
             <h3 className="font-bold text-base text-slate-900">Personal Information</h3>
           </div>
 
@@ -108,7 +108,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
                 type="text"
                 value={profileData.fullName}
                 onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-2 focus:ring-blue-50 text-slate-900 font-medium"
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-2 focus:ring-blue-50 text-slate-900 font-medium"
               />
             </div>
 
@@ -120,7 +120,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
                 type="email"
                 value={profileData.email}
                 onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-2 focus:ring-blue-50 text-slate-900 font-medium"
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-2 focus:ring-blue-50 text-slate-900 font-medium"
               />
             </div>
 
@@ -140,7 +140,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
               <button
                 type="submit"
                 disabled={isSavingProfile}
-                className="inline-flex items-center gap-2 bg-[#0B609D] hover:bg-[#084877] text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#5149B8] hover:bg-[#413B9A] text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
               >
                 <Save size={15} />
                 <span>{isSavingProfile ? 'Saving...' : 'Save Profile Changes'}</span>
@@ -152,7 +152,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
         {/* 3. Security & Password Update */}
         <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col gap-5">
           <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <Key className="text-[#0B609D]" size={20} />
+            <Key className="text-[#5149B8]" size={20} />
             <h3 className="font-bold text-base text-slate-900">Security Credentials</h3>
           </div>
 
@@ -166,7 +166,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
                 placeholder="••••••••"
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-2 focus:ring-blue-50 text-slate-900"
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-2 focus:ring-blue-50 text-slate-900"
               />
             </div>
 
@@ -179,7 +179,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
                 placeholder="Minimum 6 characters"
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-2 focus:ring-blue-50 text-slate-900"
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-2 focus:ring-blue-50 text-slate-900"
               />
             </div>
 
@@ -192,7 +192,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
                 placeholder="Repeat new password"
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#0B609D] focus:ring-2 focus:ring-blue-50 text-slate-900"
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-[#5149B8] focus:ring-2 focus:ring-blue-50 text-slate-900"
               />
             </div>
 
@@ -204,7 +204,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
               <button
                 type="submit"
                 disabled={isUpdatingPassword}
-                className="inline-flex items-center gap-2 bg-[#0B609D] hover:bg-[#084877] text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#5149B8] hover:bg-[#413B9A] text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
               >
                 <Check size={15} />
                 <span>{isUpdatingPassword ? 'Updating...' : 'Update Password'}</span>
@@ -218,7 +218,7 @@ export const AdminProfileTab = ({ onShowToast }) => {
       <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col gap-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <Laptop className="text-[#0B609D]" size={20} />
+            <Laptop className="text-[#5149B8]" size={20} />
             <h3 className="font-bold text-base text-slate-900">Active Admin Sessions</h3>
           </div>
           <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
@@ -226,9 +226,9 @@ export const AdminProfileTab = ({ onShowToast }) => {
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#EEF3FD]/50 border border-blue-100">
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#FFFFFF]/50 border border-blue-100">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-full bg-white text-[#0B609D] flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-full bg-white text-[#5149B8] flex items-center justify-center shadow-xs">
               <Laptop size={20} />
             </div>
             <div>

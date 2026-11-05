@@ -1,72 +1,57 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import ActionButton from "../../components/common/ActionButton";
 import ClassesList from "../../components/Teacher/Classes/Classes list";
 import CreateClass from "../../components/Teacher/Classes/Create class";
 import ClassDetails from "../../components/Teacher/Classes/class details";
 import Modal from "../../components/common/Modal";
-
-const initialClasses = [
-  {
-    id: "biology-10a",
-    name: "Biology 10A",
-    description: "Year 10 · Biology",
-    students: 8,
-    code: "BIO10A",
-    active: true,
-    nextItem: "Cell Biology Checkpoint",
-    nextSchedule: "Today, 10:00 GMT",
-  },
-  {
-    id: "biology-10b",
-    name: "Biology 10B",
-    description: "Year 10 · Biology",
-    students: 32,
-    code: "BIO10B",
-    active: true,
-    nextItem: "Plant Cells Practice",
-    nextSchedule: "Today, 14:00 GMT",
-  },
-  {
-    id: "science-9a",
-    name: "Science 9A",
-    description: "Year 9 · Combined science",
-    students: 28,
-    code: "SCI09A",
-    active: true,
-    nextItem: "Forces & Motion",
-    nextSchedule: "Fri 30 Oct, 09:00 GMT",
-  },
-  {
-    id: "science-enrichment",
-    name: "Science enrichment",
-    description: "Mixed years · Science",
-    students: 28,
-    code: "ENRICH",
-    active: true,
-    nextItem: "Scientific Method",
-    nextSchedule: "Mon 2 Nov, 15:30 GMT",
-  },
-];
-
-const codeCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-function createJoinCode() {
-  const values = new Uint8Array(6);
-  window.crypto.getRandomValues(values);
-
-  return Array.from(
-    values,
-    (value) => codeCharacters[value % codeCharacters.length],
-  ).join("");
-}
+import {
+  createTeacherClass,
+  getTeacherClassDetails,
+  getTeacherClasses,
+} from "../../services/teacherService";
 
 function TeacherClasses() {
-  const [classes, setClasses] = useState(initialClasses);
+  const [classes, setClasses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [copiedClassId, setCopiedClassId] = useState("");
   const [copyError, setCopyError] = useState("");
   const [selectedClass, setSelectedClass] = useState(null);
+  const [classDetails, setClassDetails] = useState(null);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState("");
+
+  const loadClasses = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError("");
+    try {
+      setClasses(await getTeacherClasses());
+    } catch (error) {
+      setLoadError(error.message || "Could not load your classes.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isCurrent = true;
+    getTeacherClasses()
+      .then((items) => {
+        if (isCurrent) setClasses(items);
+      })
+      .catch((error) => {
+        if (isCurrent) setLoadError(error.message || "Could not load your classes.");
+      })
+      .finally(() => {
+        if (isCurrent) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [loadClasses]);
 
   const activeClasses = classes.filter((teacherClass) => teacherClass.active);
   const studentCount = activeClasses.reduce(
@@ -74,20 +59,24 @@ function TeacherClasses() {
     0,
   );
 
-  function handleCreateClass({ name, description }) {
-    const newClass = {
-      id: `class-${Date.now()}`,
-      name,
-      description,
-      students: 0,
-      code: createJoinCode(),
-      active: true,
-      nextItem: "No upcoming assessments",
-      nextSchedule: "Schedule an exam to see it here",
-    };
-
+  async function handleCreateClass(values) {
+    const newClass = await createTeacherClass(values);
     setClasses((current) => [newClass, ...current]);
-    setIsCreateOpen(false);
+    return true;
+  }
+
+  async function handleOpenClass(teacherClass) {
+    setSelectedClass(teacherClass);
+    setClassDetails(null);
+    setDetailsError("");
+    setIsDetailsLoading(true);
+    try {
+      setClassDetails(await getTeacherClassDetails(teacherClass.id));
+    } catch (error) {
+      setDetailsError(error.message || "Could not load class details.");
+    } finally {
+      setIsDetailsLoading(false);
+    }
   }
 
   async function handleCopyCode(teacherClass) {
@@ -113,9 +102,9 @@ function TeacherClasses() {
             Your classes
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            A home for every group you teach, {activeClasses.length} active
-            {activeClasses.length === 1 ? " class" : " classes"} · {studentCount}{" "}
-            students.
+            {isLoading
+              ? "Loading your classes…"
+              : `${activeClasses.length} active ${activeClasses.length === 1 ? "class" : "classes"} · ${studentCount} students.`}
           </p>
         </div>
 
@@ -126,12 +115,25 @@ function TeacherClasses() {
         />
       </section>
 
+      {loadError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <span>{loadError}</span>
+          <button type="button" onClick={loadClasses} className="font-semibold underline">
+            Try again
+          </button>
+        </div>
+      )}
+
       <ClassesList
         classes={classes}
         copiedClassId={copiedClassId}
         copyError={copyError}
         onCopyCode={handleCopyCode}
-        onOpenClass={(teacherClass) => setSelectedClass(teacherClass)}
+        onOpenClass={handleOpenClass}
+        isLoading={isLoading}
       />
 
       <CreateClass
@@ -139,20 +141,44 @@ function TeacherClasses() {
         onClose={() => setIsCreateOpen(false)}
         onCreate={handleCreateClass}
       />
+
       <Modal
-  isOpen={Boolean(selectedClass)}
-  onClose={() => setSelectedClass(null)}
-  title={selectedClass ? `${selectedClass.name} details` : "Class details"}
-  size="xl"
->
-  {selectedClass && (
-    <ClassDetails
-      teacherClass={selectedClass}
-      onCopyCode={() => handleCopyCode(selectedClass)}
-      copied={copiedClassId === selectedClass.id}
-    />
-  )}
-</Modal>
+        isOpen={Boolean(selectedClass)}
+        onClose={() => {
+          setSelectedClass(null);
+          setClassDetails(null);
+        }}
+        title={selectedClass ? `${selectedClass.name} details` : "Class details"}
+        size="xl"
+      >
+        {detailsError && (
+          <div
+            role="alert"
+            className="flex items-center justify-between gap-3 text-sm text-red-700"
+          >
+            <span>{detailsError}</span>
+            <button
+              type="button"
+              onClick={() => handleOpenClass(selectedClass)}
+              className="font-semibold underline"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+        {isDetailsLoading && (
+          <p role="status" className="text-sm text-slate-500">
+            Loading class details…
+          </p>
+        )}
+        {classDetails && !isDetailsLoading && (
+          <ClassDetails
+            teacherClass={classDetails}
+            onCopyCode={() => handleCopyCode(classDetails)}
+            copied={copiedClassId === classDetails.id}
+          />
+        )}
+      </Modal>
     </div>
   );
 }

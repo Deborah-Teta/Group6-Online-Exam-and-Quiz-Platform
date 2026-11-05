@@ -1,68 +1,23 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import DataTable from "../../components/common/DataTable";
 import ExamDetailsForm from "../../components/Teacher/Exams/ExamDetailsForm";
 import ExamPreview from "../../components/Teacher/Exams/ExamPreview";
 import QuestionBankPicker from "../../components/Teacher/Exams/QuestionBankPicker";
+import StatusBadge from "../../components/common/StatusBadge";
+import {
+  createTeacherExam,
+  getTeacherClasses,
+  getTeacherExams,
+  getTeacherQuestions,
+} from "../../services/teacherService";
 
-const classes = [
-  { id: "biology-10a", name: "Biology 10A", students: 8 },
-  { id: "biology-10b", name: "Biology 10B", students: 32 },
-  { id: "science-9a", name: "Science 9A", students: 28 },
-  { id: "science-enrichment", name: "Science enrichment", students: 28 },
-];
-
-const questionBank = [
-  {
-    id: "q1",
-    questionText: "Which organelle releases energy during aerobic respiration?",
-    type: "multiple_choice",
-    typeLabel: "Multiple choice",
-    topic: "Cell organelles",
-    points: 2,
-    source: "manual",
-  },
-  {
-    id: "q2",
-    questionText: "Plant and animal cells both have a cell membrane.",
-    type: "true_false",
-    typeLabel: "True / false",
-    topic: "Cell structures",
-    points: 2,
-    source: "ai",
-  },
-  {
-    id: "q3",
-    questionText: "What controls the movement of substances into and out of a cell?",
-    type: "multiple_choice",
-    typeLabel: "Multiple choice",
-    topic: "Cell transport",
-    points: 2,
-    source: "manual",
-  },
-  {
-    id: "q4",
-    questionText: "Which structure contains the genetic material of a cell?",
-    type: "multiple_choice",
-    typeLabel: "Multiple choice",
-    topic: "Cell organelles",
-    points: 2,
-    source: "ai",
-  },
-  {
-    id: "q5",
-    questionText: "Chloroplasts are found in animal cells.",
-    type: "true_false",
-    typeLabel: "True / false",
-    topic: "Plant cells",
-    points: 2,
-    source: "manual",
-  },
-];
-
-function getToday() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
+function getTomorrow() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const year = tomorrow.getFullYear();
+  const month = String(tomorrow.getMonth() + 1).padStart(2, "0");
+  const day = String(tomorrow.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -70,13 +25,11 @@ function getEndDateTime(startDate, startTime, duration) {
   if (!startDate || !startTime || !duration) {
     return { date: startDate, time: startTime };
   }
-
   const [year, month, day] = startDate.split("-").map(Number);
   const [hour, minute] = startTime.split(":").map(Number);
   const end = new Date(
     Date.UTC(year, month - 1, day, hour, minute + Number(duration)),
   );
-
   return {
     date: end.toISOString().slice(0, 10),
     time: `${String(end.getUTCHours()).padStart(2, "0")}:${String(
@@ -87,7 +40,6 @@ function getEndDateTime(startDate, startTime, duration) {
 
 function formatDate(date) {
   if (!date) return "—";
-
   return new Date(`${date}T00:00:00`).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
@@ -95,19 +47,84 @@ function formatDate(date) {
   });
 }
 
+function toStartTimeISO(exam) {
+  const [year, month, day] = exam.startDate.split("-").map(Number);
+  const [hour, minute] = exam.startTime.split(":").map(Number);
+  const zoneOffsetMinutes = exam.timeZone === "CAT" ? 120 : 0;
+  return new Date(
+    Date.UTC(year, month - 1, day, hour, minute) - zoneOffsetMinutes * 60_000,
+  ).toISOString();
+}
+
 function TeacherCreateExam() {
+  const [searchParams] = useSearchParams();
+  const [classes, setClasses] = useState([]);
+  const [questionBank, setQuestionBank] = useState([]);
+  const [assessments, setAssessments] = useState([]);
   const [exam, setExam] = useState({
-    title: "Cell Biology Checkpoint",
-    classId: "biology-10a",
-    startDate: getToday(),
+    title: "",
+    classId: searchParams.get("classId") || "",
+    startDate: getTomorrow(),
     startTime: "10:00",
     timeZone: "GMT",
     duration: "30",
   });
-  const [selectedIds, setSelectedIds] = useState(
-    questionBank.map((question) => question.id),
-  );
+  const [selectedIds, setSelectedIds] = useState([]);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const loadPageData = useCallback(async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const [teacherClasses, questionData, teacherExams] = await Promise.all([
+        getTeacherClasses(),
+        getTeacherQuestions(),
+        getTeacherExams(),
+      ]);
+      setClasses(teacherClasses.map(({ id, name, students }) => ({ id, name, students })));
+      const mappedQuestions = questionData.questions.map((question) => ({
+        ...question,
+        typeLabel: question.type === "multiple_choice" ? "Multiple choice" : "True / false",
+      }));
+      setQuestionBank(mappedQuestions);
+      setAssessments(teacherExams);
+      setSelectedIds([]);
+    } catch (requestError) {
+      setError(requestError.message || "Could not load assessment setup data.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isCurrent = true;
+    Promise.all([getTeacherClasses(), getTeacherQuestions(), getTeacherExams()])
+      .then(([teacherClasses, questionData, teacherExams]) => {
+        if (!isCurrent) return;
+        setClasses(teacherClasses.map(({ id, name, students }) => ({ id, name, students })));
+        setQuestionBank(questionData.questions.map((question) => ({
+          ...question,
+          typeLabel: question.type === "multiple_choice" ? "Multiple choice" : "True / false",
+        })));
+        setAssessments(teacherExams);
+        setSelectedIds([]);
+      })
+      .catch((requestError) => {
+        if (isCurrent) {
+          setError(requestError.message || "Could not load assessment setup data.");
+        }
+      })
+      .finally(() => {
+        if (isCurrent) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [loadPageData]);
 
   const teacherClass = classes.find((item) => item.id === exam.classId);
   const selectedQuestions = questionBank.filter((question) =>
@@ -117,7 +134,6 @@ function TeacherCreateExam() {
     (total, question) => total + question.points,
     0,
   );
-
   const questionTypeCounts = selectedQuestions.reduce(
     (counts, question) => {
       if (question.type === "multiple_choice") counts.multipleChoice += 1;
@@ -131,7 +147,6 @@ function TeacherCreateExam() {
     () => getEndDateTime(exam.startDate, exam.startTime, exam.duration),
     [exam.startDate, exam.startTime, exam.duration],
   );
-
   const startLabel = `${formatDate(exam.startDate)} · ${exam.startTime} ${exam.timeZone}`;
   const endLabel = `${formatDate(endDateTime.date)} · ${endDateTime.time} ${exam.timeZone}`;
 
@@ -149,26 +164,65 @@ function TeacherCreateExam() {
     setMessage("");
   }
 
-  function handleAction(action) {
+  async function handleAction(action) {
     if (!exam.title.trim() || !exam.classId || !exam.startDate || !exam.startTime) {
-      setMessage("Enter an exam title, class, start date, and start time first.");
+      setMessage("Enter an assessment title, class, start date, and start time first.");
+      return;
+    }
+    if (!exam.duration || !Number.isInteger(Number(exam.duration)) || Number(exam.duration) < 1 || Number(exam.duration) > 600) {
+      setMessage("Duration must be between 1 and 600 minutes.");
+      return;
+    }
+    if (selectedIds.length === 0) {
+      setMessage("Select at least one question before saving.");
       return;
     }
 
-    if (!exam.duration || Number(exam.duration) < 1) {
-      setMessage("Duration must be at least one minute.");
-      return;
+    setIsSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      const created = await createTeacherExam({
+        title: exam.title.trim(),
+        classId: exam.classId,
+        questionIds: selectedIds,
+        startTime: toStartTimeISO(exam),
+        durationMinutes: Number(exam.duration),
+        status: action === "draft" ? "draft" : "scheduled",
+      });
+      setAssessments((current) => [created, ...current]);
+      setMessage(action === "draft" ? "Draft saved." : "Assessment scheduled successfully.");
+    } catch (requestError) {
+      setError(requestError.message || "Could not save this assessment.");
+    } finally {
+      setIsSaving(false);
     }
-
-    if (action === "publish" && selectedIds.length === 0) {
-      setMessage("Select at least one question before publishing.");
-      return;
-    }
-
-    setMessage(
-      `The ${action === "draft" ? "draft" : "publish"} API is not connected yet. Nothing has been saved.`,
-    );
   }
+
+  const assessmentColumns = [
+    { key: "title", header: "Assessment" },
+    { key: "className", header: "Class" },
+    {
+      key: "startTime",
+      header: "Starts · GMT",
+      render: (item) => new Date(item.startTime).toLocaleString("en-GB", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "UTC",
+      }),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (item) => (
+        <StatusBadge
+          label={item.status === "scheduled" ? "Scheduled" : item.status}
+          variant={item.status === "scheduled" ? "upcoming" : "closed"}
+        />
+      ),
+    },
+    { key: "questionCount", header: "Questions" },
+  ];
 
   return (
     <div className="flex flex-col gap-5">
@@ -181,36 +235,65 @@ function TeacherCreateExam() {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-3">
-        <div className="flex min-w-0 flex-col gap-5 xl:col-span-2">
-          <ExamDetailsForm
-            values={exam}
-            classes={classes}
-            onChange={handleChange}
-            endTime={`${endDateTime.time} on ${formatDate(endDateTime.date)}`}
-          />
-
-          <QuestionBankPicker
-            questions={questionBank}
-            selectedIds={selectedIds}
-            onToggle={handleToggleQuestion}
-          />
+      {error && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <span>{error}</span>
+          <button type="button" onClick={loadPageData} className="font-semibold underline">
+            Try again
+          </button>
         </div>
+      )}
 
-        <aside className="xl:sticky xl:top-24">
-          <ExamPreview
-            exam={exam}
-            teacherClass={teacherClass}
-            questions={selectedQuestions}
-            totalPoints={totalPoints}
-            questionTypeCounts={questionTypeCounts}
-            startLabel={startLabel}
-            endLabel={endLabel}
-            message={message}
-            onAction={handleAction}
-          />
-        </aside>
-      </div>
+      {isLoading ? (
+        <p role="status" className="text-sm text-slate-500">Loading classes and questions…</p>
+      ) : (
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-3">
+          <div className="flex min-w-0 flex-col gap-5 xl:col-span-2">
+            <ExamDetailsForm
+              values={exam}
+              classes={classes}
+              onChange={handleChange}
+              endTime={`${endDateTime.time} on ${formatDate(endDateTime.date)}`}
+            />
+
+            <QuestionBankPicker
+              questions={questionBank}
+              selectedIds={selectedIds}
+              onToggle={handleToggleQuestion}
+            />
+          </div>
+
+          <aside className="xl:sticky xl:top-24">
+            <ExamPreview
+              exam={exam}
+              teacherClass={teacherClass}
+              questions={selectedQuestions}
+              totalPoints={totalPoints}
+              questionTypeCounts={questionTypeCounts}
+              startLabel={startLabel}
+              endLabel={endLabel}
+              message={message}
+              isSaving={isSaving}
+              onAction={handleAction}
+            />
+          </aside>
+        </div>
+      )}
+
+      <section className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mb-4">
+          <h2 className="text-base font-bold text-slate-900">Your assessments</h2>
+          <p className="mt-1 text-xs text-slate-500">Assessments saved to your classes.</p>
+        </div>
+        <DataTable
+          columns={assessmentColumns}
+          rows={assessments}
+          emptyMessage={isLoading ? "Loading assessments…" : "You have not created any assessments yet."}
+        />
+      </section>
     </div>
   );
 }

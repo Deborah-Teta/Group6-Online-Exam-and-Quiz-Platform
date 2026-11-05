@@ -24,7 +24,7 @@ function ExamDetailsForm({ values, classes, onChange, endTime }) {
             value={values.classId}
             onChange={(event) => onChange("classId", event.target.value)}
             required
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           >
             <option value="">Select a class</option>
             {classes.map((teacherClass) => (
@@ -62,7 +62,7 @@ function ExamDetailsForm({ values, classes, onChange, endTime }) {
               id="exam-timezone"
               value={values.timeZone}
               onChange={(event) => onChange("timeZone", event.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
             >
               <option value="GMT">Europe/London · GMT</option>
               <option value="CAT">Africa/Kigali · CAT</option>

@@ -9,10 +9,6 @@ import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
 import StatusBadge from "../../components/common/StatusBadge";
 import Tabs from "../../components/common/Tabs";
-import {
-  mockExams,
-  mockNextExamNote,
-} from "../../services/studentMockData";
 import { averageScore, formatPercent } from "../../utils/scores";
 
 const VISIBLE_ROWS = 5;
@@ -53,20 +49,23 @@ const examColumns = [
 ];
 
 function StudentDashboard() {
-  const { enrolledClasses } = useOutletContext();
+  const { enrolledClasses, exams, isLoading } = useOutletContext();
   const [activeTab, setActiveTab] = useState("all");
 
   const classNames = enrolledClasses.map((enrolledClass) => enrolledClass.name);
-  const openExams = mockExams.filter((exam) => exam.status === "open");
-  const upcomingExams = mockExams.filter((exam) => exam.status === "upcoming");
-  const completedExams = mockExams.filter((exam) => exam.status === "closed");
+  const studentExams = exams.filter((exam) => exam.type === "exam");
+  const openExams = studentExams.filter((exam) => exam.status === "open");
+  const upcomingExams = studentExams.filter((exam) => exam.status === "upcoming");
+  const completedExams = studentExams.filter(
+    (exam) => exam.status === "closed" && exam.score !== undefined,
+  );
   const visibleExams = (
     activeTab === "all"
-      ? mockExams
-      : mockExams.filter((exam) => exam.status === activeTab)
+      ? studentExams
+      : studentExams.filter((exam) => exam.status === activeTab)
   ).slice(0, VISIBLE_ROWS);
 
-  const scoreTrend = [...completedExams].reverse().map((exam) => ({
+  const scoreTrend = completedExams.map((exam) => ({
     label: exam.date,
     value: exam.score,
     detail: exam.title,
@@ -89,47 +88,71 @@ function StudentDashboard() {
       {/* Row 1: statistics */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<Users size={28} className="text-[#0B609D]" />}
+          icon={<Users size={28} className="text-[#5149B8]" />}
           title="My classes"
-          value={enrolledClasses.length}
-          subtext={classNames.join(" · ")}
+          value={isLoading ? "…" : enrolledClasses.length}
+          subtext={classNames.join(" · ") || "Join a class to get started"}
         />
         <StatCard
-          icon={<ClipboardCheck size={28} className="text-[#0B609D]" />}
+          icon={<ClipboardCheck size={28} className="text-[#5149B8]" />}
           title="Open now"
-          value={openExams.length}
-          subtext={`${openExams[0].title} closes at ${openExams[0].closesAt}`}
+          value={isLoading ? "…" : openExams.length}
+          subtext={
+            openExams[0]
+              ? `${openExams[0].title} closes at ${openExams[0].closesTime}`
+              : "No assessments open right now"
+          }
         />
         <StatCard
-          icon={<CalendarClock size={28} className="text-[#0B609D]" />}
+          icon={<CalendarClock size={28} className="text-[#5149B8]" />}
           title="Coming up"
-          value={upcomingExams.length}
-          subtext={mockNextExamNote}
+          value={isLoading ? "…" : upcomingExams.length}
+          subtext={
+            upcomingExams[0]
+              ? `${upcomingExams[0].title} · ${upcomingExams[0].schedule}`
+              : "Nothing scheduled"
+          }
         />
         <StatCard
-          icon={<ChartNoAxesCombined size={28} className="text-[#0B609D]" />}
+          icon={<ChartNoAxesCombined size={28} className="text-[#5149B8]" />}
           title="Average score"
-          value={formatPercent(averageScore(completedExams))}
-          subtext={`Across ${completedExams.length} completed exams`}
+          value={
+            completedExams.length
+              ? formatPercent(averageScore(completedExams))
+              : "—"
+          }
+          subtext={`Across ${completedExams.length} released results`}
         />
       </div>
 
       {/* Row 2: charts */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <SectionCard title="Score trend" action="Completed exams" className="xl:col-span-2">
-          <LineChart
-            data={scoreTrend}
-            label="Score on each completed exam, oldest to newest"
-            formatValue={formatPercent}
-          />
+          {scoreTrend.length ? (
+            <LineChart
+              data={scoreTrend}
+              label="Score on each completed exam, oldest to newest"
+              formatValue={formatPercent}
+            />
+          ) : (
+            <p className="py-10 text-center text-sm text-muted">
+              Scores will appear here after you complete an exam.
+            </p>
+          )}
         </SectionCard>
 
         <SectionCard title="Average score by class">
-          <BarChart
-            data={scoreByClass}
-            label="Average score by class"
-            formatValue={formatPercent}
-          />
+          {scoreByClass.length ? (
+            <BarChart
+              data={scoreByClass}
+              label="Average score by class"
+              formatValue={formatPercent}
+            />
+          ) : (
+            <p className="py-10 text-center text-sm text-muted">
+              No released scores to compare yet.
+            </p>
+          )}
         </SectionCard>
       </div>
 
@@ -146,11 +169,15 @@ function StudentDashboard() {
           className="xl:col-span-2"
         >
           <Tabs tabs={examTabs} activeTab={activeTab} onChange={setActiveTab} />
-          <DataTable
-            columns={examColumns}
-            rows={visibleExams}
-            emptyMessage="No exams here yet."
-          />
+          {isLoading ? (
+            <p className="py-8 text-center text-sm text-muted">Loading your exams…</p>
+          ) : (
+            <DataTable
+              columns={examColumns}
+              rows={visibleExams}
+              emptyMessage="No exams here yet."
+            />
+          )}
         </SectionCard>
 
         <SectionCard
@@ -162,7 +189,7 @@ function StudentDashboard() {
           }
         >
           <ul className="-my-[14px] flex flex-1 flex-col justify-between divide-y divide-line-subtle">
-            {completedExams.slice(0, VISIBLE_ROWS).map((exam) => (
+            {[...completedExams].reverse().slice(0, VISIBLE_ROWS).map((exam) => (
               <li key={exam.id} className="flex items-center justify-between gap-[12px] py-[14px]">
                 <div className="min-w-0">
                   <p className="text-[13px] font-semibold leading-[1.55] text-main">
@@ -177,6 +204,11 @@ function StudentDashboard() {
                 </p>
               </li>
             ))}
+            {!isLoading && completedExams.length === 0 && (
+              <li className="py-6 text-center text-sm text-muted">
+                No released results yet.
+              </li>
+            )}
           </ul>
         </SectionCard>
       </div>

@@ -1,18 +1,18 @@
-/* The shared ExamFlow colours, taken from layouts/Sidebar, layouts/Navbar and the admin dashboard. */
+/* Shared ExamFlow palette. */
 :root {
-  --primary: #0b609d;
-  --primary-hover: #084877;
-  --primary-light: #eef3fd;
-  --primary-border: #dbe7f9;
+  --primary: #5149b8;
+  --primary-hover: #413b9a;
+  --primary-light: #f0effd;
+  --primary-border: #dcd9fa;
 
-  --bg-page: #f8fafc;
+  --bg-page: #ffffff;
   --bg-card: #ffffff;
   --bg-hover: #f1f5f9;
-  --bg-subtle: #f8fafc;
+  --bg-subtle: #FFFFFF;
 
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-subtle: #94a3b8;
+  --text-main: #202536;
+  --text-muted: #6d7180;
+  --text-subtle: #9a9daa;
   --border-color: #e2e8f0;
   --border-subtle: #f1f5f9;
 }

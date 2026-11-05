@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react";
 import {
   BookOpen,
   ClipboardList,
@@ -6,65 +7,13 @@ import {
   Users,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 import ActionButton from "../../components/common/ActionButton";
 import DataTable from "../../components/common/DataTable";
 import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
 import StatusBadge from "../../components/common/StatusBadge";
-
-const dashboardStats = [
-  {
-    title: "Your classes",
-    value: "4",
-    subtext: "96 enrolled students",
-    icon: <GraduationCap size={26} />,
-  },
-  {
-    title: "Question bank",
-    value: "24",
-    subtext: "8 AI-drafted questions",
-    icon: <BookOpen size={26} />,
-  },
-  {
-    title: "Exams this week",
-    value: "8",
-    subtext: "2 scheduled for today",
-    icon: <ClipboardList size={26} />,
-  },
-  {
-    title: "Drafts to review",
-    value: "3",
-    subtext: "Review before using",
-    icon: <Sparkles size={26} />,
-  },
-];
-
-const upcomingExams = [
-  {
-    id: "cell-biology",
-    title: "Cell Biology Checkpoint",
-    className: "Biology 10A · 5 questions · 10 points",
-    schedule: "10:00–10:30",
-    status: "upcoming",
-    statusLabel: "In 15 minutes",
-  },
-  {
-    id: "plant-cells",
-    title: "Plant Cells Practice",
-    className: "Biology 10B",
-    schedule: "14:00–14:20",
-    status: "upcoming",
-    statusLabel: "Scheduled",
-  },
-  {
-    id: "cell-transport",
-    title: "Cell Transport Quiz",
-    className: "Biology 10A",
-    schedule: "30 Oct · 11:00",
-    status: "upcoming",
-    statusLabel: "Scheduled",
-  },
-];
+import { getTeacherDashboard } from "../../services/teacherService";
 
 const examColumns = [
   {
@@ -90,27 +39,85 @@ const examColumns = [
   },
 ];
 
-const teacherClasses = [
-  { id: "biology-10a", name: "Biology 10A", students: 8, code: "BIO10A" },
-  { id: "biology-10b", name: "Biology 10B", students: 32, code: "BIO10B" },
-  { id: "science-9a", name: "Science 9A", students: 28, code: "SCI09A" },
-  {
-    id: "science-enrichment",
-    name: "Science enrichment",
-    students: 28,
-    code: "ENRICH",
-  },
-];
-
 function TeacherDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [dashboard, setDashboard] = useState(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const handleDashboardError = useCallback((requestError) => {
+    setError(requestError.message || "Could not load your dashboard.");
+  }, []);
+
+  const loadDashboard = useCallback(async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      setDashboard(await getTeacherDashboard());
+    } catch (requestError) {
+      handleDashboardError(requestError);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [handleDashboardError]);
+
+  useEffect(() => {
+    let isCurrent = true;
+    getTeacherDashboard()
+      .then((data) => {
+        if (isCurrent) setDashboard(data);
+      })
+      .catch((requestError) => {
+        if (isCurrent) handleDashboardError(requestError);
+      })
+      .finally(() => {
+        if (isCurrent) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [handleDashboardError]);
+
+  const stats = dashboard?.stats;
+  const dashboardStats = stats
+    ? [
+        {
+          title: "Your classes",
+          value: stats.classCount,
+          subtext: `${stats.studentCount} enrolled students`,
+          icon: <GraduationCap size={26} />,
+        },
+        {
+          title: "Question bank",
+          value: stats.questionCount,
+          subtext: `${stats.aiQuestionCount} AI-generated questions`,
+          icon: <BookOpen size={26} />,
+        },
+        {
+          title: "Exams next 7 days",
+          value: stats.examsNextSevenDays,
+          subtext: `${stats.examsToday} scheduled today`,
+          icon: <ClipboardList size={26} />,
+        },
+        {
+          title: "Drafts to review",
+          value: stats.pendingDraftCount,
+          subtext: "Pending AI drafts",
+          icon: <Sparkles size={26} />,
+        },
+      ]
+    : [];
+  const teacherName = user?.name || user?.fullName || "Teacher";
+  const firstName = teacherName.trim().split(/\s+/)[0];
 
   return (
     <div className="flex flex-col gap-6">
       <section className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Good morning, Sarah.
+            Welcome back, {firstName}.
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             A clear view of your classes and the day ahead.
@@ -118,31 +125,71 @@ function TeacherDashboard() {
         </div>
       </section>
 
-      <section
-        aria-label="Teacher overview"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
-      >
-        {dashboardStats.map((stat) => (
-          <StatCard key={stat.title} {...stat} />
-        ))}
-      </section>
+      {error && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <span>{error}</span>
+          <button type="button" onClick={loadDashboard} className="font-semibold underline">
+            Try again
+          </button>
+        </div>
+      )}
+
+      {isLoading ? (
+        <p role="status" className="text-sm text-slate-500">
+          Loading your dashboard…
+        </p>
+      ) : dashboard && (
+        <section
+          aria-label="Teacher overview"
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        >
+          {dashboardStats.map((stat) => (
+            <StatCard key={stat.title} {...stat} />
+          ))}
+        </section>
+      )}
 
       <section className="grid grid-cols-1 items-start gap-5 xl:grid-cols-3">
         <SectionCard
           title="Upcoming exams"
-          action={<span>Today · 29 October</span>}
+          action={<span>Upcoming scheduled assessments</span>}
           className="xl:col-span-2"
         >
           <DataTable
             columns={examColumns}
-            rows={upcomingExams}
-            emptyMessage="No upcoming exams."
+            rows={(dashboard?.upcomingExams || []).map((exam) => {
+              const start = new Date(exam.startTime);
+              const end = new Date(start.getTime() + exam.durationMinutes * 60_000);
+              const formatTime = (date) => date.toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "UTC",
+              });
+              const formatDate = (date) => date.toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                timeZone: "UTC",
+              });
+
+              return {
+                id: String(exam.id),
+                title: exam.title,
+                className: `${exam.className} · ${exam.questionCount} questions · ${exam.totalPoints} points`,
+                schedule: `${formatDate(start)} · ${formatTime(start)}–${formatTime(end)} GMT`,
+                status: "upcoming",
+                statusLabel: "Scheduled",
+              };
+            })}
+            emptyMessage={isLoading ? "Loading upcoming assessments…" : "No upcoming assessments."}
           />
 
           <button
             type="button"
             onClick={() => navigate("/teacher/exams")}
-            className="w-fit text-xs font-bold text-[#0B609D] transition hover:text-[#084877]"
+            className="w-fit text-xs font-bold text-[#5149B8] transition hover:text-[#413B9A]"
           >
             View all exams →
           </button>
@@ -153,7 +200,7 @@ function TeacherDashboard() {
           description="Use AI to get a first draft from your lesson notes."
         >
           <div className="flex flex-col gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF3FD] text-[#0B609D]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF] text-[#5149B8]">
               <Sparkles size={20} />
             </div>
 
@@ -173,7 +220,7 @@ function TeacherDashboard() {
             />
 
             <p className="text-[11px] text-slate-400">
-              3 of 10 generations used today
+              {stats?.pendingDraftCount ?? "—"} drafts currently waiting for review.
             </p>
           </div>
         </SectionCard>
@@ -185,34 +232,39 @@ function TeacherDashboard() {
           <button
             type="button"
             onClick={() => navigate("/teacher/classes")}
-            className="text-xs font-medium text-[#0B609D] transition hover:text-[#084877]"
+            className="text-xs font-medium text-[#5149B8] transition hover:text-[#413B9A]"
           >
             View all classes →
           </button>
         }
       >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {teacherClasses.map((teacherClass) => (
+          {(dashboard?.classes || []).slice(0, 4).map((teacherClass) => (
             <button
               key={teacherClass.id}
               type="button"
               onClick={() => navigate("/teacher/classes")}
-              className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-left transition hover:border-[#C9D7ED] hover:bg-[#EEF3FD]"
+              className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-left transition hover:border-[#C9D7ED] hover:bg-[#FFFFFF]"
             >
               <span className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                <Users size={15} className="text-[#0B609D]" />
+                <Users size={15} className="text-[#5149B8]" />
                 {teacherClass.name}
               </span>
 
               <span className="mt-2 block text-xs text-slate-500">
-                {teacherClass.students} students
+                {teacherClass.students} {teacherClass.students === 1 ? "student" : "students"}
               </span>
 
-              <span className="mt-3 block text-[11px] font-medium text-[#0B609D]">
+              <span className="mt-3 block text-[11px] font-medium text-[#5149B8]">
                 Joining code · {teacherClass.code}
               </span>
             </button>
           ))}
+          {!isLoading && dashboard?.classes?.length === 0 && (
+            <p className="col-span-full rounded-xl bg-slate-50 p-5 text-sm text-slate-500">
+              You do not have any active classes yet.
+            </p>
+          )}
         </div>
       </SectionCard>
     </div>

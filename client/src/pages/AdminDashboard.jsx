@@ -22,10 +22,12 @@ import Modal from '../components/common/Modal';
 import { AdminProfileTab } from '../components/admin/AdminProfileTab';
 import { AdminSettingsTab } from '../components/admin/AdminSettingsTab';
 import { adminService } from '../services/adminService';
+import { useAuth } from '../context/useAuth';
 
 export const AdminDashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   // Determine active view from URL path
   const getTabFromPath = (path) => {
@@ -235,7 +237,7 @@ export const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#FFFFFF]">
       {/* 1. ExamFlow Shared Sidebar */}
       <Sidebar
         role="admin"
@@ -245,17 +247,22 @@ export const AdminDashboard = () => {
 
       {/* 2. ExamFlow Shared Navbar */}
       <Navbar
-        user={{ name: "Blaise", role: "admin", email: "admin@examplatform.edu" }}
+        user={{
+          name: user?.name || user?.fullName || "Administrator",
+          role: "admin",
+          email: user?.email || "",
+        }}
         onMenuClick={() => setIsSidebarOpen(true)}
         onLogout={() => {
           if (window.confirm("Exit administrator session?")) {
-            window.location.reload();
+            signOut();
+            navigate("/login", { replace: true });
           }
         }}
       />
 
       {/* 3. Main Dashboard Workspace Content */}
-      <main className="md:ml-28 pt-24 px-4 sm:px-6 md:px-8 pb-16 flex flex-col gap-6">
+      <main className="pt-24 px-4 pb-16 flex flex-col gap-6 sm:px-6 md:ml-64 md:px-8">
         
         {/* ========================================================= */}
         {/* VIEW A: DEDICATED PROFILE PAGE (Clean, without statcards) */}
@@ -265,7 +272,7 @@ export const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <button
                 onClick={() => navigate('/admin/dashboard')}
-                className="inline-flex items-center gap-2 text-xs font-bold text-[#0B609D] hover:text-[#084877] transition cursor-pointer"
+                className="inline-flex items-center gap-2 text-xs font-bold text-[#5149B8] hover:text-[#413B9A] transition cursor-pointer"
               >
                 <ArrowLeft size={16} />
                 <span>Back to Dashboard Overview</span>
@@ -283,7 +290,7 @@ export const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <button
                 onClick={() => navigate('/admin/dashboard')}
-                className="inline-flex items-center gap-2 text-xs font-bold text-[#0B609D] hover:text-[#084877] transition cursor-pointer"
+                className="inline-flex items-center gap-2 text-xs font-bold text-[#5149B8] hover:text-[#413B9A] transition cursor-pointer"
               >
                 <ArrowLeft size={16} />
                 <span>Back to Dashboard Overview</span>
@@ -311,7 +318,7 @@ export const AdminDashboard = () => {
                 type="button"
                 onClick={loadData}
                 disabled={loading}
-                className="flex items-center gap-1.5 text-xs font-semibold text-[#0B609D] hover:text-[#084877] transition cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-semibold text-[#5149B8] hover:text-[#413B9A] transition cursor-pointer"
               >
                 <RotateCw size={14} className={loading ? 'animate-spin' : ''} />
                 <span>{loading ? 'Refreshing...' : 'Refresh Records'}</span>
@@ -321,28 +328,28 @@ export const AdminDashboard = () => {
             {/* 4 Key StatCards Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               <StatCard
-                icon={<GraduationCap size={28} className="text-[#0B609D]" />}
+                icon={<GraduationCap size={28} className="text-[#5149B8]" />}
                 title="Total Teachers"
                 value={stats.totalTeachers ?? 0}
                 subtext={stats.pendingTeachers > 0 ? `${stats.pendingTeachers} pending approval` : 'All verified'}
               />
 
               <StatCard
-                icon={<Users size={28} className="text-[#0B609D]" />}
+                icon={<Users size={28} className="text-[#5149B8]" />}
                 title="Enrolled Students"
                 value={stats.totalStudents ?? 0}
                 subtext={`${stats.blockedUsers ?? 0} blocked accounts`}
               />
 
               <StatCard
-                icon={<ClipboardList size={28} className="text-[#0B609D]" />}
+                icon={<ClipboardList size={28} className="text-[#5149B8]" />}
                 title="Exams This Week"
                 value={stats.examsThisWeek ?? 0}
                 subtext={`${stats.totalClasses ?? 0} active classes`}
               />
 
               <StatCard
-                icon={<Sparkles size={28} className="text-[#0B609D]" />}
+                icon={<Sparkles size={28} className="text-[#5149B8]" />}
                 title="AI Generations"
                 value={stats.aiGenerations ?? 0}
                 subtext="Questions drafted via AI"
@@ -382,8 +389,8 @@ export const AdminDashboard = () => {
                         flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer
                         ${
                           isActive
-                            ? 'bg-[#0B609D] text-white shadow-md'
-                            : 'bg-[#EEF3FD] text-[#0B609D] hover:bg-[#dbe7f9]'
+                            ? 'bg-[#5149B8] text-white shadow-md'
+                            : 'bg-[#FFFFFF] text-[#5149B8] hover:bg-[#dbe7f9]'
                         }
                       `}
                     >
@@ -393,7 +400,7 @@ export const AdminDashboard = () => {
                         <span
                           className={`
                             px-2 py-0.5 rounded-full text-[10px] font-black
-                            ${isActive ? 'bg-white/20 text-white' : 'bg-white text-[#0B609D] shadow-xs'}
+                            ${isActive ? 'bg-white/20 text-white' : 'bg-white text-[#5149B8] shadow-xs'}
                           `}
                         >
                           {tab.count}
@@ -420,14 +427,14 @@ export const AdminDashboard = () => {
                         placeholder="Search applicants..."
                         value={teacherSearch}
                         onChange={(e) => setTeacherSearch(e.target.value)}
-                        className="pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-[#0B609D] w-64 bg-slate-50/50"
+                        className="pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-[#5149B8] w-64 bg-slate-50/50"
                       />
                     </div>
                   </div>
 
                   {filteredTeachers.length === 0 ? (
                     <div className="text-center py-12 text-slate-400 flex flex-col items-center">
-                      <div className="w-14 h-14 rounded-full bg-[#EEF3FD] text-[#0B609D] flex items-center justify-center mb-3">
+                      <div className="w-14 h-14 rounded-full bg-[#FFFFFF] text-[#5149B8] flex items-center justify-center mb-3">
                         <Check size={28} />
                       </div>
                       <p className="font-bold text-slate-700">No Pending Faculty Approvals</p>
@@ -450,7 +457,7 @@ export const AdminDashboard = () => {
                             <tr key={t._id} className="hover:bg-slate-50/60 transition">
                               <td className="py-4 px-4">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-full bg-[#EEF3FD] text-[#0B609D] font-bold flex items-center justify-center text-xs shrink-0">
+                                  <div className="w-9 h-9 rounded-full bg-[#FFFFFF] text-[#5149B8] font-bold flex items-center justify-center text-xs shrink-0">
                                     {t.fullName ? t.fullName.charAt(0).toUpperCase() : 'T'}
                                   </div>
                                   <div>
@@ -475,7 +482,7 @@ export const AdminDashboard = () => {
                                 <div className="flex items-center justify-end gap-2">
                                   <button
                                     onClick={() => handleApproveTeacher(t._id)}
-                                    className="flex items-center gap-1.5 bg-[#0B609D] hover:bg-[#084877] text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
+                                    className="flex items-center gap-1.5 bg-[#5149B8] hover:bg-[#413B9A] text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-xs transition cursor-pointer"
                                   >
                                     <Check size={14} />
                                     <span>Approve</span>
@@ -515,14 +522,14 @@ export const AdminDashboard = () => {
                           placeholder="Search users..."
                           value={userSearch}
                           onChange={(e) => setUserSearch(e.target.value)}
-                          className="pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-[#0B609D] w-52 bg-slate-50/50"
+                          className="pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-[#5149B8] w-52 bg-slate-50/50"
                         />
                       </div>
 
                       <select
                         value={userRoleFilter}
                         onChange={(e) => setUserRoleFilter(e.target.value)}
-                        className="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-[#0B609D] cursor-pointer"
+                        className="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-[#5149B8] cursor-pointer"
                       >
                         <option value="all">All Roles</option>
                         <option value="teacher">Teachers</option>
@@ -533,7 +540,7 @@ export const AdminDashboard = () => {
                       <select
                         value={userStatusFilter}
                         onChange={(e) => setUserStatusFilter(e.target.value)}
-                        className="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-[#0B609D] cursor-pointer"
+                        className="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-[#5149B8] cursor-pointer"
                       >
                         <option value="all">All Statuses</option>
                         <option value="approved">Approved & Active</option>
@@ -569,7 +576,7 @@ export const AdminDashboard = () => {
                                         ? 'bg-red-100 text-red-700'
                                         : u.role === 'admin'
                                         ? 'bg-slate-200 text-slate-800'
-                                        : 'bg-[#EEF3FD] text-[#0B609D]'
+                                        : 'bg-[#FFFFFF] text-[#5149B8]'
                                     }`}
                                   >
                                     {u.fullName ? u.fullName.charAt(0).toUpperCase() : 'U'}
@@ -578,7 +585,7 @@ export const AdminDashboard = () => {
                                     <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
                                       <span>{u.fullName}</span>
                                       {u.role === 'admin' && (
-                                        <span className="text-[10px] font-bold text-[#0B609D] bg-blue-50 px-1.5 py-0.5 rounded-sm">
+                                        <span className="text-[10px] font-bold text-[#5149B8] bg-blue-50 px-1.5 py-0.5 rounded-sm">
                                           You
                                         </span>
                                       )}
@@ -593,7 +600,7 @@ export const AdminDashboard = () => {
                                 </div>
                               </td>
                               <td className="py-4 px-4">
-                                <span className="inline-block bg-[#EEF3FD] text-[#0B609D] font-bold text-[11px] px-3 py-0.5 rounded-full capitalize">
+                                <span className="inline-block bg-[#FFFFFF] text-[#5149B8] font-bold text-[11px] px-3 py-0.5 rounded-full capitalize">
                                   {u.role}
                                 </span>
                               </td>
@@ -631,7 +638,7 @@ export const AdminDashboard = () => {
                                     {isPending && (
                                       <button
                                         onClick={() => handleApproveTeacher(u._id)}
-                                        className="inline-flex items-center gap-1 bg-[#0B609D] text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-xs hover:bg-[#084877] transition cursor-pointer"
+                                        className="inline-flex items-center gap-1 bg-[#5149B8] text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-xs hover:bg-[#413B9A] transition cursor-pointer"
                                       >
                                         <Check size={13} />
                                         <span>Approve</span>
@@ -676,7 +683,7 @@ export const AdminDashboard = () => {
                         placeholder="Search classes..."
                         value={classSearch}
                         onChange={(e) => setClassSearch(e.target.value)}
-                        className="pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-[#0B609D] w-64 bg-slate-50/50"
+                        className="pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 outline-none focus:border-[#5149B8] w-64 bg-slate-50/50"
                       />
                     </div>
                   </div>
@@ -705,7 +712,7 @@ export const AdminDashboard = () => {
                               </td>
                               <td className="py-4 px-4">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-7 h-7 rounded-full bg-[#EEF3FD] text-[#0B609D] font-bold flex items-center justify-center text-xs shrink-0">
+                                  <div className="w-7 h-7 rounded-full bg-[#FFFFFF] text-[#5149B8] font-bold flex items-center justify-center text-xs shrink-0">
                                     {teacher?.fullName ? teacher.fullName.charAt(0).toUpperCase() : 'T'}
                                   </div>
                                   <div>
@@ -717,7 +724,7 @@ export const AdminDashboard = () => {
                               <td className="py-4 px-4">
                                 <button
                                   onClick={() => handleCopyCode(c.classCode)}
-                                  className="inline-flex items-center gap-1.5 font-mono font-bold bg-[#EEF3FD] text-[#0B609D] hover:bg-[#dbe7f9] px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 font-mono font-bold bg-[#FFFFFF] text-[#5149B8] hover:bg-[#dbe7f9] px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
                                   title="Click to copy join code"
                                 >
                                   <span>{c.classCode}</span>
@@ -757,7 +764,7 @@ export const AdminDashboard = () => {
                     <select
                       value={auditFilter}
                       onChange={(e) => setAuditFilter(e.target.value)}
-                      className="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-[#0B609D] cursor-pointer"
+                      className="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-[#5149B8] cursor-pointer"
                     >
                       <option value="all">All Actions</option>
                       <option value="approve_teacher">Teacher Approvals</option>
@@ -831,12 +838,12 @@ export const AdminDashboard = () => {
       >
         {blockingUser && (
           <form onSubmit={handleConfirmBlock} className="flex flex-col gap-4">
-            <div className="bg-[#EEF3FD] p-3.5 rounded-2xl flex items-center justify-between">
+            <div className="bg-[#FFFFFF] p-3.5 rounded-2xl flex items-center justify-between">
               <div>
                 <p className="font-bold text-sm text-slate-900">{blockingUser.fullName}</p>
                 <p className="text-xs text-slate-500">{blockingUser.email}</p>
               </div>
-              <span className="bg-white text-[#0B609D] font-bold text-xs px-3 py-1 rounded-full capitalize">
+              <span className="bg-white text-[#5149B8] font-bold text-xs px-3 py-1 rounded-full capitalize">
                 {blockingUser.role}
               </span>
             </div>
@@ -888,7 +895,7 @@ export const AdminDashboard = () => {
 
       {/* Floating Toast Notice */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-[#0B609D] text-white px-5 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2.5 z-50 animate-bounce">
+        <div className="fixed bottom-6 right-6 bg-[#5149B8] text-white px-5 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2.5 z-50 animate-bounce">
           <Check size={16} />
           <span>{toastMessage}</span>
         </div>

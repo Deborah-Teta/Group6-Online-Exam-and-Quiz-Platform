@@ -37,7 +37,7 @@ function QuestionBankPicker({ questions, selectedIds, onToggle }) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search questions..."
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           />
         </div>
 
@@ -49,7 +49,7 @@ function QuestionBankPicker({ questions, selectedIds, onToggle }) {
             id="question-topic"
             value={topic}
             onChange={(event) => setTopic(event.target.value)}
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#0B609D] focus:ring-4 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
           >
             <option value="all">All topics</option>
             {topics.map((questionTopic) => (
@@ -74,7 +74,7 @@ function QuestionBankPicker({ questions, selectedIds, onToggle }) {
                 type="checkbox"
                 checked={selected}
                 onChange={() => onToggle(question.id)}
-                className="mt-1 h-4 w-4 accent-[#0B609D]"
+                className="mt-1 h-4 w-4 accent-[#5149B8]"
               />
 
               <span className="min-w-0 flex-1">

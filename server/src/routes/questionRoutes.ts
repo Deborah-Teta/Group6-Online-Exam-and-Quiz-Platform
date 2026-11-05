@@ -1,7 +1,12 @@
 import express from "express";
 import {authenticate} from "../middleware/authMiddleware.js";
 import {authorize} from "../middleware/roleMiddleware.js";
-import {createQuestion, getMyQuestions} from "../controller/questionController.js";
+import {
+    createQuestion,
+    deleteQuestion,
+    getMyQuestions,
+    updateQuestion
+} from "../controller/questionController.js";
 
 
 const router = express.Router();
@@ -19,6 +24,20 @@ router.get(
     authenticate,
     authorize("teacher"),
     getMyQuestions
+);
+
+router.patch(
+    "/:questionId",
+    authenticate,
+    authorize("teacher"),
+    updateQuestion
+);
+
+router.delete(
+    "/:questionId",
+    authenticate,
+    authorize("teacher"),
+    deleteQuestion
 );
 
 export default router;

@@ -4,11 +4,12 @@ import Button from "../../components/common/ActionButton";
 import DataTable from "../../components/common/DataTable";
 import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
-import { mockExams, mockNextExamNote } from "../../services/studentMockData";
 import { averageScore, formatPercent } from "../../utils/scores";
 
-const examsInClass = (enrolledClass, status) =>
-  mockExams.filter((exam) => exam.className === enrolledClass.name && exam.status === status);
+const examsInClass = (exams, enrolledClass, status) =>
+  exams.filter(
+    (exam) => exam.classId === enrolledClass.id && exam.status === status,
+  );
 
 const classColumns = [
   {
@@ -29,32 +30,29 @@ const classColumns = [
   {
     key: "open",
     header: "Open now",
-    render: (enrolledClass) => examsInClass(enrolledClass, "open").length,
+    render: (enrolledClass) => enrolledClass.openCount,
   },
   {
     key: "upcoming",
     header: "Coming up",
-    render: (enrolledClass) => examsInClass(enrolledClass, "upcoming").length,
+    render: (enrolledClass) => enrolledClass.upcomingCount,
   },
   {
     key: "completed",
     header: "Completed",
-    render: (enrolledClass) => examsInClass(enrolledClass, "closed").length,
+    render: (enrolledClass) => enrolledClass.completedCount,
   },
   {
     key: "average",
     header: "Average",
-    render: (enrolledClass) => {
-      const completedExams = examsInClass(enrolledClass, "closed");
-      return completedExams.length ? formatPercent(averageScore(completedExams)) : "—";
-    },
+    render: (enrolledClass) => enrolledClass.classAverage,
   },
   {
     key: "nextExam",
     header: "Next exam · GMT",
     render: (enrolledClass) => {
       const nextExam =
-        examsInClass(enrolledClass, "open")[0] ?? examsInClass(enrolledClass, "upcoming")[0];
+        enrolledClass.nextExam;
 
       if (!nextExam) {
         return <span className="whitespace-nowrap text-muted">None scheduled</span>;
@@ -74,7 +72,7 @@ const classColumns = [
     render: (enrolledClass) => (
       <Link
         to={`/student/exams?class=${encodeURIComponent(enrolledClass.name)}`}
-        className="text-xs font-bold whitespace-nowrap text-[#0B609D] hover:underline"
+        className="text-xs font-bold whitespace-nowrap text-[#5149B8] hover:underline"
       >
         View exams →
       </Link>
@@ -84,40 +82,50 @@ const classColumns = [
 
 function StudentClasses() {
   const navigate = useNavigate();
-  const { enrolledClasses } = useOutletContext();
+  const { enrolledClasses, exams, isLoading } = useOutletContext();
   const classNames = enrolledClasses.map((enrolledClass) => enrolledClass.name);
 
-  const openExams = mockExams.filter((exam) => exam.status === "open");
-  const upcomingExams = mockExams.filter((exam) => exam.status === "upcoming");
-  const completedExams = mockExams.filter((exam) => exam.status === "closed");
+  const openExams = exams.filter((exam) => exam.status === "open");
+  const upcomingExams = exams.filter((exam) => exam.status === "upcoming");
+  const completedExams = exams.filter(
+    (exam) => exam.status === "closed" && exam.score !== undefined,
+  );
 
   return (
     <>
       {/* Statistics */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<Users size={28} className="text-[#0B609D]" />}
+          icon={<Users size={28} className="text-[#5149B8]" />}
           title="Enrolled classes"
-          value={enrolledClasses.length}
+          value={isLoading ? "…" : enrolledClasses.length}
           subtext={classNames.join(" · ")}
         />
         <StatCard
-          icon={<ClipboardCheck size={28} className="text-[#0B609D]" />}
+          icon={<ClipboardCheck size={28} className="text-[#5149B8]" />}
           title="Open now"
           value={openExams.length}
-          subtext={`${openExams[0].title} closes at ${openExams[0].closesAt}`}
+          subtext={
+            openExams[0]
+              ? `${openExams[0].title} closes at ${openExams[0].closesTime}`
+              : "No assessments open right now"
+          }
         />
         <StatCard
-          icon={<CalendarClock size={28} className="text-[#0B609D]" />}
+          icon={<CalendarClock size={28} className="text-[#5149B8]" />}
           title="Coming up"
           value={upcomingExams.length}
-          subtext={mockNextExamNote}
+          subtext={
+            upcomingExams[0]
+              ? `${upcomingExams[0].title} · ${upcomingExams[0].schedule}`
+              : "Nothing scheduled"
+          }
         />
         <StatCard
-          icon={<ChartNoAxesCombined size={28} className="text-[#0B609D]" />}
+          icon={<ChartNoAxesCombined size={28} className="text-[#5149B8]" />}
           title="Average score"
-          value={formatPercent(averageScore(completedExams))}
-          subtext={`Across ${completedExams.length} completed exams`}
+          value={completedExams.length ? formatPercent(averageScore(completedExams)) : "—"}
+          subtext={`Across ${completedExams.length} released results`}
         />
       </div>
 
@@ -133,11 +141,34 @@ function StudentClasses() {
           />
         }
       >
-        <DataTable
-          columns={classColumns}
-          rows={enrolledClasses}
-          emptyMessage="You haven't joined a class yet."
-        />
+        {isLoading ? (
+          <p className="py-8 text-center text-sm text-muted">Loading your classes…</p>
+        ) : (
+          <DataTable
+            columns={classColumns}
+            rows={enrolledClasses.map((enrolledClass) => ({
+              ...enrolledClass,
+              openCount: examsInClass(exams, enrolledClass, "open").length,
+              upcomingCount: examsInClass(exams, enrolledClass, "upcoming").length,
+              completedCount: exams.filter(
+                (exam) =>
+                  exam.classId === enrolledClass.id &&
+                  exam.attempt &&
+                  exam.attempt.status !== "in_progress",
+              ).length,
+              classAverage: (() => {
+                const released = examsInClass(exams, enrolledClass, "closed").filter(
+                  (exam) => exam.score !== undefined,
+                );
+                return released.length ? formatPercent(averageScore(released)) : "—";
+              })(),
+              nextExam:
+                examsInClass(exams, enrolledClass, "open")[0] ??
+                examsInClass(exams, enrolledClass, "upcoming")[0],
+            }))}
+            emptyMessage="You haven't joined a class yet."
+          />
+        )}
       </SectionCard>
     </>
   );

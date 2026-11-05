@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import {examModel} from "../models/ExamSchema.js";
 import {examAttemptModel} from "../models/ExamAttemptSchema.js";
 import {questionModel} from "../models/QuestionsSchema.js";
+import { classMemberModel } from "../models/ClassMember.js";
 
 
 
@@ -11,20 +12,22 @@ export const getExamResults = async (
     res: express.Response
 ) => {
     try {
-        const { examId } = req.params;
+        const examId = req.params.examId;
         const teacherId = (req as any).user.userId;
 
 
-        if (!mongoose.Types.ObjectId.isValid(examId)) {
+        if (typeof examId !== "string" || !mongoose.Types.ObjectId.isValid(examId)) {
             return res.status(400).json({
                 error: "Invalid exam ID."
             });
         }
 
-        const exam = await examModel.findOne({
+        const exam: any = await examModel.findOne({
             _id: examId,
             teacherId
-        });
+        })
+            .populate("classId", "name")
+            .populate("questionIds", "points");
 
         if (!exam) {
             return res.status(404).json({
@@ -33,11 +36,12 @@ export const getExamResults = async (
         }
 
 
-        const attempts = await examAttemptModel.find({
-            examId
-        })
-            .populate("studentId", "fullName email")
-            .sort({ createdAt: 1 });
+        const [attempts, classStudentCount] = await Promise.all([
+            examAttemptModel.find({ examId })
+                .populate("studentId", "fullName email")
+                .sort({ createdAt: 1 }),
+            classMemberModel.countDocuments({ classId: exam.classId._id })
+        ]);
 
 
         const submittedAttempts = attempts.filter(
@@ -79,7 +83,11 @@ export const getExamResults = async (
         });
 
         const questions = await questionModel.find({
-            _id: { $in: exam.questionIds }
+            _id: {
+                $in: exam.questionIds.map((question: any) =>
+                    question?._id || question
+                )
+            }
         });
 
 
@@ -121,15 +129,23 @@ export const getExamResults = async (
             exam: {
                 id: exam._id,
                 title: exam.title,
-                classId: exam.classId,
+                classId: exam.classId._id,
+                className: exam.classId.name,
                 startTime: exam.startTime,
-                durationMinutes: exam.durationMinutes
+                durationMinutes: exam.durationMinutes,
+                questionCount: exam.questionIds.length,
+                totalPoints: exam.questionIds.reduce(
+                    (total: number, question: { points?: number }) =>
+                        total + (question.points || 0),
+                    0
+                )
             },
             summary: {
                 totalAttempts: attempts.length,
                 submittedAttempts: submittedAttempts.length,
                 inProgressAttempts: attempts.length - submittedAttempts.length,
-                classAverage
+                classAverage,
+                classStudentCount
             },
             studentResults,
             questionResults

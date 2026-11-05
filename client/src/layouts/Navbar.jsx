@@ -48,13 +48,13 @@ function Navbar({
   const headerInfo = title ? { title, desc: description } : getHeaderInfo();
 
   return (
-    <header className="fixed px-6 top-0 left-0 right-0 z-40 pr-8 rounded-2xl md:left-28 md:pr-8 py-2 md:py-3 flex items-center justify-between bg-[#EEF3FD] shadow-xs">
+    <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2.5 shadow-sm sm:px-6 md:left-64 md:px-8">
       {/* Left section */}
       <div className="flex items-center gap-4">
         <button
           type="button"
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 lg:hidden cursor-pointer"
+          className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 md:hidden cursor-pointer"
           aria-label="Open navigation menu"
         >
           <Menu size={22} />
@@ -95,7 +95,7 @@ function Navbar({
             aria-expanded={isProfileOpen}
             aria-label="Open profile menu"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0B609D] text-sm font-bold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#5149B8] text-sm font-bold text-white">
               {user?.name?.charAt(0).toUpperCase() || "A"}
             </div>
 
@@ -103,7 +103,7 @@ function Navbar({
               <p className="text-xs font-bold text-slate-800">
                 {user?.name || "Admin"}
               </p>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#0B609D]">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#5149B8]">
                 {user?.role || "Administrator"}
               </p>
             </div>

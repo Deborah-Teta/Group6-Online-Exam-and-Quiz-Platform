@@ -6,27 +6,43 @@ import Modal from "../../common/Modal";
 
 function CreateClass({ isOpen, onClose, onCreate }) {
   const [formData, setFormData] = useState({ name: "", description: "" });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((current) => ({ ...current, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const name = formData.name.trim();
-    if (!name) return;
+    if (!name) {
+      setError("Enter a class name.");
+      return;
+    }
 
-    onCreate({
-      name,
-      description: formData.description.trim() || "Class",
-    });
-
-    setFormData({ name: "", description: "" });
+    setError("");
+    setIsSubmitting(true);
+    try {
+      const created = await onCreate({
+        name,
+        description: formData.description.trim(),
+      });
+      if (created) {
+        setFormData({ name: "", description: "" });
+        onClose();
+      }
+    } catch (requestError) {
+      setError(requestError.message || "Could not create the class.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function handleClose() {
+    setError("");
     setFormData({ name: "", description: "" });
     onClose();
   }
@@ -59,6 +75,8 @@ function CreateClass({ isOpen, onClose, onCreate }) {
           A joining code will be created for this class.
         </p>
 
+        {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+
         <div className="flex flex-wrap justify-end gap-3">
           <button
             type="button"
@@ -71,6 +89,7 @@ function CreateClass({ isOpen, onClose, onCreate }) {
             type="submit"
             label="Create class"
             icon={<Plus size={15} />}
+            disabled={isSubmitting}
           />
         </div>
       </form>

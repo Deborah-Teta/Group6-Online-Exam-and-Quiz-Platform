@@ -94,8 +94,8 @@ function ClassFilter({ classNames, value, onChange }) {
           className={`
             flex cursor-pointer items-center gap-2 rounded-xl border bg-white
             px-3 py-2 text-xs whitespace-nowrap text-slate-700
-            outline-none transition-colors hover:bg-slate-50 focus-visible:border-[#0B609D]
-            ${isOpen ? "border-[#0B609D]" : "border-slate-200"}
+            outline-none transition-colors hover:bg-slate-50 focus-visible:border-[#5149B8]
+            ${isOpen ? "border-[#5149B8]" : "border-slate-200"}
           `}
         >
           {options[selectedIndex].label}
@@ -127,8 +127,8 @@ function ClassFilter({ classNames, value, onChange }) {
                   className={`
                     flex cursor-pointer items-center justify-between gap-4 rounded-xl px-3 py-2
                     text-xs font-medium whitespace-nowrap transition
-                    ${isSelected ? "font-bold text-[#0B609D]" : "text-slate-600"}
-                    ${index === activeIndex ? "bg-[#EEF3FD]" : ""}
+                    ${isSelected ? "font-bold text-[#5149B8]" : "text-slate-600"}
+                    ${index === activeIndex ? "bg-[#FFFFFF]" : ""}
                   `}
                 >
                   {option.label}

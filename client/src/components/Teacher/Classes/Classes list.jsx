@@ -9,6 +9,7 @@ function ClassesList({
   copyError,
   onCopyCode,
   onOpenClass,
+  isLoading,
 }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
@@ -76,7 +77,7 @@ function ClassesList({
           {visibleClasses.map((teacherClass) => (
             <Card key={teacherClass.id} className="p-5 sm:p-6">
               <div className="flex items-start justify-between gap-4">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF3FD] text-[#0B609D]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF] text-[#5149B8]">
                   <BookOpen size={19} />
                 </span>
 
@@ -95,7 +96,8 @@ function ClassesList({
                 {teacherClass.name}
               </h2>
               <p className="mt-1 text-xs text-slate-500">
-                {teacherClass.description} · {teacherClass.students} students
+                {teacherClass.description && `${teacherClass.description} · `}
+                {teacherClass.students} {teacherClass.students === 1 ? "student" : "students"}
               </p>
 
               <div className="mt-4 flex items-center justify-between gap-3">
@@ -108,7 +110,7 @@ function ClassesList({
                 <button
                   type="button"
                   onClick={() => onCopyCode(teacherClass)}
-                  className="rounded-lg p-2 text-[#0B609D] transition hover:bg-[#EEF3FD]"
+                  className="rounded-lg p-2 text-[#5149B8] transition hover:bg-[#FFFFFF]"
                   aria-label={`Copy joining code for ${teacherClass.name}`}
                   title={
                     copiedClassId === teacherClass.id
@@ -140,7 +142,7 @@ function ClassesList({
                   <button
                     type="button"
                     onClick={() => onOpenClass(teacherClass)}
-                    className="text-xs font-medium text-[#0B609D] transition hover:text-[#084877]"
+                    className="text-xs font-medium text-[#5149B8] transition hover:text-[#413B9A]"
                   >
                     Open class →
                   </button>
@@ -152,11 +154,13 @@ function ClassesList({
       ) : (
         <Card className="p-10 text-center">
           <p className="text-sm font-medium text-slate-700">
-            No classes match your search.
+            {isLoading ? "Loading your classes…" : "No classes match your search."}
           </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Try another class name or joining code, or change the status filter.
-          </p>
+          {!isLoading && (
+            <p className="mt-1 text-xs text-slate-500">
+              Try another class name or joining code, or change the status filter.
+            </p>
+          )}
         </Card>
       )}
     </div>
