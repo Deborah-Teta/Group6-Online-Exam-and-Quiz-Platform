@@ -12,6 +12,12 @@ export const startExam = async (
 ) => {
     try {
         const { examId } = req.params;
+
+        if (typeof examId !== "string") {
+            return res.status(400).json({
+                message: "Invalid exam ID"
+            });
+        }
         const studentId = (req as any).user.userId;
 
         if (!mongoose.Types.ObjectId.isValid(examId)) {
@@ -137,6 +143,12 @@ export const saveAnswer = async (
 ) => {
     try {
         const { attemptId } = req.params;
+
+        if (typeof attemptId !== "string") {
+            return res.status(400).json({
+                message: "Invalid attempt ID"
+            });
+        }
         const { questionId, selectedOptionIndex } = req.body;
         const studentId = (req as any).user.userId;
 
@@ -348,6 +360,11 @@ export const getAttemptResult = async (
 ) => {
     try {
         const { attemptId } = req.params;
+        if (typeof attemptId !== "string") {
+            return res.status(400).json({
+                message: "Invalid attempt ID"
+            });
+        }
         const studentId = (req as any).user.userId;
 
         if (!mongoose.Types.ObjectId.isValid(attemptId)) {
