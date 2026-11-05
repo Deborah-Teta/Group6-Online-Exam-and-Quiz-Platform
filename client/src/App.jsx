@@ -12,12 +12,30 @@ import StudentHelp from './pages/student/StudentHelp';
 import StudentJoinClass from './pages/student/StudentJoinClass';
 import StudentResults from './pages/student/StudentResults';
 import StudentSettings from './pages/student/StudentSettings';
+import TeacherLayout from "./layouts/TeacherLayout";
+import TeacherDashboard from "./components/Teacher/Dashboard";
+import TeacherClasses from "./pages/teacher/TeacherClasses";
+import TeacherCreateExam from "./pages/teacher/TeacherCreateExam";
+import TeacherQuestionBank from "./pages/teacher/TeacherQuestionBank";
+import TeacherResults from "./pages/teacher/TeacherResults";
 
 function App() {
   return (
     <Routes>
+      
       <Route path="/" element={<Navigate to="/student/dashboard" replace />} />
+      
 
+    <Route path="/teacher" element={<TeacherLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<TeacherDashboard />} />
+        <Route path="classes" element={<TeacherClasses />} />
+  
+        <Route path="questions" element={<TeacherQuestionBank />}/>
+        <Route path="ai-generator" element={<p className="text-slate-600">AI question generator page is next.</p>}/>
+        <Route path="exams" element={<TeacherCreateExam />}/>
+        <Route path="results" element={<TeacherResults />}/>
+    </Route>
       <Route path="/student" element={<StudentLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<StudentDashboard />} />
@@ -38,6 +56,7 @@ function App() {
 
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/*" element={<AdminDashboard />} />
+
 
       <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
     </Routes>

@@ -20,7 +20,6 @@ const navigationByRole = {
     { label: "Overview", icon: Home, href: "/teacher/dashboard" },
     { label: "My Classes", icon: GraduationCap, href: "/teacher/classes" },
     { label: "Question Bank", icon: BookOpen, href: "/teacher/questions" },
-    { label: "AI Generator", icon: Sparkles, href: "/teacher/ai-generator" },
     { label: "Exams", icon: ClipboardList, href: "/teacher/exams" },
     { label: "Results", icon: BarChart3, href: "/teacher/results" },
   ],
@@ -98,13 +97,13 @@ function Sidebar({ role, isOpen = false, onClose }) {
 
         {/* Desktop logo */}
         <div className="mb-8 hidden md:flex">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0B609D] text-white shadow-md">
-            <GraduationCap size={25} />
+          <div className="flex h-8 w-20 items-center justify-center rounded-full bg-[#0B609D] text-white shadow-md">
+            <span className="text-lg font-bold tracking-tight">@Learn</span>
           </div>
         </div>
 
         {/* Main navigation */}
-        <nav className="flex flex-1 flex-col gap-2 md:w-full md:items-center md:gap-4">
+        <nav className="flex flex-1 flex-col md:w-full md:items-center md:gap-4">
           {navigation.map(({ label, icon: Icon, href }) => (
             <NavLink
               key={href}
