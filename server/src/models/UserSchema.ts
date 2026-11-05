@@ -1,9 +1,11 @@
-import mongoose, {Document, Schema} from "mongoose";
-export interface IUser extends Document{
-    fullName: string,
-    email: string,
-    password: string,
-    role:"admin" | "student" | "teacher",
+
+import mongoose, { Document, Schema } from "mongoose";
+
+export interface IUser extends Document {
+    fullName: string;
+    email: string;
+    password: string;
+    role: "admin" | "student" | "teacher";
     resetCode?: string;
     resetCodeExpires?: Date;
     approvalStatus: "pending" | "approved" | "rejected";
@@ -12,27 +14,51 @@ export interface IUser extends Document{
 }
 
 const userSchema = new Schema<IUser>({
-    fullName:{type:String,required:true},
-    email:{type:String,required:true,unique:true},
-    password:{type:String,required:true,select:false},
-    role:{type:String,required:true,enum:["admin" ,"student" ,"teacher"],default:"student"},
-    resetCode:{type:String},
-    resetCodeExpires:{type:Date},
+    fullName: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true,
+        select: false
+    },
+    role: {
+        type: String,
+        required: true,
+        enum: ["admin", "student", "teacher"],
+        default: "student"
+    },
+    resetCode: {
+        type: String
+    },
+    resetCodeExpires: {
+        type: Date
+    },
     approvalStatus: {
         type: String,
         enum: ["pending", "approved", "rejected"],
-        default: function () {
-            return this.role === "teacher" ? "pending" : "approved";
-        },
+        default: "approved"
     },
     isBlocked: {
         type: Boolean,
-        default: false,
+        default: false
     },
     blockedReason: {
         type: String,
-        trim: true,
-    },
-},{timestamps:true})
+        trim: true
+    }
+}, { timestamps: true });
+
+userSchema.pre("validate", function () {
+    if (this.isNew && this.role === "teacher" && !this.approvalStatus) {
+        this.approvalStatus = "pending";
+    }
+});
 
 export const userModel = mongoose.model<IUser>("User", userSchema);

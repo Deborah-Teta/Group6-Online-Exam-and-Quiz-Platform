@@ -17,6 +17,7 @@ export const registerUser = async (req: express.Request, res: express.Response) 
             return res.status(400).json({
                 error: "Invalid role"
             });
+
         }
 
         const userRole = role || "student";

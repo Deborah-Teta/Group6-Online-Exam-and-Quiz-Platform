@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAIGeneration extends Document {
     teacherId: mongoose.Types.ObjectId;
+    topic: string;
     sourceNotes: string;
     requestedCount: number;
     questionType: "multiple_choice" | "true_false";
@@ -20,6 +21,11 @@ const aiGenerationSchema = new Schema<IAIGeneration>(
             ref: "User",
             required: true,
             index:true
+        },
+        topic: {
+            type: String,
+            required: true,
+            trim: true,
         },
         sourceNotes: {
             type: String,

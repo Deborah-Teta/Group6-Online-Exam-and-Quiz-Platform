@@ -1,5 +1,5 @@
 import express from "express"
-import {dbConnection} from "./database/DatabaseConnection.js";
+import { dbConnection } from "./database/DatabaseConnection.js";
 import authRoute from "./routes/authRoute.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import classRoutes from "./routes/classRoutes.js";
@@ -9,6 +9,7 @@ import studentExamRoutes from "./routes/studentExamRoutes.js";
 import teacherResultRoutes from "./routes/teacherResultRoutes.js";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
 import teacherDashboardRoutes from "./routes/teacherDashboardRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 
 const app = express();
@@ -23,6 +24,7 @@ app.use("/api/exams", examRoutes);
 app.use("/api/teacher-results", teacherResultRoutes);
 app.use("/api/adminstats", adminDashboardRoutes);
 app.use("/api/teacher", teacherDashboardRoutes);
+app.use("/api/ai", aiRoutes);
 
 dbConnection().then(()=>{
     app.listen(5000,()=>{

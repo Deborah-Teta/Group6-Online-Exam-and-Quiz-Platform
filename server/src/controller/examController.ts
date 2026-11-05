@@ -166,10 +166,12 @@ export const getStudentExams = async (
     }
 };
 
+
 export const createExam = async (
     req: express.Request,
     res: express.Response
 ) => {
+
     try {
         const {
             title,

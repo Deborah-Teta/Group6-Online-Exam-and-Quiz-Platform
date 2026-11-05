@@ -13,6 +13,12 @@ export const getExamResults = async (
 ) => {
     try {
         const examId = req.params.examId;
+        const { examId } = req.params;
+        if (typeof examId !== "string") {
+            return res.status(400).json({
+                message: "Invalid exam ID"
+            });
+        }
         const teacherId = (req as any).user.userId;
 
 

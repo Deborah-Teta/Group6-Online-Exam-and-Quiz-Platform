@@ -71,7 +71,9 @@ export const AdminSidebar = ({ activeTab, onSelectTab, pendingCount = 0 }) => {
           className="btn-signout"
           onClick={() => {
             if (window.confirm("Do you want to refresh the admin session?")) {
-              window.location.reload();
+              localStorage.clear();
+              sessionStorage.clear();
+              window.location.href = '/login';
             }
           }}
         >

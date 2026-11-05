@@ -36,6 +36,12 @@ export const blockUser = async (
         const { userId } = req.params;
         const { reason } = req.body;
 
+        if (typeof userId !== "string") {
+            return res.status(400).json({
+                message: "Invalid user ID"
+            });
+        }
+
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ error: "Invalid user ID." });
         }
@@ -89,6 +95,11 @@ export const unblockUser = async (
 ) => {
     try {
         const { userId } = req.params;
+        if (typeof userId !== "string") {
+            return res.status(400).json({
+                message: "Invalid user ID"
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ error: "Invalid user ID." });
