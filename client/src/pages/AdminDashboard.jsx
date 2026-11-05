@@ -249,7 +249,9 @@ export const AdminDashboard = () => {
         onMenuClick={() => setIsSidebarOpen(true)}
         onLogout={() => {
           if (window.confirm("Exit administrator session?")) {
-            window.location.reload();
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/login';
           }
         }}
       />

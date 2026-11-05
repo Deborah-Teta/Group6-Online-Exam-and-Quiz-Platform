@@ -158,7 +158,13 @@ function Navbar({
                 type="button"
                 onClick={() => {
                   setIsProfileOpen(false);
-                  onLogout?.();
+                  if (onLogout) {
+                    onLogout();
+                  } else {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.href = '/login';
+                  }
                 }}
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50 cursor-pointer"
               >
