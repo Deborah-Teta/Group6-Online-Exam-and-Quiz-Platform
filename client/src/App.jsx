@@ -18,12 +18,16 @@ import TeacherClasses from "./pages/teacher/TeacherClasses";
 import TeacherCreateExam from "./pages/teacher/TeacherCreateExam";
 import TeacherQuestionBank from "./pages/teacher/TeacherQuestionBank";
 import TeacherResults from "./pages/teacher/TeacherResults";
+import SignIn from "./pages/auth/SignIn";
+import SignUp from "./pages/auth/SignUp";
 
 function App() {
   return (
     <Routes>
       
-      <Route path="/" element={<Navigate to="/student/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<SignIn />} />
+      <Route path="/signup" element={<SignUp />} />
       
 
     <Route path="/teacher" element={<TeacherLayout />}>
