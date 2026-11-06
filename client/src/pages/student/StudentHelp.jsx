@@ -30,7 +30,7 @@ function StudentHelp() {
 
         <div className="flex flex-col gap-6">
           {/* Guidelines */}
-          <SectionCard title="Exam and quiz guidelines">
+          <SectionCard title="Exam guidelines">
             <div className="flex flex-col gap-6">
               {helpGuidelines.map(({ icon, title, text }) => (
                 <InfoRow key={title} icon={icon} title={title}>
@@ -43,7 +43,7 @@ function StudentHelp() {
           {/* Contact */}
           <SectionCard title="Still need help?">
             <p className="text-[13px] leading-[1.55] text-muted">
-              Speak to your teacher. If the problem is during an exam or quiz, tell them before it closes.
+              Speak to your teacher. If the problem is during an exam, tell them before it closes.
             </p>
 
             <div className="flex flex-col gap-[12px]">

@@ -11,17 +11,17 @@ import Tabs from "../../components/common/Tabs";
 import { assessmentTypes } from "../../services/studentAssessments";
 import { averageScore, formatPercent } from "../../utils/scores";
 
-const buildTabs = ({ plural }) => [
-  { label: `All ${plural}`, value: "all" },
+const buildTabs = () => [
+  { label: "All exams", value: "all" },
   { label: "Open", value: "open" },
   { label: "Upcoming", value: "upcoming" },
   { label: "Completed", value: "closed" },
 ];
 
-const buildColumns = ({ nounTitle }, type) => [
+const buildColumns = (type) => [
   {
     key: "title",
-    header: nounTitle,
+    header: "Exam",
     render: (item) => (
       <div className="flex flex-col gap-[4px]">
         <p className="text-sm font-bold text-slate-900">{item.title}</p>
@@ -36,7 +36,7 @@ const buildColumns = ({ nounTitle }, type) => [
   },
   {
     key: "schedule",
-    header: "Schedule · GMT",
+    header: "Schedule · CAT",
     render: (item) => <span className="whitespace-nowrap">{item.schedule}</span>,
   },
   {
@@ -52,15 +52,13 @@ const buildColumns = ({ nounTitle }, type) => [
   {
     key: "action",
     header: "Action",
-    render: (item) => <ExamAction exam={item} type={type} />,
+    render: (item) => <ExamAction exam={item} type="exam" />,
   },
 ];
 
-function StudentAssessments({ type }) {
-  const config = assessmentTypes[type];
+function StudentAssessments({ type = "exam" }) {
   const { enrolledClasses, exams, isLoading } = useOutletContext();
-  const items = exams.filter((exam) => exam.type === type);
-  const { plural } = config;
+  const items = exams;
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("all");
 
@@ -88,7 +86,7 @@ function StudentAssessments({ type }) {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={<ClipboardList size={28} className="text-[#5149B8]" />}
-          title={`All ${plural}`}
+          title="All exams"
           value={isLoading ? "…" : items.length}
           subtext={`Across ${enrolledClasses.length} classes`}
         />
@@ -122,7 +120,7 @@ function StudentAssessments({ type }) {
 
       {/* List */}
       <SectionCard
-        title={`Your ${plural}`}
+        title="Your exams"
        
         action={
           <ClassFilter
@@ -132,16 +130,16 @@ function StudentAssessments({ type }) {
           />
         }
       >
-        <Tabs tabs={buildTabs(config)} activeTab={activeTab} onChange={setActiveTab} />
+        <Tabs tabs={buildTabs()} activeTab={activeTab} onChange={setActiveTab} />
         {isLoading ? (
           <p className="py-8 text-center text-sm text-muted">
-            Loading your {plural}…
+            Loading your exams…
           </p>
         ) : (
           <DataTable
-            columns={buildColumns(config, type)}
+            columns={buildColumns("exam")}
             rows={visibleItems}
-            emptyMessage={`No ${plural} match this filter.`}
+            emptyMessage="No exams match this filter."
           />
         )}
       </SectionCard>

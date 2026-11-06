@@ -853,7 +853,7 @@ export const AdminDashboard = () => {
                           return (
                             <tr key={log._id} className="hover:bg-slate-50/60 transition">
                               <td className="py-4 px-4 font-bold text-slate-900">
-                                {admin?.fullName || 'Blaise (Admin)'}
+                                {admin?.fullName || 'Administrator'}
                               </td>
                               <td className="py-4 px-4">
                                 <span

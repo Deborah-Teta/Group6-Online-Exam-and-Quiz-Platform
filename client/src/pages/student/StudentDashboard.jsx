@@ -33,7 +33,7 @@ const examColumns = [
   },
   {
     key: "schedule",
-    header: "Schedule · GMT",
+    header: "Schedule · CAT",
     render: (exam) => <span className="whitespace-nowrap">{exam.schedule}</span>,
   },
   {
@@ -53,7 +53,7 @@ function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("all");
 
   const classNames = enrolledClasses.map((enrolledClass) => enrolledClass.name);
-  const studentExams = exams.filter((exam) => exam.type === "exam");
+  const studentExams = exams;
   const openExams = studentExams.filter((exam) => exam.status === "open");
   const upcomingExams = studentExams.filter((exam) => exam.status === "upcoming");
   const completedExams = studentExams.filter(
