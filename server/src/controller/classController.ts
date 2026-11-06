@@ -2,214 +2,8 @@ import express from "express";
 import { classModel } from "../models/ClassSchema.js";
 import crypto from "crypto";
 import {classMemberModel} from "../models/ClassMember.js";
-import mongoose from "mongoose";
 import { examModel } from "../models/ExamSchema.js";
 
-export const getTeacherClasses = async (
-    req: express.Request,
-    res: express.Response
-) => {
-    try {
-        const teacherId = (req as any).user.userId;
-        const classes = await classModel.find({ teacherId }).sort({ createdAt: -1 }).lean();
-        const classIds = classes.map((item) => item._id);
-        const [memberships, exams] = await Promise.all([
-            classIds.length
-                ? classMemberModel.aggregate([
-                    { $match: { classId: { $in: classIds } } },
-                    { $group: { _id: "$classId", students: { $sum: 1 } } }
-                ])
-                : Promise.resolve([]),
-            examModel.find({
-                teacherId,
-                classId: { $in: classIds },
-                status: { $in: ["scheduled", "published"] },
-                startTime: { $gte: new Date() }
-            }).select("title classId startTime durationMinutes").sort({ startTime: 1 }).lean()
-        ]);
-        const studentCountByClassId = new Map(
-            memberships.map((membership: { _id: { toString(): string }; students: number }) => [
-                membership._id.toString(),
-                membership.students
-            ])
-        );
-        const nextExamByClassId = new Map();
-        for (const exam of exams) {
-            const classId = exam.classId.toString();
-            if (!nextExamByClassId.has(classId)) {
-                nextExamByClassId.set(classId, exam);
-            }
-        }
-
-        return res.status(200).json({
-            classes: classes.map((item) => {
-                const nextExam = nextExamByClassId.get(item._id.toString());
-                return {
-                    id: item._id,
-                    name: item.name,
-                    description: item.description || "",
-                    code: item.classCode,
-                    active: item.isActive,
-                    students: studentCountByClassId.get(item._id.toString()) || 0,
-                    nextExam: nextExam
-                        ? {
-                            title: nextExam.title,
-                            startTime: nextExam.startTime,
-                            durationMinutes: nextExam.durationMinutes
-                        }
-                        : null
-                };
-            })
-        });
-    } catch (error) {
-        console.error("Failed to retrieve teacher classes:", error);
-        return res.status(500).json({ error: "Failed to retrieve your classes." });
-    }
-};
-
-export const getTeacherClassDetails = async (
-    req: express.Request,
-    res: express.Response
-) => {
-    try {
-        const classId = req.params.classId;
-        if (typeof classId !== "string" || !mongoose.Types.ObjectId.isValid(classId)) {
-            return res.status(400).json({ error: "Invalid class ID." });
-        }
-
-        const teacherId = (req as any).user.userId;
-        const classItem = await classModel.findOne({ _id: classId, teacherId }).lean();
-        if (!classItem) {
-            return res.status(404).json({ error: "Class not found." });
-        }
-
-        const [memberships, exams] = await Promise.all([
-            classMemberModel.find({ classId })
-                .populate("studentId", "fullName email")
-                .sort({ joinedAt: -1 })
-                .lean(),
-            examModel.find({ classId, teacherId })
-                .select("title status startTime durationMinutes")
-                .sort({ startTime: -1 })
-                .lean()
-        ]);
-
-        return res.status(200).json({
-            class: {
-                id: classItem._id,
-                name: classItem.name,
-                description: classItem.description || "",
-                code: classItem.classCode,
-                active: classItem.isActive,
-                students: memberships.map((membership: any) => ({
-                    id: membership.studentId?._id,
-                    name: membership.studentId?.fullName || "Unknown student",
-                    email: membership.studentId?.email || "",
-                    joinedAt: membership.joinedAt
-                })),
-                exams: exams.map((exam) => ({
-                    id: exam._id,
-                    title: exam.title,
-                    status: exam.status,
-                    startTime: exam.startTime,
-                    durationMinutes: exam.durationMinutes
-                }))
-            }
-        });
-    } catch (error) {
-        console.error("Failed to retrieve teacher class details:", error);
-        return res.status(500).json({ error: "Failed to retrieve class details." });
-    }
-};
-
-export const getStudentClasses = async (
-    req: express.Request,
-    res: express.Response
-) => {
-    try {
-        const studentId = (req as any).user.userId;
-        const memberships = await classMemberModel.find({ studentId }).sort({ joinedAt: -1 });
-        const classIds = memberships.map((membership) => membership.classId);
-        const classes = await classModel
-            .find({ _id: { $in: classIds }, isActive: true })
-            .populate("teacherId", "fullName email");
-        const joinedAtByClassId = new Map(
-            memberships.map((membership) => [
-                membership.classId.toString(),
-                membership.joinedAt
-            ])
-        );
-
-        return res.status(200).json({
-            classes: classes.map((item: any) => ({
-                id: item._id,
-                name: item.name,
-                description: item.description || "",
-                classCode: item.classCode,
-                teacher: item.teacherId
-                    ? {
-                        id: item.teacherId._id,
-                        name: item.teacherId.fullName,
-                        email: item.teacherId.email
-                    }
-                    : null,
-                joinedAt: joinedAtByClassId.get(item._id.toString()) || item.createdAt
-            }))
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to retrieve your classes." });
-    }
-};
-
-export const findClassByCode = async (
-    req: express.Request,
-    res: express.Response
-) => {
-    try {
-        const classCode = typeof req.body.classCode === "string"
-            ? req.body.classCode.trim().toUpperCase()
-            : "";
-
-        if (!classCode) {
-            return res.status(400).json({ error: "Class code is required." });
-        }
-
-        const classItem = await classModel
-            .findOne({ classCode, isActive: true })
-            .populate("teacherId", "fullName email");
-
-        if (!classItem) {
-            return res.status(404).json({ error: "Class not found or inactive." });
-        }
-
-        const studentId = (req as any).user.userId;
-        const membership = await classMemberModel.findOne({
-            classId: classItem._id,
-            studentId
-        });
-
-        return res.status(200).json({
-            class: {
-                id: classItem._id,
-                name: classItem.name,
-                description: classItem.description || "",
-                classCode: classItem.classCode,
-                alreadyJoined: Boolean(membership),
-                teacher: classItem.teacherId
-                    ? {
-                        id: (classItem.teacherId as any)._id,
-                        name: (classItem.teacherId as any).fullName,
-                        email: (classItem.teacherId as any).email
-                    }
-                    : null
-            }
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to find the class." });
-    }
-};
 
 export const createClass = async (
     req: express.Request,
@@ -329,5 +123,195 @@ export const joinClass = async (
         return res.status(500).json({
             error: "Failed to join class"
         });
+    }
+};
+
+export const getStudentClasses = async (
+    req: express.Request,
+    res: express.Response
+) => {
+    try {
+        const studentId = (req as any).user.userId;
+        const memberships = await classMemberModel
+            .find({ studentId })
+            .sort({ joinedAt: -1 });
+
+        const classIds = memberships.map(m => m.classId);
+        const classes = await classModel
+            .find({ _id: { $in: classIds }, isActive: true })
+            .populate("teacherId", "fullName email");
+
+        const result = memberships.map(m => {
+            const cls = classes.find(c => c._id.toString() === m.classId.toString());
+            if (!cls) return null;
+            const teacher = cls.teacherId as any;
+            return {
+                id: cls._id,
+                name: cls.name,
+                description: cls.description || "",
+                classCode: cls.classCode,
+                teacher: {
+                    name: teacher?.fullName || "Teacher",
+                    email: teacher?.email || ""
+                },
+                joinedAt: m.joinedAt
+            };
+        }).filter(Boolean);
+
+        return res.status(200).json({ classes: result });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Failed to retrieve classes" });
+    }
+};
+
+export const lookupClass = async (
+    req: express.Request,
+    res: express.Response
+) => {
+    try {
+        const { classCode } = req.body;
+        if (!classCode) {
+            return res.status(400).json({ error: "Class code is required" });
+        }
+        const studentId = (req as any).user.userId;
+        const foundClass = await classModel.findOne({
+            classCode: classCode.trim().toUpperCase(),
+            isActive: true
+        }).populate("teacherId", "fullName email");
+
+        if (!foundClass) {
+            return res.status(404).json({ error: "Class not found with that code" });
+        }
+
+        const existingMembership = await classMemberModel.findOne({
+            classId: foundClass._id,
+            studentId
+        });
+
+        const teacher = foundClass.teacherId as any;
+
+        return res.status(200).json({
+            class: {
+                id: foundClass._id,
+                name: foundClass.name,
+                description: foundClass.description || "",
+                classCode: foundClass.classCode,
+                teacher: {
+                    name: teacher?.fullName || "Teacher",
+                    email: teacher?.email || ""
+                },
+                alreadyJoined: Boolean(existingMembership)
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Failed to lookup class" });
+    }
+};
+
+export const getTeacherClasses = async (
+    req: express.Request,
+    res: express.Response
+) => {
+    try {
+        const teacherId = (req as any).user.userId;
+        const classes = await classModel
+            .find({ teacherId, isActive: true })
+            .sort({ createdAt: -1 });
+
+        const classIds = classes.map(c => c._id);
+        const members = await classMemberModel.find({ classId: { $in: classIds } });
+
+        const now = new Date();
+        const exams = await examModel.find({
+            classId: { $in: classIds },
+            startTime: { $gte: now },
+            status: { $in: ["scheduled", "published"] }
+        }).sort({ startTime: 1 });
+
+        const result = classes.map(cls => {
+            const studentCount = members.filter(
+                m => m.classId.toString() === cls._id.toString()
+            ).length;
+            const nextExam = exams.find(
+                e => e.classId.toString() === cls._id.toString()
+            );
+
+            return {
+                id: cls._id,
+                name: cls.name,
+                description: cls.description || "",
+                classCode: cls.classCode,
+                students: studentCount,
+                active: cls.isActive,
+                nextExam: nextExam
+                    ? {
+                        title: nextExam.title,
+                        startTime: nextExam.startTime
+                    }
+                    : null
+            };
+        });
+
+        return res.status(200).json({ classes: result });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Failed to retrieve teacher classes" });
+    }
+};
+
+export const getTeacherClassDetails = async (
+    req: express.Request,
+    res: express.Response
+) => {
+    try {
+        const teacherId = (req as any).user.userId;
+        const { classId } = req.params;
+
+        if (typeof classId !== "string") {
+            return res.status(400).json({ error: "Invalid class ID" });
+        }
+
+        const cls = await classModel.findOne({ _id: classId, teacherId });
+        if (!cls) {
+            return res.status(404).json({ error: "Class not found" });
+        }
+
+        const members = await classMemberModel
+            .find({ classId })
+            .populate("studentId", "fullName email");
+        const exams = await examModel
+            .find({ classId })
+            .sort({ startTime: -1 });
+
+        return res.status(200).json({
+            class: {
+                id: cls._id,
+                name: cls.name,
+                description: cls.description || "",
+                classCode: cls.classCode,
+                active: cls.isActive,
+                students: members.map(m => {
+                    const student = m.studentId as any;
+                    return {
+                        id: student?._id,
+                        fullName: student?.fullName || "Student",
+                        email: student?.email || "",
+                        joinedAt: m.joinedAt
+                    };
+                }),
+                exams: exams.map(e => ({
+                    id: e._id,
+                    title: e.title,
+                    startTime: e.startTime,
+                    durationMinutes: e.durationMinutes,
+                    status: e.status
+                }))
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Failed to retrieve class details" });
     }
 };

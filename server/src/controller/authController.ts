@@ -76,93 +76,76 @@ export const loginUser = async (req: express.Request, res: express.Response) => 
             process.env.JWT_SECRET as string,
             {expiresIn:"1d"})
 
-        return res.status(200).json({
-            message: "Login successful",
-            token,
-            user: {
-                id: user._id.toString(),
-                fullName: user.fullName,
-                email: user.email,
-                role: user.role
-            }
-        });
+        return  res.status(200).json({message:"Login successful",token:token});
     }catch(e){
         console.log(e)
         return res.status(500).send({message:"Something went wrong",e})
     }
 }
 
-export const updateStudentProfile = async (
-    req: express.Request,
-    res: express.Response
-) => {
+export const updateStudentProfile = async (req: express.Request, res: express.Response) => {
     try {
-        const fullName = typeof req.body.fullName === "string"
-            ? req.body.fullName.trim()
-            : "";
-        if (fullName.length < 2 || fullName.length > 100) {
-            return res.status(400).json({
-                error: "Name must be between 2 and 100 characters."
-            });
+        const userId = (req as any).user.userId;
+        const { fullName } = req.body;
+
+        if (!fullName || !fullName.trim()) {
+            return res.status(400).json({ error: "Full name is required" });
         }
 
-        const studentId = (req as any).user.userId;
-        const user = await userModel.findOneAndUpdate(
-            { _id: studentId, role: "student" },
-            { fullName },
-            { new: true, runValidators: true }
-        ).select("fullName email role");
+        const user = await userModel.findByIdAndUpdate(
+            userId,
+            { $set: { fullName: fullName.trim() } },
+            { new: true }
+        ).select("-password");
 
         if (!user) {
-            return res.status(404).json({ error: "Student account not found." });
+            return res.status(404).json({ error: "User not found" });
         }
 
         return res.status(200).json({
-            message: "Profile updated successfully.",
+            message: "Profile updated successfully",
             user: {
-                id: user._id.toString(),
+                id: user._id,
                 fullName: user.fullName,
                 email: user.email,
                 role: user.role
             }
         });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to update your profile." });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: "Failed to update profile" });
     }
 };
 
-export const changeStudentPassword = async (
-    req: express.Request,
-    res: express.Response
-) => {
+export const changeStudentPassword = async (req: express.Request, res: express.Response) => {
     try {
+        const userId = (req as any).user.userId;
         const { currentPassword, newPassword } = req.body;
-        if (typeof currentPassword !== "string" || typeof newPassword !== "string") {
-            return res.status(400).json({ error: "Current and new passwords are required." });
-        }
-        if (newPassword.length < 8 || !/\d/.test(newPassword)) {
-            return res.status(400).json({
-                error: "Use at least 8 characters and include at least one number."
-            });
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: "Current and new password are required" });
         }
 
-        const studentId = (req as any).user.userId;
-        const user = await userModel.findOne({ _id: studentId, role: "student" }).select("+password");
+        if (newPassword.length < 6) {
+            return res.status(400).json({ error: "New password must be at least 6 characters" });
+        }
+
+        const user = await userModel.findById(userId).select("+password");
         if (!user) {
-            return res.status(404).json({ error: "Student account not found." });
+            return res.status(404).json({ error: "User not found" });
         }
 
-        const passwordMatches = await bcrypt.compare(currentPassword, user.password);
-        if (!passwordMatches) {
-            return res.status(400).json({ error: "Your current password is incorrect." });
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: "Incorrect current password" });
         }
 
         user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
-        return res.status(200).json({ message: "Password updated successfully." });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to update your password." });
+
+        return res.status(200).json({ message: "Password updated successfully" });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: "Failed to change password" });
     }
 };
