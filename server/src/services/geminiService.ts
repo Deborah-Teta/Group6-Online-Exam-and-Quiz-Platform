@@ -1,4 +1,7 @@
 import Groq from "groq-sdk";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 interface GenerateQuestionsInput {
     sourceNotes: string;
@@ -21,13 +24,21 @@ export interface GeneratedQuestion {
     points: number;
 }
 
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
-});
+let groqClient: Groq | null = null;
+const getGroqClient = () => {
+    if (!groqClient) {
+        dotenv.config();
+        groqClient = new Groq({
+            apiKey: process.env.GROQ_API_KEY,
+        });
+    }
+    return groqClient;
+};
 
 export const generateQuestions = async (
     input: GenerateQuestionsInput
 ): Promise<GeneratedQuestion[]> => {
+    const groq = getGroqClient();
 
     const prompt = `
 You are an educational question generator.

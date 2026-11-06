@@ -4,7 +4,6 @@ export interface IExam extends Document {
     teacherId: mongoose.Types.ObjectId;
     classId: mongoose.Types.ObjectId;
     title: string;
-    type: "exam" | "quiz";
     instructions?: string;
     questionIds: mongoose.Types.ObjectId[];
     startTime: Date;
@@ -30,12 +29,6 @@ const examSchema = new Schema<IExam>(
             type: String,
             required: true,
             trim: true,
-        },
-        type: {
-            type: String,
-            enum: ["exam", "quiz"],
-            default: "exam",
-            required: true,
         },
         instructions: String,
         questionIds: {
