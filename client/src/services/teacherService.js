@@ -55,8 +55,8 @@ function mapClass(item) {
       ? new Date(nextExam.startTime).toLocaleString("en-GB", {
           dateStyle: "medium",
           timeStyle: "short",
-          timeZone: "UTC",
-        }) + " GMT"
+          timeZone: "Africa/Kigali",
+        }) + " CAT"
       : "No assessments scheduled",
   };
 }
@@ -85,6 +85,7 @@ export async function getTeacherClassDetails(classId) {
     students: (classItem.students || []).map((student) => ({
       ...student,
       id: String(student.id || student._id),
+      name: student.name || student.fullName || "Student",
     })),
     exams: (classItem.exams || []).map(mapExam),
   };
