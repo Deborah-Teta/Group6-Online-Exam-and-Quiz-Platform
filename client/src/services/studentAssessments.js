@@ -7,10 +7,10 @@ export const assessmentTypes = {
     basePath: "/student/exams",
   },
   quiz: {
-    noun: "quiz",
-    nounTitle: "Quiz",
-    plural: "quizzes",
-    pluralTitle: "Quizzes",
-    basePath: "/student/quizzes",
+    noun: "exam",
+    nounTitle: "Exam",
+    plural: "exams",
+    pluralTitle: "Exams",
+    basePath: "/student/exams",
   },
 };

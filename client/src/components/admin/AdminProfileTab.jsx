@@ -10,11 +10,13 @@ import {
   LogOut,
   Save
 } from 'lucide-react';
+import { useAuth } from '../../context/useAuth';
 
 export const AdminProfileTab = ({ onShowToast }) => {
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState({
-    fullName: 'Blaise Niyonshuti',
-    email: 'admin@examplatform.edu',
+    fullName: user?.name || user?.fullName || 'Administrator',
+    email: user?.email || 'admin@examplatform.edu',
     title: 'Lead Deployment & System Administrator',
     joinedDate: 'Oct 29, 2026'
   });
@@ -68,7 +70,12 @@ export const AdminProfileTab = ({ onShowToast }) => {
       <div className="bg-gradient-to-r from-[#5149B8] to-[#1e3a8a] rounded-3xl p-6 sm:p-8 text-white shadow-sm flex flex-wrap items-center justify-between gap-6">
         <div className="flex items-center gap-5">
           <div className="w-20 h-20 rounded-full bg-white text-[#5149B8] font-black text-2xl flex items-center justify-center shadow-lg border-4 border-white/20">
-            BN
+            {(profileData.fullName || 'Admin')
+              .split(' ')
+              .filter(Boolean)
+              .slice(0, 2)
+              .map(part => part[0].toUpperCase())
+              .join('')}
           </div>
           <div>
             <div className="flex items-center gap-2.5">

@@ -12,6 +12,7 @@ import {
   LogOut,
   Shield,
   Settings,
+  Sparkles,
   Users,
   X,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const navigationByRole = {
     { label: "Dashboard", icon: Home, href: "/teacher/dashboard" },
     { label: "My classes", icon: GraduationCap, href: "/teacher/classes" },
     { label: "Question bank", icon: BookOpen, href: "/teacher/questions" },
+    { label: "AI Generator", icon: Sparkles, href: "/teacher/ai-generator" },
     { label: "Exams", icon: ClipboardList, href: "/teacher/exams" },
     { label: "Results", icon: BarChart3, href: "/teacher/results" },
   ],
@@ -29,7 +31,6 @@ const navigationByRole = {
     { label: "Dashboard", icon: LayoutGrid, href: "/student/dashboard" },
     { label: "My classes", icon: Users, href: "/student/classes" },
     { label: "My exams", icon: FileQuestion, href: "/student/exams" },
-    { label: "My quizzes", icon: ListChecks, href: "/student/quizzes" },
     { label: "Results", icon: BarChart3, href: "/student/results" },
   ],
   admin: [

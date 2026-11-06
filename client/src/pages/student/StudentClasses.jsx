@@ -49,7 +49,7 @@ const classColumns = [
   },
   {
     key: "nextExam",
-    header: "Next exam · GMT",
+    header: "Next exam · CAT",
     render: (enrolledClass) => {
       const nextExam =
         enrolledClass.nextExam;

@@ -24,6 +24,8 @@ import TeacherCreateExam from "./pages/teacher/TeacherCreateExam";
 import TeacherQuestionBank from "./pages/teacher/TeacherQuestionBank";
 import TeacherResults from "./pages/teacher/TeacherResults";
 import TeacherDashboard from "./components/Teacher/Dashboard";
+// Teacher AI Question Generator integration
+import TeacherAIGenerator from "./pages/teacher/TeacherAIGenerator";
 
 function HomeRedirect() {
   const { user } = useAuth();
@@ -67,11 +69,7 @@ function App() {
           />
           <Route
             path="ai-generator"
-            element={
-              <p className="text-slate-600">
-                Teacher AI question generator page is next.
-              </p>
-            }
+            element={<TeacherAIGenerator />}
           />
           <Route path="exams" element={<TeacherCreateExam />} />
           <Route path="results" element={<TeacherResults />} />
@@ -101,20 +99,8 @@ function App() {
             element={<StudentAssessmentSubmitted key="exam" type="exam" />}
           />
           <Route
-            path="quizzes"
-            element={<StudentAssessments key="quiz" type="quiz" />}
-          />
-          <Route
-            path="quizzes/:examId/instructions"
-            element={<StudentAssessmentInstructions key="quiz" type="quiz" />}
-          />
-          <Route
-            path="quizzes/:examId/attempt"
-            element={<StudentAssessmentAttempt key="quiz" type="quiz" />}
-          />
-          <Route
-            path="quizzes/:examId/submitted"
-            element={<StudentAssessmentSubmitted key="quiz" type="quiz" />}
+            path="quizzes/*"
+            element={<Navigate to="/student/exams" replace />}
           />
           <Route path="results" element={<StudentResults />} />
           <Route path="help" element={<StudentHelp />} />

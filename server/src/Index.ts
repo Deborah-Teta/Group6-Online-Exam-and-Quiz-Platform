@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express"
 import { dbConnection } from "./database/DatabaseConnection.js";
 import authRoute from "./routes/authRoute.js";
@@ -8,8 +9,8 @@ import examRoutes from "./routes/examRoutes.js";
 import studentExamRoutes from "./routes/studentExamRoutes.js";
 import teacherResultRoutes from "./routes/teacherResultRoutes.js";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
-import teacherDashboardRoutes from "./routes/teacherDashboardRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import teacherDashboardRoutes from "./routes/teacherDashboardRoutes.js";
 
 
 const app = express();
@@ -22,8 +23,8 @@ app.use("/api/questions", questionRoutes);
 app.use("/api/student-exams", studentExamRoutes);
 app.use("/api/exams", examRoutes);
 app.use("/api/teacher-results", teacherResultRoutes);
-app.use("/api/adminstats", adminDashboardRoutes);
 app.use("/api/teacher", teacherDashboardRoutes);
+app.use("/api/adminstats", adminDashboardRoutes);
 app.use("/api/ai", aiRoutes);
 
 dbConnection().then(()=>{

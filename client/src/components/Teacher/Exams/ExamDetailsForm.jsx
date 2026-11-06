@@ -64,8 +64,8 @@ function ExamDetailsForm({ values, classes, onChange, endTime }) {
               onChange={(event) => onChange("timeZone", event.target.value)}
               className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100"
             >
+              <option value="CAT">Africa/Kigali · CAT (Kigali time)</option>
               <option value="GMT">Europe/London · GMT</option>
-              <option value="CAT">Africa/Kigali · CAT</option>
             </select>
           </div>
         </div>

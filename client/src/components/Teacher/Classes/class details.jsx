@@ -11,15 +11,15 @@ function formatDateTime(dateValue) {
   return new Date(dateValue).toLocaleString("en-GB", {
     dateStyle: "medium",
     timeStyle: "short",
-    timeZone: "UTC",
-  }) + " GMT";
+    timeZone: "Africa/Kigali",
+  }) + " CAT";
 }
 
 function getExamStatus(exam) {
   if (exam.status === "draft") return { status: "closed", label: "Draft" };
   if (exam.status === "closed") return { status: "closed", label: "Closed" };
-  const endTime = new Date(exam.startTime).getTime() + exam.durationMinutes * 60_000;
-  if (endTime < Date.now()) return { status: "closed", label: "Completed" };
+  const endTime = new Date(exam.startTime).getTime() + (Number(exam.durationMinutes) || 0) * 60_000;
+  if (endTime < Date.now()) return { status: "closed", label: "Closed" };
   if (new Date(exam.startTime).getTime() <= Date.now()) {
     return { status: "open", label: "In progress" };
   }
@@ -45,7 +45,7 @@ const examColumns = [
   { key: "title", header: "Assessment" },
   {
     key: "startTime",
-    header: "Schedule · GMT",
+    header: "Schedule · CAT",
     render: (exam) => formatDateTime(exam.startTime),
   },
   {

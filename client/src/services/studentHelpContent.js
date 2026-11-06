@@ -3,7 +3,7 @@ import { ClipboardCheck, Clock, Send, ShieldCheck, Wifi } from "lucide-react";
 export const helpTopics = [
   { label: "All questions", value: "all" },
   { label: "Classes", value: "classes" },
-  { label: "Exams & quizzes", value: "assessments" },
+  { label: "Exams", value: "assessments" },
   { label: "Results", value: "results" },
   { label: "Account", value: "account" },
 ];
@@ -32,9 +32,9 @@ export const helpQuestions = [
   {
     id: "exam-vs-quiz",
     topic: "assessments",
-    title: "Are exams and quizzes different?",
+    title: "How do exams work?",
     content:
-      "They work the same way here. Both have a scheduled window, a countdown, one attempt and results that unlock after closing. You'll find them under My exams and My quizzes.",
+      "Every exam has a scheduled window in Kigali time (CAT), a countdown timer, one final attempt, and results that unlock after the assessment closes. You will find them under My exams.",
   },
   {
     id: "when-to-start",
@@ -74,7 +74,7 @@ export const helpQuestions = [
   {
     id: "retake",
     topic: "assessments",
-    title: "Can I retake an exam or quiz?",
+    title: "Can I retake an exam?",
     content:
       "No. You have one attempt and one final submission. After you submit, you can't change your answers or start again.",
   },
@@ -83,14 +83,14 @@ export const helpQuestions = [
     topic: "results",
     title: "Why can't I see my score yet?",
     content:
-      "Scores and correct answers stay locked until the exam or quiz closes for everyone, even if you submit early. You can still view your submission in the meantime.",
+      "Scores and correct answers stay locked until the exam closes for everyone, even if you submit early. You can still view your submission in the meantime.",
   },
   {
     id: "find-results",
     topic: "results",
     title: "Where do I find my results?",
     content:
-      "Open Results in the menu. You can filter by exams or quizzes and by class, and see how your scores change over time.",
+      "Open Results in the menu. You can filter by class and see how your scores change over time.",
   },
   {
     id: "change-details",

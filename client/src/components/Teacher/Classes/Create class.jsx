@@ -64,11 +64,11 @@ function CreateClass({ isOpen, onClose, onCreate }) {
         />
 
         <Input
-          label="Year and subject"
+          label="Description"
           name="description"
           value={formData.description}
           onChange={handleChange}
-          placeholder="e.g. Year 10 · Biology"
+          placeholder="e.g. Introductory biology course covering cellular structures and genetics"
         />
 
         <p className="text-xs leading-5 text-slate-500">

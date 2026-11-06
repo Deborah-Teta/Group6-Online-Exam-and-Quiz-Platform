@@ -7,7 +7,7 @@ import Notice from "../../components/common/Notice";
 import SectionCard from "../../components/common/SectionCard";
 import StatusBadge from "../../components/common/StatusBadge";
 import { assessmentTypes } from "../../services/studentAssessments";
-import { getStudentAttempt } from "../../services/studentService";
+import { getStudentAttempt, getStudentAttemptResult } from "../../services/studentService";
 import { formatPercent } from "../../utils/scores";
 
 const formatSubmittedAt = (timestamp) => {
@@ -17,14 +17,14 @@ const formatSubmittedAt = (timestamp) => {
     day: "numeric",
     month: "short",
     year: "numeric",
-    timeZone: "UTC",
+    timeZone: "Africa/Kigali",
   });
   const time = date.toLocaleTimeString("en-GB", {
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "UTC",
+    timeZone: "Africa/Kigali",
   });
-  return `${day} · ${time} GMT`;
+  return `${day} · ${time} CAT`;
 };
 
 function ReceiptFact({ label, value }) {
@@ -43,6 +43,8 @@ function StudentAssessmentSubmitted({ type }) {
   const [attempt, setAttempt] = useState(null);
   const [isAttemptLoading, setIsAttemptLoading] = useState(true);
   const [error, setError] = useState("");
+  const [detailedResult, setDetailedResult] = useState(null);
+  const [loadingDetailedResult, setLoadingDetailedResult] = useState(false);
   const navigate = useNavigate();
   const assessment = exams.find((item) => item.id === examId && item.type === type);
 
@@ -63,6 +65,16 @@ function StudentAssessmentSubmitted({ type }) {
       active = false;
     };
   }, [examId]);
+
+  useEffect(() => {
+    if (attempt?.id && attempt?.resultReleased) {
+      setLoadingDetailedResult(true);
+      getStudentAttemptResult(attempt.id)
+        .then((res) => setDetailedResult(res))
+        .catch(() => {})
+        .finally(() => setLoadingDetailedResult(false));
+    }
+  }, [attempt?.id, attempt?.resultReleased]);
 
   if (isLoading || isAttemptLoading) {
     return <p className="py-8 text-center text-sm text-muted">Loading submission…</p>;
@@ -144,13 +156,78 @@ function StudentAssessmentSubmitted({ type }) {
                 {assessment.closesDate}
               </p>
               <p className="text-xs text-muted">
-                {assessment.closesTime} GMT · Results unlock after the assessment closes.
+                {assessment.closesTime} CAT · Results unlock after the assessment closes.
               </p>
               <StatusBadge label="Not yet available" variant="closed" />
             </>
           )}
         </SectionCard>
       </div>
+
+      {loadingDetailedResult && (
+        <p className="py-6 text-center text-sm text-muted">Loading question answers and explanations…</p>
+      )}
+
+      {detailedResult?.answers?.length > 0 && (
+        <SectionCard title="Question Breakdown & Explanations" action={`${detailedResult.answers.length} questions`}>
+          <div className="flex flex-col gap-5">
+            {detailedResult.answers.map((ans, idx) => (
+              <div
+                key={ans.questionId || idx}
+                className={`rounded-2xl border p-4 ${
+                  ans.isCorrect ? "border-emerald-200 bg-emerald-50/40" : "border-red-200 bg-red-50/40"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm font-bold text-slate-900">
+                    Question {idx + 1}: {ans.questionText}
+                  </p>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      ans.isCorrect ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {ans.isCorrect ? `+${ans.awardedPoints} pts (Correct)` : "0 pts (Incorrect)"}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex flex-col gap-2">
+                  {ans.options?.map((opt, optIdx) => {
+                    const isSelected = ans.selectedOptionIndex === optIdx;
+                    const isCorrectOption = ans.correctOptionIndex === optIdx;
+                    return (
+                      <div
+                        key={optIdx}
+                        className={`flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium ${
+                          isCorrectOption
+                            ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                            : isSelected
+                            ? "bg-red-100 text-red-900 border border-red-300"
+                            : "bg-white text-slate-700 border border-slate-200"
+                        }`}
+                      >
+                        <span className="font-bold">{String.fromCharCode(65 + optIdx)}.</span>
+                        <span>{opt}</span>
+                        {isSelected && <span className="ml-auto font-bold">(Your answer)</span>}
+                        {isCorrectOption && !isSelected && (
+                          <span className="ml-auto font-bold text-emerald-700">(Correct answer)</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {ans.explanation && (
+                  <p className="mt-3 rounded-lg bg-white/80 p-2.5 text-xs text-slate-600 border border-slate-200/60">
+                    <span className="font-bold text-slate-800">Explanation: </span>
+                    {ans.explanation}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
     </>
   );
 }

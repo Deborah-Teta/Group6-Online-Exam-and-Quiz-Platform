@@ -1,54 +1,106 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ExamResults from "../../components/Teacher/Results/Exam results";
-import { getTeacherExamResults, getTeacherExams } from "../../services/teacherService";
+import { getTeacherClasses, getTeacherExamResults, getTeacherExams } from "../../services/teacherService";
 
 function formatSubmittedAt(value) {
   if (!value) return "—";
   return new Date(value).toLocaleTimeString("en-GB", {
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "UTC",
+    timeZone: "Africa/Kigali",
   });
 }
 
-function mapExamResults(data) {
-  const submittedStudents = data.studentResults.filter(
+function mapExamResults(data, selectedAssessment, classes = []) {
+  const submittedStudents = (data.studentResults || []).filter(
     (student) => student.status !== "in_progress",
   );
   const scores = submittedStudents.map((student) => student.score ?? 0);
-  const totalPoints = data.exam.totalPoints;
+
+  // Safely resolve totalPoints from question results, attempt, assessment, or exam object
+  const calculatedPointsFromQuestions = (data.questionResults || []).reduce(
+    (sum, q) => sum + (Number(q.points) || 1),
+    0
+  );
+  const pointsFromAttempt = (data.studentResults || []).find(
+    (s) => s.totalPoints !== undefined && s.totalPoints !== null
+  )?.totalPoints;
+  const totalPoints = Number(
+    data.exam?.totalPoints ||
+    selectedAssessment?.totalPoints ||
+    (calculatedPointsFromQuestions > 0 ? calculatedPointsFromQuestions : undefined) ||
+    pointsFromAttempt ||
+    0
+  );
+
+  const questionCount = Number(
+    data.exam?.questionCount ||
+    selectedAssessment?.questionCount ||
+    data.questionResults?.length ||
+    0
+  );
+
+  const selectedClass = classes.find(
+    (c) => String(c.id) === String(data.exam?.classId || selectedAssessment?.classId)
+  );
+  const className =
+    data.exam?.className ||
+    selectedAssessment?.className ||
+    selectedClass?.name ||
+    "Class";
+
+  const startTime = new Date(data.exam?.startTime || selectedAssessment?.startTime || Date.now());
+  const durationMinutes = Number(data.exam?.durationMinutes || selectedAssessment?.durationMinutes || 0);
+  const endTime = new Date(startTime.getTime() + durationMinutes * 60_000);
+
+  const classStudentCount = Number(
+    data.summary?.classStudentCount ||
+    selectedClass?.students ||
+    Math.max(
+      data.summary?.totalAttempts || 0,
+      data.studentResults?.length || 0,
+      submittedStudents.length,
+      1
+    )
+  );
+
+  const averagePercent = Number(data.summary?.classAverage ?? 0);
+  const averageScore = totalPoints > 0
+    ? Number(((averagePercent / 100) * totalPoints).toFixed(2))
+    : 0;
+
+  const highestScore = scores.length > 0 ? Math.max(...scores) : 0;
+  const fullMarkCount = totalPoints > 0 ? scores.filter((score) => score === totalPoints).length : 0;
 
   return {
-    title: data.exam.title,
-    className: data.exam.className,
-    date: new Date(data.exam.startTime).toLocaleDateString("en-GB", {
+    title: data.exam?.title || selectedAssessment?.title || "Exam",
+    className,
+    date: startTime.toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
       year: "numeric",
-      timeZone: "UTC",
+      timeZone: "Africa/Kigali",
     }),
-    schedule: `${new Date(data.exam.startTime).toLocaleTimeString("en-GB", {
+    schedule: `${startTime.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-      timeZone: "UTC",
-    })}–${new Date(
-      new Date(data.exam.startTime).getTime() + data.exam.durationMinutes * 60_000,
-    ).toLocaleTimeString("en-GB", {
+      timeZone: "Africa/Kigali",
+    })}–${endTime.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-      timeZone: "UTC",
-    })} GMT`,
-    questionCount: data.exam.questionCount,
+      timeZone: "Africa/Kigali",
+    })} CAT`,
+    questionCount,
     totalPoints,
-    average: data.summary.classAverage,
-    averageScore: Number(((data.summary.classAverage / 100) * totalPoints).toFixed(2)),
-    highestScore: Math.max(0, ...scores),
-    fullMarkCount: scores.filter((score) => score === totalPoints).length,
-    submittedCount: data.summary.submittedAttempts,
-    inProgressCount: data.summary.inProgressAttempts,
-    classStudentCount: data.summary.classStudentCount,
-    students: data.studentResults.map((student) => ({
+    average: averagePercent,
+    averageScore,
+    highestScore,
+    fullMarkCount,
+    submittedCount: Number(data.summary?.submittedAttempts ?? submittedStudents.length),
+    inProgressCount: Number(data.summary?.inProgressAttempts ?? ((data.studentResults?.length || 0) - submittedStudents.length)),
+    classStudentCount,
+    students: (data.studentResults || []).map((student) => ({
       id: String(student.studentId),
       name: student.fullName,
       email: student.email,
@@ -62,7 +114,7 @@ function mapExamResults(data) {
           ? "Attempt in progress"
           : "Submitted by student",
     })),
-    questions: data.questionResults.map((question) => ({
+    questions: (data.questionResults || []).map((question) => ({
       id: String(question.questionId),
       topic: question.topic,
       questionText: question.questionText,
@@ -70,7 +122,7 @@ function mapExamResults(data) {
       totalStudents: question.totalStudents,
       correctPercentage: question.correctPercentage,
     })),
-    reviewQuestions: data.questionResults
+    reviewQuestions: (data.questionResults || [])
       .filter((question) => question.totalStudents > 0 && question.correctPercentage < 70)
       .sort((left, right) => left.correctPercentage - right.correctPercentage)
       .map((question) => ({
@@ -87,6 +139,7 @@ function escapeCsv(value) {
 function TeacherResults() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [assessments, setAssessments] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [selectedExamId, setSelectedExamId] = useState(
     searchParams.get("examId") || "",
   );
@@ -97,13 +150,14 @@ function TeacherResults() {
 
   useEffect(() => {
     let isCurrent = true;
-    getTeacherExams()
-      .then((items) => {
-        const available = items.filter((item) => item.status !== "draft");
+    Promise.all([getTeacherExams(), getTeacherClasses()])
+      .then(([examItems, classItems]) => {
         if (!isCurrent) return;
+        const available = (examItems || []).filter((item) => item.status !== "draft");
         setAssessments(available);
+        setClasses(classItems || []);
         setSelectedExamId((current) => {
-          if (current && available.some((item) => item.id === current)) return current;
+          if (current && available.some((item) => String(item.id) === String(current))) return current;
           return available[0]?.id || "";
         });
         setIsLoadingAssessments(false);
@@ -127,10 +181,14 @@ function TeacherResults() {
     }
 
     let isCurrent = true;
+    const selectedAssessment = assessments.find(
+      (item) => String(item.id) === String(selectedExamId)
+    );
+
     getTeacherExamResults(selectedExamId)
       .then((result) => {
         if (isCurrent) {
-          setExam(mapExamResults(result));
+          setExam(mapExamResults(result, selectedAssessment, classes));
           setError("");
           setIsLoadingResults(false);
         }
@@ -146,7 +204,7 @@ function TeacherResults() {
     return () => {
       isCurrent = false;
     };
-  }, [selectedExamId]);
+  }, [selectedExamId, assessments, classes]);
 
   function handleSelectExam(event) {
     const examId = event.target.value;
@@ -160,7 +218,7 @@ function TeacherResults() {
   function exportResults() {
     if (!exam) return;
     const rows = [
-      ["Student", "Score", "Percent", "Submitted (GMT)", "Status"],
+      ["Student", "Score", "Percent", "Submitted (CAT)", "Status"],
       ...exam.students.map((student) => [
         student.name,
         student.score === null ? "" : `${student.score}/${exam.totalPoints}`,

@@ -36,34 +36,14 @@ export const studentPageHeaders = [
     description: "Every exam from your classes, and what you can do next.",
   },
   {
-    href: "/student/quizzes/:examId/instructions",
-    title: "Before you begin",
-    description: "Read the rules, then start when you're ready.",
-  },
-  {
-    href: "/student/quizzes/:examId/attempt",
-    title: "Quiz in progress",
-    description: "Your answers save automatically.",
-  },
-  {
-    href: "/student/quizzes/:examId/submitted",
-    title: "Submission received",
-    description: "Your attempt has been submitted.",
-  },
-  {
-    href: "/student/quizzes",
-    title: "My quizzes",
-    description: "Every quiz from your classes, and what you can do next.",
-  },
-  {
     href: "/student/results",
     title: "Results",
-    description: "Your scores from exams and quizzes, and how they're changing over time.",
+    description: "Your scores from exams and how they're changing over time.",
   },
   {
     href: "/student/help",
     title: "Help & guidelines",
-    description: "How your exams and quizzes work, and what to do if something goes wrong.",
+    description: "How your exams work, and what to do if something goes wrong.",
   },
   {
     href: "/student/settings",

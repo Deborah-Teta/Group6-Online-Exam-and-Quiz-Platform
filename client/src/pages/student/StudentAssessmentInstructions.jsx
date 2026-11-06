@@ -84,7 +84,7 @@ function StudentAssessmentInstructions({ type }) {
             </InfoRow>
             <InfoRow
               icon={Timer}
-              title={`${assessment.durationMinutes} minutes, ending at ${assessment.closesTime} GMT`}
+              title={`${assessment.durationMinutes} minutes, ending at ${assessment.closesTime} CAT`}
             >
               Starting late does not extend the closing time. Your countdown shows the time left until the {noun} ends.
             </InfoRow>

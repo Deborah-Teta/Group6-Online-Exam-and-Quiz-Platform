@@ -167,7 +167,7 @@ function AttemptWorkspace({ assessment, attempt, type, refreshStudentData }) {
         </div>
       </div>
 
-      <Notice icon={Info} title={`Your attempt ends at ${assessment.closesTime} GMT`}>
+      <Notice icon={Info} title={`Your attempt ends at ${assessment.closesTime} CAT`}>
         Answers save automatically. Your {noun} is submitted when time runs out.
       </Notice>
 

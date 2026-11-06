@@ -45,7 +45,7 @@ function SignIn() {
       const canReturnToIntendedPath =
         typeof intendedPath === "string" &&
         (intendedPath.startsWith(rolePrefix) ||
-          (result.user.role === "admin" && intendedPath === "/admin"));
+          (result.user.role === "admin" && intendedPath.startsWith("/admin")));
 
       navigate(
         canReturnToIntendedPath

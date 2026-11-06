@@ -40,7 +40,7 @@ function formatTime(date) {
   return date.toLocaleTimeString("en-GB", {
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "UTC",
+    timeZone: "Africa/Kigali",
   });
 }
 
@@ -49,7 +49,7 @@ function formatDate(date) {
     day: "numeric",
     month: "short",
     year: "numeric",
-    timeZone: "UTC",
+    timeZone: "Africa/Kigali",
   });
 }
 
@@ -57,55 +57,87 @@ function formatSchedule(start, end) {
   const startDay = start.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
-    timeZone: "UTC",
+    timeZone: "Africa/Kigali",
   });
   const endDay = end.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
-    timeZone: "UTC",
+    timeZone: "Africa/Kigali",
   });
   const dayLabel = startDay === endDay ? startDay : `${startDay}–${endDay}`;
 
-  return `${dayLabel} · ${formatTime(start)}–${formatTime(end)} GMT`;
+  return `${dayLabel} · ${formatTime(start)}–${formatTime(end)} CAT`;
 }
 
 function mapExam(exam) {
   const startTime = new Date(exam.startTime);
-  const closesAt = new Date(exam.closesAt);
+  const closesAt = exam.closesAt
+    ? new Date(exam.closesAt)
+    : new Date(startTime.getTime() + (Number(exam.durationMinutes) || 0) * 60_000);
   const attempt = exam.attempt
     ? {
         ...exam.attempt,
-        id: String(exam.attempt.id),
+        id: String(exam.attempt.id || exam.attempt._id),
       }
     : null;
 
+  const now = new Date();
+  const isPast = now >= closesAt;
+  const isStarted = now >= startTime;
+  const isSubmitted = Boolean(
+    attempt && (attempt.status === "submitted" || attempt.status === "auto_submitted")
+  );
+  const isInProgress = Boolean(attempt && attempt.status === "in_progress");
+
+  let status = "upcoming";
+  let statusLabel = "Scheduled";
+
+  if (isSubmitted) {
+    status = "closed";
+    statusLabel = "Finished";
+  } else if (isPast || exam.status === "closed") {
+    status = "closed";
+    statusLabel = "Closed";
+  } else if (isStarted || exam.status === "open") {
+    status = "open";
+    statusLabel = isInProgress ? "In progress" : "Open now";
+  } else {
+    status = "upcoming";
+    statusLabel = "Scheduled";
+  }
+
   return {
     ...exam,
-    id: String(exam.id),
+    type: "exam",
+    id: String(exam.id || exam._id),
     classId: String(exam.classId),
     startTime,
     closesAt,
     schedule: formatSchedule(startTime, closesAt),
     date: formatDate(startTime),
     dateLabel: formatDate(startTime),
-    closesLabel: `${formatDate(closesAt)} · ${formatTime(closesAt)} GMT`,
+    closesLabel: `${formatDate(closesAt)} · ${formatTime(closesAt)} CAT`,
     closesDate: formatDate(closesAt),
     closesTime: formatTime(closesAt),
-    windowLabel: `${formatDate(startTime)} · ${formatTime(startTime)}–${formatTime(closesAt)} GMT`,
-    details: `${exam.questionCount} questions · ${exam.durationMinutes} minutes · ${exam.totalPoints} points`,
+    windowLabel: `${formatDate(startTime)} · ${formatTime(startTime)}–${formatTime(closesAt)} CAT`,
+    details: `${exam.questionCount ?? 0} questions · ${exam.durationMinutes ?? 0} minutes · ${exam.totalPoints ?? 0} points`,
     summary: exam.instructions || "Complete the questions during the scheduled assessment window.",
     questionTypes: exam.questionTypes || "Questions",
-    statusLabel:
-      exam.status === "open" && attempt?.status === "in_progress"
-        ? "In progress"
-        : exam.statusLabel,
-    score: attempt?.resultReleased ? attempt.score : undefined,
+    status,
+    statusLabel,
+    score: attempt?.resultReleased
+      ? attempt.score
+      : isPast && attempt?.score !== undefined
+        ? attempt.score
+        : undefined,
     availability:
-      exam.status === "upcoming"
-        ? `Opens ${formatDate(startTime)} at ${formatTime(startTime)} GMT`
-        : exam.status === "closed"
-          ? "Assessment closed"
-          : "",
+      status === "upcoming"
+        ? `Opens ${formatDate(startTime)} at ${formatTime(startTime)} CAT`
+        : status === "closed"
+          ? isSubmitted
+            ? "Finished"
+            : "Assessment closed"
+          : "Open now",
   };
 }
 
@@ -170,6 +202,11 @@ export async function submitStudentExam(attemptId) {
   return studentRequest(`/student-exams/attempts/${attemptId}/submit`, {
     method: "POST",
   });
+}
+
+export async function getStudentAttemptResult(attemptId) {
+  const data = await studentRequest(`/student-exams/attempts/${attemptId}/result`);
+  return data.result;
 }
 
 export async function updateStudentProfile(fullName) {

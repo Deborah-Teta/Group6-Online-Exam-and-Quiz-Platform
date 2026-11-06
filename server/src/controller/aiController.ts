@@ -136,20 +136,29 @@ export const generateAIDrafts = async (req: Request, res: Response) => {
                 break;
             }
 
+            if (!question) continue;
+
+            const qType = String(question.type || "").toLowerCase().replace("-", "_").replace(" ", "_");
+            const qDifficulty = String(question.difficulty || "").toLowerCase();
+            const qPoints = Number(question.points) || 1;
+
             if (
-                !question ||
-                question.type !== questionType ||
+                (qType !== questionType) ||
                 typeof question.questionText !== "string" ||
                 !question.questionText.trim() ||
                 !Array.isArray(question.options) ||
                 typeof question.explanation !== "string" ||
                 !question.explanation.trim() ||
-                question.difficulty !== difficulty ||
-                !Number.isInteger(question.points) ||
-                question.points < 1
+                (qDifficulty !== difficulty.toLowerCase()) ||
+                !Number.isInteger(qPoints) ||
+                qPoints < 1
             ) {
                 continue;
             }
+
+            question.type = questionType as any;
+            question.difficulty = difficulty as any;
+            question.points = qPoints;
 
             const normalizedQuestion = normalizeText(question.questionText);
 
@@ -621,10 +630,52 @@ export const approveAIDraft = async (req: Request, res: Response) => {
             });
         }
 
-        return res.status(500).json({
-            message: "Unable to approve AI draft. Check that MongoDB transactions are supported."
-        });
+        // Fallback without transaction if session/replica set transaction is not supported
+        try {
+            const teacherId = (req as any).user?.userId;
+            const { draftId } = req.params;
 
+            const draft = await aiDraftModel.findOne({
+                _id: draftId,
+                teacherId,
+                reviewStatus: "pending"
+            });
+
+            if (!draft) {
+                return res.status(409).json({ message: "Draft not found, or it has already been reviewed." });
+            }
+
+            const questions = await questionModel.create([{
+                teacherId: draft.teacherId,
+                topic: draft.topic,
+                type: draft.type,
+                questionText: draft.questionText,
+                options: draft.options.map(o => ({ text: o.text, isCorrect: o.isCorrect })),
+                explanation: draft.explanation,
+                difficulty: draft.difficulty,
+                points: draft.points,
+                source: "ai"
+            }]);
+
+            draft.reviewStatus = "approved";
+            draft.reviewedAt = new Date();
+            await draft.save();
+
+            await aiGenerationModel.updateOne(
+                { _id: draft.generationId, teacherId },
+                { $inc: { acceptedCount: 1 } }
+            );
+
+            return res.status(201).json({
+                message: "AI draft approved and saved as a question.",
+                question: questions[0]
+            });
+        } catch (fallbackError) {
+            console.error("Approve AI draft fallback error:", fallbackError);
+            return res.status(500).json({
+                message: "Unable to approve AI draft."
+            });
+        }
     } finally {
         await session.endSession();
     }

@@ -5,120 +5,12 @@ import {classMemberModel} from "../models/ClassMember.js";
 import {examAttemptModel} from "../models/ExamAttemptSchema.js";
 import {questionModel} from "../models/QuestionsSchema.js";
 
-const getSingleRouteParam = (value: string | string[] | undefined) =>
-    Array.isArray(value) ? value[0] : value;
-
-export const getStudentAttempt = async (
-    req: express.Request,
-    res: express.Response
-) => {
-    try {
-        const examId = getSingleRouteParam(req.params.examId);
-        const studentId = (req as any).user.userId;
-
-        if (typeof examId !== "string" || !mongoose.Types.ObjectId.isValid(examId)) {
-            return res.status(400).json({ error: "Invalid exam ID." });
-        }
-
-        const exam = await examModel.findById(examId);
-        if (!exam) {
-            return res.status(404).json({ error: "Assessment not found." });
-        }
-
-        const membership = await classMemberModel.findOne({
-            classId: exam.classId,
-            studentId
-        });
-        if (!membership) {
-            return res.status(403).json({ error: "You are not a member of this class." });
-        }
-
-        let attempt = await examAttemptModel.findOne({ examId, studentId });
-        if (!attempt) {
-            return res.status(200).json({ attempt: null });
-        }
-
-        const deadline = new Date(
-            exam.startTime.getTime() + exam.durationMinutes * 60 * 1000
-        );
-        if (attempt.status === "in_progress" && new Date() >= deadline) {
-            attempt = await finalizeAttempt(attempt, exam, true);
-        }
-        if (!attempt) {
-            return res.status(404).json({ error: "Assessment attempt not found." });
-        }
-
-        const resultReleased =
-            (exam.status === "closed" || new Date() >= deadline) &&
-            attempt.status !== "in_progress";
-
-        if (attempt.status !== "in_progress") {
-            return res.status(200).json({
-                attempt: {
-                    id: attempt._id,
-                    status: attempt.status,
-                    submittedAt: attempt.submittedAt,
-                    answeredCount: attempt.answers.filter(
-                        (answer) => answer.selectedOptionIndex !== null
-                    ).length,
-                    questionCount: exam.questionIds.length,
-                    deadline,
-                    resultReleased,
-                    score: resultReleased ? attempt.score : null,
-                    totalPoints: attempt.totalPoints,
-                    percentage: resultReleased ? attempt.percentage : null
-                }
-            });
-        }
-
-        const questions = await questionModel.find({
-            _id: { $in: exam.questionIds }
-        });
-        const answersByQuestionId = new Map(
-            attempt.answers.map((answer) => [
-                answer.questionId.toString(),
-                answer.selectedOptionIndex
-            ])
-        );
-        const safeQuestions = exam.questionIds.flatMap((questionId) => {
-            const question = questions.find(
-                (item) => item._id.toString() === questionId.toString()
-            );
-            if (!question) return [];
-
-            return [{
-                id: question._id,
-                type: question.type,
-                points: question.points,
-                text: question.questionText,
-                options: question.options.map((option) => option.text),
-                selectedOptionIndex:
-                    answersByQuestionId.get(question._id.toString()) ?? null
-            }];
-        });
-
-        return res.status(200).json({
-            attempt: {
-                id: attempt._id,
-                status: attempt.status,
-                startedAt: attempt.startedAt,
-                deadline,
-                questions: safeQuestions
-            }
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to retrieve your assessment attempt." });
-    }
-};
-
 
 export const startExam = async (
     req: express.Request,
     res: express.Response
 ) => {
     try {
-        const examId = getSingleRouteParam(req.params.examId);
         const { examId } = req.params;
 
         if (typeof examId !== "string") {
@@ -128,7 +20,7 @@ export const startExam = async (
         }
         const studentId = (req as any).user.userId;
 
-        if (typeof examId !== "string" || !mongoose.Types.ObjectId.isValid(examId)) {
+        if (!mongoose.Types.ObjectId.isValid(examId)) {
             return res.status(400).json({ error: "Invalid exam ID." });
         }
 
@@ -250,7 +142,6 @@ export const saveAnswer = async (
     res: express.Response
 ) => {
     try {
-        const attemptId = getSingleRouteParam(req.params.attemptId);
         const { attemptId } = req.params;
 
         if (typeof attemptId !== "string") {
@@ -262,7 +153,6 @@ export const saveAnswer = async (
         const studentId = (req as any).user.userId;
 
         if (
-            typeof attemptId !== "string" ||
             !mongoose.Types.ObjectId.isValid(attemptId) ||
             !mongoose.Types.ObjectId.isValid(questionId)
         ) {
@@ -359,7 +249,7 @@ export const saveAnswer = async (
 };
 
 
-export const finalizeAttempt = async (
+const finalizeAttempt = async (
     attempt: any,
     exam: any,
     automatic: boolean
@@ -469,7 +359,6 @@ export const getAttemptResult = async (
     res: express.Response
 ) => {
     try {
-        const attemptId = getSingleRouteParam(req.params.attemptId);
         const { attemptId } = req.params;
         if (typeof attemptId !== "string") {
             return res.status(400).json({
@@ -478,7 +367,7 @@ export const getAttemptResult = async (
         }
         const studentId = (req as any).user.userId;
 
-        if (typeof attemptId !== "string" || !mongoose.Types.ObjectId.isValid(attemptId)) {
+        if (!mongoose.Types.ObjectId.isValid(attemptId)) {
             return res.status(400).json({
                 error: "Invalid attempt ID."
             });
@@ -581,5 +470,84 @@ export const getAttemptResult = async (
         return res.status(500).json({
             error: "Failed to retrieve exam result."
         });
+    }
+};
+
+export const getAttemptByExam = async (
+    req: express.Request,
+    res: express.Response
+) => {
+    try {
+        const { examId } = req.params;
+        const studentId = (req as any).user.userId;
+
+        if (typeof examId !== "string" || !mongoose.Types.ObjectId.isValid(examId)) {
+            return res.status(400).json({ error: "Invalid exam ID." });
+        }
+
+        const attempt = await examAttemptModel.findOne({ examId, studentId });
+        if (!attempt) {
+            return res.status(404).json({ error: "No attempt found." });
+        }
+
+        const exam = await examModel.findById(examId);
+        if (!exam) {
+            return res.status(404).json({ error: "Exam not found." });
+        }
+
+        const now = new Date();
+        const deadline = new Date(
+            exam.startTime.getTime() + exam.durationMinutes * 60 * 1000
+        );
+        const examClosed = exam.status === "closed" || now >= deadline;
+
+        if (attempt.status === "in_progress" && examClosed) {
+            await finalizeAttempt(attempt, exam, true);
+        }
+
+        const questions = await questionModel.find({
+            _id: { $in: exam.questionIds }
+        });
+
+        const safeQuestions = questions.map(q => {
+            const savedAnswer = attempt.answers.find(
+                a => a.questionId.toString() === q._id.toString()
+            );
+            return {
+                id: q._id,
+                topic: q.topic,
+                type: q.type,
+                text: q.questionText,
+                options: q.options.map(opt => opt.text),
+                points: q.points,
+                selectedOptionIndex: savedAnswer?.selectedOptionIndex ?? null
+            };
+        });
+
+        const answeredCount = attempt.answers.filter(
+            a => a.selectedOptionIndex !== null && a.selectedOptionIndex !== undefined
+        ).length;
+
+        const resultReleased = examClosed && exam.showAnswersAfterClose;
+
+        return res.status(200).json({
+            attempt: {
+                id: attempt._id,
+                examId: attempt.examId,
+                status: attempt.status,
+                startedAt: attempt.startedAt,
+                submittedAt: attempt.submittedAt,
+                deadline,
+                score: resultReleased ? attempt.score : undefined,
+                totalPoints: attempt.totalPoints,
+                percentage: resultReleased ? attempt.percentage : undefined,
+                resultReleased,
+                answeredCount,
+                questions: safeQuestions
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Failed to retrieve attempt" });
     }
 };

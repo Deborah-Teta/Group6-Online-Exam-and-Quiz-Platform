@@ -12,12 +12,6 @@ import StatusBadge from "../../components/common/StatusBadge";
 import Tabs from "../../components/common/Tabs";
 import { averageScore, formatPercent } from "../../utils/scores";
 
-const ALL_TYPES = "all";
-const typeTabs = [
-  { label: "All results", value: ALL_TYPES },
-  { label: "Exams", value: "exam" },
-  { label: "Quizzes", value: "quiz" },
-];
 const scoreBands = [
   { label: "90–100%", min: 90, max: 100 },
   { label: "80–89%", min: 80, max: 89 },
@@ -29,15 +23,11 @@ const scoreBands = [
 function buildResults(exams) {
   return exams.flatMap((exam) => {
     if (!exam.attempt || exam.attempt.status === "in_progress") return [];
-    const shared = {
-      ...exam,
-      typeLabel: exam.type === "quiz" ? "Quiz" : "Exam",
-    };
 
     if (exam.attempt.resultReleased) {
       return [
         {
-          ...shared,
+          ...exam,
           isLocked: false,
           score: exam.attempt.score,
           date: exam.date,
@@ -45,20 +35,20 @@ function buildResults(exams) {
       ];
     }
 
-    return [{ ...shared, isLocked: true }];
+    return [{ ...exam, isLocked: true }];
   });
 }
 
 const resultColumns = [
   {
     key: "title",
-    header: "Name",
+    header: "Exam",
     render: (result) => (
       <div className="flex flex-col gap-1">
         <p className="text-sm font-bold text-slate-900">{result.title}</p>
         {result.isLocked ? (
           <Link
-            to={`/student/${result.type === "quiz" ? "quizzes" : "exams"}/${result.id}/submitted`}
+            to={`/student/exams/${result.id}/submitted`}
             className="text-[11px] whitespace-nowrap text-primary hover:underline"
           >
             View submission →
@@ -69,7 +59,6 @@ const resultColumns = [
       </div>
     ),
   },
-  { key: "typeLabel", header: "Type" },
   {
     key: "className",
     header: "Class",
@@ -89,7 +78,7 @@ const resultColumns = [
     header: "Status",
     render: (result) =>
       result.isLocked ? (
-        <StatusBadge label={`Locked until ${result.closesTime}`} variant="closed" />
+        <StatusBadge label={`Locked until ${result.closesTime} CAT`} variant="closed" />
       ) : (
         <StatusBadge label="Released" variant="open" />
       ),
@@ -127,7 +116,6 @@ function EmptyChart() {
 function StudentResults() {
   const { enrolledClasses, exams, isLoading } = useOutletContext();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeType, setActiveType] = useState(ALL_TYPES);
   const classNames = enrolledClasses.map((item) => item.name);
   const requestedClass = searchParams.get("class");
   const activeClass = classNames.includes(requestedClass) ? requestedClass : ALL_CLASSES;
@@ -135,11 +123,9 @@ function StudentResults() {
   const results = useMemo(
     () =>
       buildResults(exams).filter(
-        (result) =>
-          (activeType === ALL_TYPES || result.type === activeType) &&
-          (activeClass === ALL_CLASSES || result.className === activeClass),
+        (result) => activeClass === ALL_CLASSES || result.className === activeClass,
       ),
-    [exams, activeType, activeClass],
+    [exams, activeClass],
   );
   const lockedResults = results.filter((result) => result.isLocked);
   const released = results
@@ -164,8 +150,11 @@ function StudentResults() {
 
   return (
     <>
-      <Card className="flex flex-wrap items-center justify-between gap-4 p-6 [&>[role=tablist]]:border-b-0 [&>[role=tablist]]:pb-0">
-        <Tabs tabs={typeTabs} activeTab={activeType} onChange={setActiveType} />
+      <Card className="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
+        <div>
+          <h2 className="text-base font-bold text-slate-900">Your Exam Results</h2>
+          <p className="text-xs text-slate-500">View released performance metrics and score progress.</p>
+        </div>
         <ClassFilter
           classNames={classNames}
           value={activeClass}
