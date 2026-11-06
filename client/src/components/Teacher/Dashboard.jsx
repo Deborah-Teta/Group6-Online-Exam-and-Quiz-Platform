@@ -28,7 +28,7 @@ const examColumns = [
   },
   {
     key: "schedule",
-    header: "Schedule · GMT",
+    header: "Schedule · CAT",
   },
   {
     key: "status",
@@ -166,21 +166,25 @@ function TeacherDashboard() {
               const formatTime = (date) => date.toLocaleTimeString("en-GB", {
                 hour: "2-digit",
                 minute: "2-digit",
-                timeZone: "UTC",
+                timeZone: "Africa/Kigali",
               });
               const formatDate = (date) => date.toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "short",
-                timeZone: "UTC",
+                timeZone: "Africa/Kigali",
               });
+
+              const now = Date.now();
+              const isPast = now >= end.getTime();
+              const isStarted = now >= start.getTime() && !isPast;
 
               return {
                 id: String(exam.id),
                 title: exam.title,
                 className: `${exam.className} · ${exam.questionCount} questions · ${exam.totalPoints} points`,
-                schedule: `${formatDate(start)} · ${formatTime(start)}–${formatTime(end)} GMT`,
-                status: "upcoming",
-                statusLabel: "Scheduled",
+                schedule: `${formatDate(start)} · ${formatTime(start)}–${formatTime(end)} CAT`,
+                status: isPast ? "closed" : isStarted ? "open" : "upcoming",
+                statusLabel: isPast ? "Closed" : isStarted ? "In progress" : "Scheduled",
               };
             })}
             emptyMessage={isLoading ? "Loading upcoming assessments…" : "No upcoming assessments."}
@@ -205,7 +209,7 @@ function TeacherDashboard() {
             </div>
 
             <p className="text-sm leading-6 text-slate-700">
-              Turn your lesson notes into a starting point for your next quiz.
+              Turn your lesson notes into a starting point for your next exam.
             </p>
 
             <p className="text-xs leading-5 text-slate-500">

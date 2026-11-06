@@ -50,7 +50,7 @@ function formatDate(date) {
 function toStartTimeISO(exam) {
   const [year, month, day] = exam.startDate.split("-").map(Number);
   const [hour, minute] = exam.startTime.split(":").map(Number);
-  const zoneOffsetMinutes = exam.timeZone === "CAT" ? 120 : 0;
+  const zoneOffsetMinutes = exam.timeZone === "GMT" ? 0 : 120;
   return new Date(
     Date.UTC(year, month - 1, day, hour, minute) - zoneOffsetMinutes * 60_000,
   ).toISOString();
@@ -66,7 +66,7 @@ function TeacherCreateExam() {
     classId: searchParams.get("classId") || "",
     startDate: getTomorrow(),
     startTime: "10:00",
-    timeZone: "GMT",
+    timeZone: "CAT",
     duration: "30",
   });
   const [selectedIds, setSelectedIds] = useState([]);
@@ -204,22 +204,26 @@ function TeacherCreateExam() {
     { key: "className", header: "Class" },
     {
       key: "startTime",
-      header: "Starts · GMT",
+      header: "Starts · CAT",
       render: (item) => new Date(item.startTime).toLocaleString("en-GB", {
         dateStyle: "medium",
         timeStyle: "short",
-        timeZone: "UTC",
+        timeZone: "Africa/Kigali",
       }),
     },
     {
       key: "status",
       header: "Status",
-      render: (item) => (
-        <StatusBadge
-          label={item.status === "scheduled" ? "Scheduled" : item.status}
-          variant={item.status === "scheduled" ? "upcoming" : "closed"}
-        />
-      ),
+      render: (item) => {
+        const start = new Date(item.startTime).getTime();
+        const end = start + (Number(item.durationMinutes) || 0) * 60_000;
+        const now = Date.now();
+        const isClosed = item.status === "closed" || now >= end;
+        const isOpen = now >= start && now < end;
+        const label = isClosed ? "Closed" : isOpen ? "In progress" : (item.status === "scheduled" ? "Scheduled" : item.status);
+        const variant = isClosed ? "closed" : isOpen ? "open" : "upcoming";
+        return <StatusBadge label={label} variant={variant} />;
+      },
     },
     { key: "questionCount", header: "Questions" },
   ];

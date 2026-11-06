@@ -17,7 +17,9 @@ const studentColumns = (totalPoints) => [
     key: "score",
     header: "Score",
     render: (student) =>
-      student.score === null ? "—" : `${student.score} / ${totalPoints}`,
+      student.score === null || student.score === undefined
+        ? "—"
+        : `${student.score} / ${totalPoints ?? 0}`,
   },
   {
     key: "percent",
@@ -26,7 +28,7 @@ const studentColumns = (totalPoints) => [
   },
   {
     key: "submittedAt",
-    header: "Submitted · GMT",
+    header: "Submitted · CAT",
   },
   {
     key: "status",
@@ -58,8 +60,8 @@ function ExamResults({ exam, onExport }) {
             {exam.title}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            {exam.className} · {exam.date} · {exam.schedule} ·{" "}
-            {exam.questionCount} questions · {exam.totalPoints} points
+            {exam.className || "Class"} · {exam.date} · {exam.schedule} ·{" "}
+            {exam.questionCount ?? 0} questions · {exam.totalPoints ?? 0} points
           </p>
         </div>
 
@@ -76,22 +78,22 @@ function ExamResults({ exam, onExport }) {
       >
         <SummaryCard
           label="Class average"
-          value={`${exam.average}%`}
-          detail={`${exam.averageScore} out of ${exam.totalPoints} points`}
+          value={`${exam.average ?? 0}%`}
+          detail={`${exam.averageScore ?? 0} out of ${exam.totalPoints ?? 0} points`}
         />
         <SummaryCard
           label="Submitted"
-          value={`${exam.submittedCount} / ${exam.classStudentCount}`}
-          detail={`${exam.classStudentCount > 0 ? Math.round((exam.submittedCount / exam.classStudentCount) * 100) : 0}% class participation`}
+          value={`${exam.submittedCount ?? 0} / ${exam.classStudentCount ?? 1}`}
+          detail={`${(exam.classStudentCount ?? 0) > 0 ? Math.round(((exam.submittedCount ?? 0) / exam.classStudentCount) * 100) : 0}% class participation`}
         />
         <SummaryCard
           label="Highest score"
-          value={`${exam.highestScore} / ${exam.totalPoints}`}
-          detail={`${exam.fullMarkCount} ${exam.fullMarkCount === 1 ? "student" : "students"} earned full marks`}
+          value={`${exam.highestScore ?? 0} / ${exam.totalPoints ?? 0}`}
+          detail={`${exam.fullMarkCount ?? 0} ${(exam.fullMarkCount ?? 0) === 1 ? "student" : "students"} earned full marks`}
         />
         <SummaryCard
           label="Still in progress"
-          value={exam.inProgressCount}
+          value={exam.inProgressCount ?? 0}
           detail="Attempts not yet submitted"
         />
       </section>
