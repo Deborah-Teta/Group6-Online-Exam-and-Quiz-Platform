@@ -8,9 +8,7 @@ import {
     updateQuestion
 } from "../controller/questionController.js";
 
-
 const router = express.Router();
-
 
 router.post(
     "/",

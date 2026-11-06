@@ -2,22 +2,14 @@ import express from "express";
 import {authenticate} from "../middleware/authMiddleware.js";
 import {authorize} from "../middleware/roleMiddleware.js";
 import {
+    getAttemptByExam,
     getAttemptResult,
-    getStudentAttempt,
     saveAnswer,
     startExam,
     submitExam
 } from "../controller/studentExamController.js";
 
-
 const router = express.Router();
-
-router.get(
-    "/attempts/exam/:examId",
-    authenticate,
-    authorize("student"),
-    getStudentAttempt
-);
 
 router.post(
     "/:examId/start",
@@ -45,6 +37,13 @@ router.get(
     authenticate,
     authorize("student"),
     getAttemptResult
+);
+
+router.get(
+    "/attempts/exam/:examId",
+    authenticate,
+    authorize("student"),
+    getAttemptByExam
 );
 
 export default router;
