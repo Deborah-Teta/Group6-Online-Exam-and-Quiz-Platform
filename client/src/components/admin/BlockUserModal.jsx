@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BanIcon, CloseIcon, AlertTriangleIcon } from './Icons';
 
 export const BlockUserModal = ({ user, isOpen, onClose, onConfirm }) => {

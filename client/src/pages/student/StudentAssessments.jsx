@@ -8,7 +8,6 @@ import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
 import StatusBadge from "../../components/common/StatusBadge";
 import Tabs from "../../components/common/Tabs";
-import { assessmentTypes } from "../../services/studentAssessments";
 import { averageScore, formatPercent } from "../../utils/scores";
 
 const buildTabs = () => [
@@ -18,7 +17,7 @@ const buildTabs = () => [
   { label: "Completed", value: "closed" },
 ];
 
-const buildColumns = (type) => [
+const buildColumns = () => [
   {
     key: "title",
     header: "Exam",
@@ -56,7 +55,7 @@ const buildColumns = (type) => [
   },
 ];
 
-function StudentAssessments({ type = "exam" }) {
+function StudentAssessments() {
   const { enrolledClasses, exams, isLoading } = useOutletContext();
   const items = exams;
   const [searchParams, setSearchParams] = useSearchParams();
@@ -137,7 +136,7 @@ function StudentAssessments({ type = "exam" }) {
           </p>
         ) : (
           <DataTable
-            columns={buildColumns("exam")}
+            columns={buildColumns()}
             rows={visibleItems}
             emptyMessage="No exams match this filter."
           />

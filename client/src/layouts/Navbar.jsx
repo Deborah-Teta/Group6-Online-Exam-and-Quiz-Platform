@@ -74,17 +74,7 @@ function Navbar({
 
       {/* Right section */}
       <div className="flex items-center gap-3 sm:gap-4">
-        {/* Notifications */}
-        <button
-          type="button"
-          onClick={() => notificationsPath && navigate(notificationsPath)}
-          className="relative rounded-full bg-white p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 shadow-xs cursor-pointer"
-          aria-label="Notifications"
-          title="View pending faculty approvals"
-        >
-          <Bell size={20} />
-          <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
-        </button>
+        
 
         {/* Profile */}
         <div className="relative">

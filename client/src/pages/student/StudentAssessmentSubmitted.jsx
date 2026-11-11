@@ -44,9 +44,12 @@ function StudentAssessmentSubmitted({ type }) {
   const [isAttemptLoading, setIsAttemptLoading] = useState(true);
   const [error, setError] = useState("");
   const [detailedResult, setDetailedResult] = useState(null);
-  const [loadingDetailedResult, setLoadingDetailedResult] = useState(false);
+  const [detailedResultError, setDetailedResultError] = useState("");
   const navigate = useNavigate();
   const assessment = exams.find((item) => item.id === examId && item.type === type);
+  const loadingDetailedResult = Boolean(
+    attempt?.id && attempt?.resultReleased && !detailedResult && !detailedResultError,
+  );
 
   useEffect(() => {
     let active = true;
@@ -67,13 +70,24 @@ function StudentAssessmentSubmitted({ type }) {
   }, [examId]);
 
   useEffect(() => {
-    if (attempt?.id && attempt?.resultReleased) {
-      setLoadingDetailedResult(true);
-      getStudentAttemptResult(attempt.id)
-        .then((res) => setDetailedResult(res))
-        .catch(() => {})
-        .finally(() => setLoadingDetailedResult(false));
-    }
+    if (!attempt?.id || !attempt?.resultReleased) return undefined;
+
+    let active = true;
+    getStudentAttemptResult(attempt.id)
+      .then((result) => {
+        if (active) setDetailedResult(result);
+      })
+      .catch((requestError) => {
+        if (active) {
+          setDetailedResultError(
+            requestError.message || "Could not load question answers and explanations.",
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, [attempt?.id, attempt?.resultReleased]);
 
   if (isLoading || isAttemptLoading) {
@@ -166,6 +180,11 @@ function StudentAssessmentSubmitted({ type }) {
 
       {loadingDetailedResult && (
         <p className="py-6 text-center text-sm text-muted">Loading question answers and explanations…</p>
+      )}
+      {detailedResultError && (
+        <p role="alert" className="py-6 text-center text-sm text-red-600">
+          {detailedResultError}
+        </p>
       )}
 
       {detailedResult?.answers?.length > 0 && (

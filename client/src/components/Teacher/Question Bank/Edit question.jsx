@@ -14,7 +14,6 @@ function EditQuestion({ question, onClose, onSave, error }) {
           {error && <p role="alert" className="mb-3 text-sm text-red-600">{error}</p>}
           <QuestionForm
             key={question.id}
-            isOpen={Boolean(question)}
             initialQuestion={question}
             onSubmit={onSave}
             onCancel={onClose}

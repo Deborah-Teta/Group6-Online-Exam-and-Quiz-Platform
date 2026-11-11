@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UsersIcon, SearchIcon, BanIcon, CheckIcon } from './Icons';
 
 export const UsersManagementTab = ({
   users,
   onOpenBlockModal,
   onUnblockUser,
-  onApproveTeacher,
-  loading
+  onApproveTeacher
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');

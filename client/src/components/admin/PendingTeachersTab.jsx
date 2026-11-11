@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UserCheckIcon, CheckIcon, CloseIcon, SearchIcon } from './Icons';
 
 export const PendingTeachersTab = ({
   teachers,
   onApprove,
-  onReject,
-  loading
+  onReject
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [processingId, setProcessingId] = useState(null);

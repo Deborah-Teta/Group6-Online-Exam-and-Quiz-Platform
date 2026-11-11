@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Sparkles, Save } from 'lucide-react';
 
 export const AdminSettingsTab = ({ onShowToast }) => {

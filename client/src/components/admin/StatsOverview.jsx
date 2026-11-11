@@ -1,4 +1,3 @@
-import React from 'react';
 import { TeacherIcon, UsersIcon, ExamIcon, SparklesIcon } from './Icons';
 
 export const StatsOverview = ({ stats, onPendingClick }) => {

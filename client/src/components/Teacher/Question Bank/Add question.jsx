@@ -6,7 +6,6 @@ function AddQuestion({ isOpen, onClose, onAdd, error }) {
     <Modal isOpen={isOpen} onClose={onClose} title="Add a question" size="xl">
       {error && <p role="alert" className="mb-3 text-sm text-red-600">{error}</p>}
       <QuestionForm
-        isOpen={isOpen}
         onSubmit={onAdd}
         onCancel={onClose}
         submitLabel="Add question"

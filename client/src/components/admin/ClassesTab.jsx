@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ClassesIcon, SearchIcon, CopyIcon, CheckIcon } from './Icons';
 
-export const ClassesTab = ({ classes, loading }) => {
+export const ClassesTab = ({ classes }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCode, setCopiedCode] = useState(null);
 

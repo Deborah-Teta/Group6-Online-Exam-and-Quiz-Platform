@@ -89,22 +89,20 @@ function mapExam(exam) {
   );
   const isInProgress = Boolean(attempt && attempt.status === "in_progress");
 
-  let status = "upcoming";
-  let statusLabel = "Scheduled";
-
-  if (isSubmitted) {
-    status = "closed";
-    statusLabel = "Finished";
-  } else if (isPast || exam.status === "closed") {
-    status = "closed";
-    statusLabel = "Closed";
-  } else if (isStarted || exam.status === "open") {
-    status = "open";
-    statusLabel = isInProgress ? "In progress" : "Open now";
-  } else {
-    status = "upcoming";
-    statusLabel = "Scheduled";
-  }
+  const status = isSubmitted || isPast || exam.status === "closed"
+    ? "closed"
+    : isStarted || exam.status === "open"
+      ? "open"
+      : "upcoming";
+  const statusLabel = isSubmitted
+    ? "Finished"
+    : status === "closed"
+      ? "Closed"
+      : status === "open"
+        ? isInProgress
+          ? "In progress"
+          : "Open now"
+        : "Scheduled";
 
   return {
     ...exam,
