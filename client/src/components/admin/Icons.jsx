@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const DashboardIcon = ({ className = "w-5 h-5", size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <rect x="3" y="3" width="7" height="9" rx="1" />
@@ -139,4 +137,3 @@ export const FilterIcon = ({ className = "w-4 h-4", size = 16 }) => (
     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
   </svg>
 );
-

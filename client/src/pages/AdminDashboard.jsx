@@ -27,7 +27,7 @@ import { useAuth } from '../context/useAuth';
 export const AdminDashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   // Determine active view from URL path
   const getTabFromPath = (path) => {
@@ -297,7 +297,7 @@ export const AdminDashboard = () => {
       />
 
       {/* 3. Main Dashboard Workspace Content */}
-      <main className="pt-24 px-4 pb-16 flex flex-col gap-6 sm:px-6 md:ml-64 md:px-8">
+      <main className="bg-[#EEF3FD] pt-24 px-4 pb-16 flex flex-col gap-6 sm:px-6 md:ml-64 md:px-8">
         
         {/* ========================================================= */}
         {/* VIEW A: DEDICATED PROFILE PAGE (Clean, without statcards) */}
@@ -317,9 +317,7 @@ export const AdminDashboard = () => {
           </div>
         )}
 
-        {/* ========================================================= */}
-        {/* VIEW B: DEDICATED SETTINGS PAGE (Clean, without statcards) */}
-        {/* ========================================================= */}
+        
         {activeTab === 'settings' && (
           <div className="flex flex-col gap-5">
             <div className="flex items-center justify-between">
@@ -335,9 +333,7 @@ export const AdminDashboard = () => {
           </div>
         )}
 
-        {/* ========================================================= */}
-        {/* VIEW C: MAIN MANAGEMENT DASHBOARD (With statcards & queue) */}
-        {/* ========================================================= */}
+        
         {!isDedicatedPage && (
           <>
             {/* Top Status Strip */}

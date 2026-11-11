@@ -43,6 +43,7 @@ function TeacherDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [dashboard, setDashboard] = useState(null);
+  const [currentTime, setCurrentTime] = useState(0);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const handleDashboardError = useCallback((requestError) => {
@@ -55,6 +56,7 @@ function TeacherDashboard() {
 
     try {
       setDashboard(await getTeacherDashboard());
+      setCurrentTime(Date.now());
     } catch (requestError) {
       handleDashboardError(requestError);
     } finally {
@@ -66,7 +68,10 @@ function TeacherDashboard() {
     let isCurrent = true;
     getTeacherDashboard()
       .then((data) => {
-        if (isCurrent) setDashboard(data);
+        if (isCurrent) {
+          setDashboard(data);
+          setCurrentTime(Date.now());
+        }
       })
       .catch((requestError) => {
         if (isCurrent) handleDashboardError(requestError);
@@ -79,6 +84,14 @@ function TeacherDashboard() {
       isCurrent = false;
     };
   }, [handleDashboardError]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 30_000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   const stats = dashboard?.stats;
   const dashboardStats = stats
@@ -173,10 +186,8 @@ function TeacherDashboard() {
                 month: "short",
                 timeZone: "Africa/Kigali",
               });
-
-              const now = Date.now();
-              const isPast = now >= end.getTime();
-              const isStarted = now >= start.getTime() && !isPast;
+              const isPast = currentTime >= end.getTime();
+              const isStarted = currentTime >= start.getTime() && !isPast;
 
               return {
                 id: String(exam.id),

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import { ChartNoAxesCombined, LockKeyhole, TrendingDown, Trophy } from "lucide-react";
 import BarChart from "../../components/common/BarChart";
@@ -9,7 +9,6 @@ import LineChart from "../../components/common/LineChart";
 import SectionCard from "../../components/common/SectionCard";
 import StatCard from "../../components/common/statuscard";
 import StatusBadge from "../../components/common/StatusBadge";
-import Tabs from "../../components/common/Tabs";
 import { averageScore, formatPercent } from "../../utils/scores";
 
 const scoreBands = [

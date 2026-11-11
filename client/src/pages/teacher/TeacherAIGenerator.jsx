@@ -7,16 +7,12 @@ import {
   Trash2,
   Edit2,
   BookOpen,
-  Info,
-  Clock,
-  Layers,
-  ArrowRight
+  Loader2,
 } from "lucide-react";
 import ActionButton from "../../components/common/ActionButton";
 import Card from "../../components/common/Card";
 import Input from "../../components/common/Input";
 import Modal from "../../components/common/Modal";
-import Notice from "../../components/common/Notice";
 import SectionCard from "../../components/common/SectionCard";
 import StatusBadge from "../../components/common/StatusBadge";
 import Tabs from "../../components/common/Tabs";
@@ -51,14 +47,14 @@ export default function TeacherAIGenerator() {
   const [editingDraft, setEditingDraft] = useState(null);
   const [isUpdatingDraft, setIsUpdatingDraft] = useState(false);
   const [editError, setEditError] = useState("");
+  const [approvingDraftId, setApprovingDraftId] = useState(null);
 
   // History states
   const [generations, setGenerations] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState("");
 
   const loadDrafts = useCallback(async (status = activeTab) => {
-    setIsLoadingDrafts(true);
-    setDraftsError("");
     try {
       const data = await getAllAIDrafts({ reviewStatus: status });
       setDrafts(data.drafts || []);
@@ -70,24 +66,72 @@ export default function TeacherAIGenerator() {
   }, [activeTab]);
 
   const loadHistory = useCallback(async () => {
-    setIsLoadingHistory(true);
     try {
       const data = await getAIGenerations();
       setGenerations(data.generations || []);
-    } catch {
-      // ignore
+    } catch (err) {
+      setHistoryError(err.message || "Failed to load generation history.");
     } finally {
       setIsLoadingHistory(false);
     }
   }, []);
 
   useEffect(() => {
+    let active = true;
+
     if (activeTab === "history") {
-      loadHistory();
+      getAIGenerations()
+        .then((data) => {
+          if (active) setGenerations(data.generations || []);
+        })
+        .catch((err) => {
+          if (active) {
+            setHistoryError(err.message || "Failed to load generation history.");
+          }
+        })
+        .finally(() => {
+          if (active) setIsLoadingHistory(false);
+        });
     } else {
-      loadDrafts(activeTab);
+      getAllAIDrafts({ reviewStatus: activeTab })
+        .then((data) => {
+          if (active) setDrafts(data.drafts || []);
+        })
+        .catch((err) => {
+          if (active) setDraftsError(err.message || "Failed to load drafts.");
+        })
+        .finally(() => {
+          if (active) setIsLoadingDrafts(false);
+        });
     }
-  }, [activeTab, loadDrafts, loadHistory]);
+
+    return () => {
+      active = false;
+    };
+  }, [activeTab]);
+
+  const handleTabChange = (nextTab) => {
+    setActiveTab(nextTab);
+    if (nextTab === "history") {
+      setIsLoadingHistory(true);
+      setHistoryError("");
+    } else {
+      setIsLoadingDrafts(true);
+      setDraftsError("");
+    }
+  };
+
+  const handleRefresh = () => {
+    if (activeTab === "history") {
+      setIsLoadingHistory(true);
+      setHistoryError("");
+      void loadHistory();
+    } else {
+      setIsLoadingDrafts(true);
+      setDraftsError("");
+      void loadDrafts(activeTab);
+    }
+  };
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -127,6 +171,8 @@ export default function TeacherAIGenerator() {
         }
       }
       setActiveTab("pending");
+      setIsLoadingDrafts(true);
+      setDraftsError("");
       await loadDrafts("pending");
     } catch (err) {
       setGenerateError(err.message || "Failed to generate questions.");
@@ -136,12 +182,15 @@ export default function TeacherAIGenerator() {
   };
 
   const handleApprove = async (draftId) => {
+    setApprovingDraftId(draftId);
     try {
       await approveAIDraft(draftId);
       setDrafts((prev) => prev.filter((d) => d._id !== draftId));
       setGenerateSuccess("Question approved and added to your Question Bank!");
     } catch (err) {
       setDraftsError(err.message || "Failed to approve draft.");
+    } finally {
+      setApprovingDraftId(null);
     }
   };
 
@@ -309,10 +358,10 @@ export default function TeacherAIGenerator() {
       {/* Drafts Management */}
       <Card className="flex flex-col gap-5 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
-          <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+          <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange} />
           <button
             type="button"
-            onClick={() => (activeTab === "history" ? loadHistory() : loadDrafts(activeTab))}
+            onClick={handleRefresh}
             className="text-xs font-semibold text-[#5149B8] hover:underline"
           >
             Refresh
@@ -322,6 +371,11 @@ export default function TeacherAIGenerator() {
         {draftsError && (
           <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             {draftsError}
+          </div>
+        )}
+        {activeTab === "history" && historyError && (
+          <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {historyError}
           </div>
         )}
 
@@ -361,10 +415,19 @@ export default function TeacherAIGenerator() {
                           <button
                             type="button"
                             onClick={() => handleApprove(draft._id)}
-                            className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition cursor-pointer"
+                            disabled={approvingDraftId !== null}
+                            className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
                           >
-                            <Check size={14} />
-                            <span>Approve & Add</span>
+                            {approvingDraftId === draft._id ? (
+                              <Loader2 size={14} className="animate-spin" />
+                            ) : (
+                              <Check size={14} />
+                            )}
+                            <span>
+                              {approvingDraftId === draft._id
+                                ? "Adding..."
+                                : "Approve & Add"}
+                            </span>
                           </button>
                           <button
                             type="button"
@@ -561,4 +624,3 @@ export default function TeacherAIGenerator() {
     </div>
   );
 }
-

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AuditIcon, SearchIcon, CheckIcon, CloseIcon, BanIcon, ShieldIcon } from './Icons';
 
-export const AuditLogsTab = ({ logs, loading }) => {
+export const AuditLogsTab = ({ logs }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
 

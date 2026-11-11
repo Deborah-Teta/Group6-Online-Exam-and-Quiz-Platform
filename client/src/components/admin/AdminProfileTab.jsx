@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   User,
-  Mail,
   Shield,
   Key,
   Laptop,
   Check,
-  Clock,
-  LogOut,
   Save
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
@@ -255,4 +252,3 @@ export const AdminProfileTab = ({ onShowToast }) => {
     </div>
   );
 };
-

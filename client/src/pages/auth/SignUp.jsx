@@ -66,15 +66,9 @@ function SignUp() {
 
   return (
     <AuthLayout sidePosition="right">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#5149B8]">
-        A fresh start
-      </p>
       <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
         Make room for learning.
       </h2>
-      <p className="mt-2 text-sm text-slate-500">
-        Create your account. Find your people.
-      </p>
 
       {errors.root?.server && (
         <p
@@ -214,10 +208,6 @@ function SignUp() {
           {isSubmitting ? "Creating account..." : "Create account"}
         </button>
       </form>
-
-      <p className="mt-5 text-center text-[10px] leading-5 text-slate-500">
-        By creating an account, you agree to our Terms of Service and Privacy Policy.
-      </p>
 
       <p className="mt-4 text-center text-xs text-slate-500">
         Already have an account?{" "}

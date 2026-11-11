@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const emptyQuestion = {
   questionText: "",
@@ -18,21 +18,15 @@ const emptyQuestion = {
 const fieldClass =
   "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#5149B8] focus:ring-4 focus:ring-blue-100";
 
-function QuestionForm({ initialQuestion, isOpen, onSubmit, onCancel, submitLabel }) {
-  const [form, setForm] = useState(emptyQuestion);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    setForm(
-      initialQuestion
-        ? {
-            ...initialQuestion,
-            options: initialQuestion.options.map((option) => ({ ...option })),
-          }
-        : emptyQuestion,
-    );
-  }, [initialQuestion, isOpen]);
+function QuestionForm({ initialQuestion, onSubmit, onCancel, submitLabel }) {
+  const [form, setForm] = useState(() =>
+    initialQuestion
+      ? {
+          ...initialQuestion,
+          options: initialQuestion.options.map((option) => ({ ...option })),
+        }
+      : emptyQuestion,
+  );
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));

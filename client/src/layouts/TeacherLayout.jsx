@@ -68,7 +68,7 @@ function TeacherLayout() {
         }}
       />
 
-      <main className="flex flex-col gap-6 px-4 pb-24 pt-24 sm:px-6 md:ml-64 md:px-8">
+      <main className="bg-[#EEF3FD] flex flex-col gap-6 px-4 pb-24 pt-24 sm:px-6 md:ml-64 md:px-8">
         <Outlet />
       </main>
 

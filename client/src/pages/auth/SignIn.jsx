@@ -63,15 +63,12 @@ function SignIn() {
 
   return (
     <AuthLayout sidePosition="left">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#5149B8]">
+      <p className="top-0 text-[10px] font-semibold uppercase tracking-wide text-[#5149B8]">
         Your classroom, connected
       </p>
       <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
         Welcome back.
       </h2>
-      <p className="mt-2 text-sm text-slate-500">
-        Good to see you. Sign in to your ExamFlow account.
-      </p>
 
       {notice && (
         <p
@@ -176,9 +173,7 @@ function SignIn() {
         </Link>
       </p>
 
-      <p className="mt-6 rounded-xl bg-slate-50 p-3 text-center text-xs text-slate-500">
-        One secure account for teachers and students.
-      </p>
+      
     </AuthLayout>
   );
 }
